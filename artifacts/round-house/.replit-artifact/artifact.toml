@@ -1,0 +1,27 @@
+kind = "mobile"
+previewPath = "/"
+title = "Round House"
+version = "1.0.0"
+id = "artifacts/round-house"
+router = "expo-domain"
+
+[[integratedSkills]]
+name = "expo"
+version = "1.0.0"
+
+[[services]]
+ensurePreviewReachable = "/status"
+name = "expo"
+paths = [ "/" ]
+localPort = 23331
+
+[services.development]
+run = "pnpm --filter @workspace/round-house run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/round-house", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/round-house", "run", "serve" ]
+
+[services.env]
+PORT = "23331"
+BASE_PATH = "/"

@@ -1,0 +1,25 @@
+uploads = []
+
+[[generated]]
+id = "Jp96HTvaZ7XBzehl5u-ya"
+uri = "file://artifacts/round-house/assets/images/icon.png"
+type = "image"
+title = "generated_image"
+
+[[outputs]]
+id = "cPJn8QtaWFtx8KXFg2y7y"
+uri = "file://docs/HOW_THIS_WAS_BUILT.md"
+type = "text"
+title = "How Round House Was Built — Retrospective"
+
+[[outputs]]
+id = "o5r7LzJoilt6zZlFqdY5x"
+uri = "file://HANDOFF.md"
+type = "text"
+title = "Roundhouse Handoff Spec"
+
+[[outputs]]
+id = "qChAPCtodBE3QdpClMa1-"
+uri = "file://docs/architecture/entity-model-proposal.md"
+type = "text"
+title = "Entity Model Architecture — Proposal (round 3 incorporated)"

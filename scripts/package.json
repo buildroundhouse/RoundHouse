@@ -1,0 +1,28 @@
+{
+  "name": "@workspace/scripts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "hello": "tsx ./src/hello.ts",
+    "seed:nudge-fixtures": "tsx ./src/seed-nudge-fixtures.ts",
+    "seed:admin-fixture": "tsx ./src/seed-admin-fixture.ts",
+    "seed:standard-fixture": "tsx ./src/seed-standard-fixture.ts",
+    "seed:pro-tag-fixture": "tsx ./src/seed-pro-tag-fixture.ts",
+    "seed:pro-tag-fixtures": "tsx ./src/seed-pro-tag-fixtures.ts",
+    "seed:teammate-chip-fixtures": "tsx ./src/seed-teammate-chip-fixtures.ts",
+    "seed:picked-skin-banner-fixtures": "tsx ./src/seed-picked-skin-banner-fixtures.ts",
+    "seed:picked-skin-avatar-fixtures": "tsx ./src/seed-picked-skin-avatar-fixtures.ts",
+    "seed:facilities-fixture": "tsx ./src/seed-facilities-fixture.ts",
+    "seed:operator-skin-fixture": "tsx ./src/seed-operator-skin-fixture.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@workspace/db": "workspace:*",
+    "drizzle-orm": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "tsx": "catalog:"
+  }
+}
