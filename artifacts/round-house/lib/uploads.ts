@@ -1,5 +1,6 @@
 import { Platform } from "react-native";
 import { requestUploadUrl } from "@workspace/api-client-react";
+import { getApiBaseUrl } from "./apiBaseUrl";
 
 export type UploadedAsset = {
   path: string;
@@ -7,11 +8,6 @@ export type UploadedAsset = {
   contentType: string;
   size: number;
 };
-
-// Use the same API origin as the generated API client. The old
-// EXPO_PUBLIC_DOMAIN value was a Replit-era host-only setting and could point
-// profile-media reads at a different server than the one that issued uploads.
-const baseUrl = (process.env.EXPO_PUBLIC_API_URL ?? "").trim().replace(/\/+$/, "");
 
 export function resolveStorageUrl(
   path: string | null | undefined,
@@ -27,13 +23,8 @@ export function resolveStorageUrl(
     : normalized.startsWith("/public-objects/")
     ? `/api/storage${normalized}`
     : normalized;
-  const url = isAbsolute ? apiPath : `${baseUrl}${apiPath}`;
+  const url = isAbsolute ? apiPath : `${getApiBaseUrl()}${apiPath}`;
   if (bust == null || bust === "") return url;
-  // Stable per-version cache key. We use this for profile media (avatar /
-  // banner / company logo) so an updated profile image is fetched fresh
-  // even if the React Native <Image> cache holds a previous response for
-  // the same URL (e.g. an earlier 401 from before the public-profile-media
-  // route shipped).
   const v = bust instanceof Date ? bust.getTime() : String(bust);
   const sep = url.includes("?") ? "&" : "?";
   return `${url}${sep}v=${encodeURIComponent(v)}`;
