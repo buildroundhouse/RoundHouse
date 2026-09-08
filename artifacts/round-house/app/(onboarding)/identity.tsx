@@ -22,6 +22,7 @@ import {
 } from "@workspace/api-client-react";
 import { uploadAsset, resolveStorageUrl } from "@/lib/uploads";
 import { useProfile } from "@/lib/profile";
+import { useAuth } from "@/lib/auth";
 import { useColorScheme } from "react-native";
 
 const logoLockup = require("@/assets/images/logo-lockup.png");
@@ -43,6 +44,7 @@ export default function IdentityScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { profile, refetchProfile } = useProfile();
+  const { signOut } = useAuth();
   const isDark = useColorScheme() === "dark";
 
   const [username, setUsername] = useState(profile?.username ?? "");
@@ -52,6 +54,7 @@ export default function IdentityScreen() {
   const [usernameStatus, setUsernameStatus] = useState<{ ok: boolean; reason: string | null } | null>(null);
   const [submitError, setSubmitError] = useState("");
   const [checking, setChecking] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
 
   const updateIdentity = useUpdateMyIdentity();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -143,6 +146,19 @@ export default function IdentityScreen() {
     }
   };
 
+  const startOver = async () => {
+    setSubmitError("");
+    try {
+      setSigningOut(true);
+      await signOut();
+      router.replace("/");
+    } catch (e) {
+      setSubmitError(readableApiError(e, "Couldn't sign out. Please try again."));
+    } finally {
+      setSigningOut(false);
+    }
+  };
+
   const previewUri = pickedPreview ?? resolveStorageUrl(avatarPath);
 
   return (
@@ -231,6 +247,14 @@ export default function IdentityScreen() {
               {updateIdentity.isPending ? "Saving..." : "Continue"}
             </Text>
           </Pressable>
+
+          <Pressable onPress={startOver} disabled={signingOut} style={styles.startOverBtn}>
+            {signingOut ? (
+              <ActivityIndicator size="small" color={colors.mutedForeground} />
+            ) : (
+              <Text style={[styles.startOverText, { color: colors.mutedForeground }]}>Sign out / Start over</Text>
+            )}
+          </Pressable>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -277,4 +301,6 @@ const styles = StyleSheet.create({
   error: { fontSize: 13, fontFamily: "Inter_400Regular" },
   btn: { height: 52, borderRadius: 14, alignItems: "center", justifyContent: "center", marginTop: 16 },
   btnText: { fontSize: 16, fontFamily: "Inter_600SemiBold" },
+  startOverBtn: { minHeight: 44, alignItems: "center", justifyContent: "center" },
+  startOverText: { fontSize: 14, fontFamily: "Inter_600SemiBold", textDecorationLine: "underline" },
 });
