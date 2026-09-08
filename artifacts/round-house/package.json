@@ -4,7 +4,7 @@
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
-    "dev": "EXPO_PUBLIC_DOMAIN=$(node -e \"const raw=process.env.EXPO_PUBLIC_API_URL;if(!raw)throw new Error('EXPO_PUBLIC_API_URL is required');process.stdout.write(new URL(raw).host)\") pnpm exec expo start --localhost --port ${PORT:-8081}",
+    "dev": "pnpm exec expo start --localhost --port ${PORT:-8081}",
     "build": "node scripts/build.js",
     "serve": "node server/serve.js",
     "typecheck": "tsc -p tsconfig.json --noEmit"
