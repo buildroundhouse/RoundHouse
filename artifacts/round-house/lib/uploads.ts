@@ -8,7 +8,10 @@ export type UploadedAsset = {
   size: number;
 };
 
-const baseUrl = (process.env.EXPO_PUBLIC_DOMAIN ? `https://${process.env.EXPO_PUBLIC_DOMAIN}` : "").replace(/\/+$/, "");
+// Use the same API origin as the generated API client. The old
+// EXPO_PUBLIC_DOMAIN value was a Replit-era host-only setting and could point
+// profile-media reads at a different server than the one that issued uploads.
+const baseUrl = (process.env.EXPO_PUBLIC_API_URL ?? "").trim().replace(/\/+$/, "");
 
 export function resolveStorageUrl(
   path: string | null | undefined,
