@@ -26,6 +26,18 @@ import { useColorScheme } from "react-native";
 
 const logoLockup = require("@/assets/images/logo-lockup.png");
 
+function readableApiError(error: unknown, fallback: string): string {
+  if (!(error instanceof Error)) return fallback;
+  const message = error.message || fallback;
+  if (/401|unauthorized/i.test(message)) {
+    return "RoundHouse could not verify this signed-in account. Please sign out and sign in again.";
+  }
+  if (/failed to fetch|network request failed|load failed|networkerror/i.test(message)) {
+    return "RoundHouse cannot reach its API right now. Your username and photo have not been lost.";
+  }
+  return message;
+}
+
 export default function IdentityScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -44,6 +56,16 @@ export default function IdentityScreen() {
   const updateIdentity = useUpdateMyIdentity();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Profile data arrives asynchronously after Firebase restores the session.
+  // Do not permanently initialize the form from an empty first render.
+  useEffect(() => {
+    if (!profile) return;
+    if (!username.trim() && profile.username && !profile.username.startsWith("_pending_")) {
+      setUsername(profile.username);
+    }
+    if (!avatarPath && profile.avatarUrl) setAvatarPath(profile.avatarUrl);
+  }, [profile?.username, profile?.avatarUrl]);
+
   useEffect(() => {
     setUsernameStatus(null);
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -52,10 +74,13 @@ export default function IdentityScreen() {
     debounceRef.current = setTimeout(async () => {
       try {
         setChecking(true);
+        setSubmitError("");
         const r = await checkUsernameAvailable({ u: trimmed });
         setUsernameStatus({ ok: r.available, reason: r.reason ?? null });
-      } catch {
-        setUsernameStatus(null);
+      } catch (e) {
+        const reason = readableApiError(e, "Couldn't verify that username.");
+        setUsernameStatus({ ok: false, reason });
+        setSubmitError(reason);
       } finally {
         setChecking(false);
       }
@@ -93,16 +118,16 @@ export default function IdentityScreen() {
       });
       setAvatarPath(uploaded.path);
     } catch (e) {
-      setSubmitError(e instanceof Error ? e.message : "Couldn't upload photo.");
+      setSubmitError(readableApiError(e, "Couldn't upload photo."));
       setPickedPreview(null);
     } finally {
       setUploading(false);
     }
   };
 
-  const usernameValid = !!username.trim() && (usernameStatus === null || usernameStatus.ok);
+  const usernameValid = !!username.trim() && usernameStatus?.ok === true;
   const photoValid = !!avatarPath && !uploading;
-  const ready = usernameValid && photoValid && (usernameStatus?.ok ?? false);
+  const ready = usernameValid && photoValid;
 
   const submit = async () => {
     setSubmitError("");
@@ -112,16 +137,9 @@ export default function IdentityScreen() {
         data: { username: username.trim().toLowerCase(), avatarUrl: avatarPath! },
       });
       await refetchProfile();
-      // #572: every user now has the permanent Collaborator / Friend
-      // baseline mode auto-provisioned server-side, so identity →
-      // straight into the app. The profile gate will route to the
-      // mode picker only if backfill genuinely failed; otherwise the
-      // user lands on collab and can add a working hat at their pace
-      // from Profile → Add another hat.
       router.replace("/(tabs)");
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "Couldn't save your identity.";
-      setSubmitError(msg);
+      setSubmitError(readableApiError(e, "Couldn't save your identity."));
     }
   };
 
@@ -180,8 +198,9 @@ export default function IdentityScreen() {
               placeholderTextColor={colors.mutedForeground}
               autoCapitalize="none"
               autoCorrect={false}
-              autoComplete="username"
-              textContentType="username"
+              autoComplete="off"
+              textContentType="none"
+              importantForAutofill="no"
               style={[styles.usernameInput, { color: colors.foreground }]}
               maxLength={24}
             />
@@ -194,8 +213,7 @@ export default function IdentityScreen() {
             ) : null}
           </View>
           <Text style={[styles.helper, { color: usernameStatus?.ok === false ? colors.destructive : colors.mutedForeground }]}>
-            {usernameStatus?.reason ??
-              "3–24 lowercase letters, numbers, or underscores."}
+            {usernameStatus?.reason ?? "3–24 lowercase letters, numbers, or underscores."}
           </Text>
 
           {submitError ? <Text style={[styles.error, { color: colors.destructive }]}>{submitError}</Text> : null}
