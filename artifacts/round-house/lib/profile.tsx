@@ -81,12 +81,11 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       status = { kind: "loading" };
     } else if (profileLoading || modesLoading || !profile) {
       status = { kind: "loading" };
-    } else if (!profile.identityCompletedAt || !profile.avatarUrl) {
-      status = { kind: "needs-identity" };
     } else if (profile.isAdmin && modes.length === 0) {
-      // Admin operators don't have to wear a real skin to use the app —
-      // they manage demo personas and can later "wear" one. Skip the
-      // mode-picker / intake entirely and land in the Admin Hub.
+      // Identity passage is now owned by the authenticated Neon profile row.
+      // Firebase proves who the user is; /users/me proves Neon has the user.
+      // A missing avatar, pending username, upload, or remote username check
+      // must never trap a signed-in user between those two systems.
       status = { kind: "admin-empty" };
     } else if (modes.length === 0) {
       status = { kind: "needs-mode-picker" };
