@@ -44,8 +44,8 @@ import {
 } from "@/lib/pushNotifications";
 import { clearAllForegroundReminderBanners } from "@/lib/reminderNotifications";
 
-const domain = process.env.EXPO_PUBLIC_DOMAIN;
-if (domain) setBaseUrl(`https://${domain}`);
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+if (apiUrl) setBaseUrl(apiUrl);
 
 SplashScreen.preventAutoHideAsync();
 
@@ -169,8 +169,8 @@ function ActiveModeBridge() {
 }
 
 /**
- * Bridges the user's currently-selected outward account into the API client
- * so every authenticated request carries an `x-active-outward-account-id`
+ * Bridges the user's currently-selected outward account into the API client so
+ * every authenticated request carries an `x-active-outward-account-id`
  * header. The server's `withActiveOutwardAccount` middleware uses it to
  * resolve `req.activeOutwardAccountId`.
  */
