@@ -42,9 +42,13 @@ The **person remains visually dominant**. The Entity logo is intentionally small
 
 ## 4. Profile Actions
 
-On the **same horizontal area as the Entity Logo and identity information**, extending toward the right side of the screen, are two primary actions.
+On the **same horizontal area as the Entity Logo and identity information**, extending toward the right side of the screen, is the Profile action area. The actions shown here depend on whether the person is editing their own Profile or someone else is viewing the outward-facing Profile.
 
-### View Profile
+### Editable / Private Profile
+
+The Profile owner sees **View Profile** and **Share Roundhouse**.
+
+#### View Profile
 
 **View Profile** opens the person's outward-facing Profile.
 
@@ -52,7 +56,7 @@ It allows the user to immediately see the Profile as another authorized person w
 
 This makes it possible to edit something, tap **View Profile**, and immediately verify the result.
 
-### Share Roundhouse
+#### Share Roundhouse
 
 **Share Roundhouse** sits directly beside View Profile and displays the **point value earned for a qualifying share/invitation**.
 
@@ -61,6 +65,14 @@ Share Roundhouse does not create a generic invitation with no destination. The i
 For example, it can be used to invite someone to participate through a Business, connect a Trade Professional, invite a Viewer, or invite someone to claim/participate in a Property.
 
 The exact available choices depend upon the current Entity and the authority of the person sending the invitation.
+
+### Outward-Facing Profile
+
+When another person views the outward-facing Profile, **View Profile** and **Share Roundhouse** are not shown. Their action area is occupied by a **Message** button so the outward-facing layout does not leave an empty space.
+
+**Message** provides the familiar action of messaging a person directly from their Profile. It opens or begins communication with that person through Roundhouse's messaging system while retaining the appropriate **Entity context** for the interaction.
+
+The Message button does not create a separate Profile mailbox or a context-free person-to-person messaging system. The resulting conversation is part of the same Roundhouse Mail system and remains associated with the Entity through which the interaction occurs.
 
 ---
 
@@ -144,7 +156,7 @@ Visually, from top to bottom:
 ↓  
 **Full-width Banner**  
 ↓  
-**Overlapping Profile Photo → Entity Logo → Name / Role / Entity → View Profile → Share Roundhouse + Points**  
+**Overlapping Profile Photo → Entity Logo → Name / Role / Entity → Profile Action Area**  
 ↓  
 **Editable personal information with Public/Private controls on the far right**  
 ↓  
@@ -153,6 +165,8 @@ Visually, from top to bottom:
 **Other Settings →**  
 ↓  
 **Definite bottom of Profile**
+
+For the Profile owner, the **Profile Action Area** contains **View Profile → Share Roundhouse + Points**. On the outward-facing Profile, that same area contains **Message**.
 
 The important visual hierarchy is that **the person dominates the page**. The banner and large Profile Photo establish the person; the smaller Entity Logo establishes the context in which that version of the person is participating. Company information does not take over the person's Profile.
 
