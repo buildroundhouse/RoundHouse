@@ -20,10 +20,10 @@ The owner of the home and the primary authority over the Property.
 ### Home Team Member
 Someone the Homeowner allows to participate in managing or caring for the home. Authority depends on the permissions given to them.
 
-### Home Collaborator
-Someone invited to participate in or view a Home without becoming a Home Team Member. A Home Collaborator may be invited into this role directly. Access is limited to what the Homeowner or authorized person grants.
+### Viewer
+A person given authorized visibility into a Home or other applicable Entity without becoming a Team Member and without receiving contribution or management authority. Access is limited to what the Owner or authorized person grants.
 
-A Home Team Member who is removed from the Home Team may remain connected to their own historical participation as a Home Collaborator without retaining the authority or access of a Home Team Member.
+A Home Team Member who is removed from the Home Team may remain connected as a Viewer where continued visibility is appropriate, without retaining the authority or access of a Home Team Member.
 
 ### Trade Professional
 A person providing professional trade or service work. Access to one Property or Job does not automatically provide access to another.
@@ -33,19 +33,13 @@ A person may create their own Trade Business and become a Trade Professional. Be
 ### Trade Team Member
 A person working as part of a Trade Business or team. Being a Trade Team Member does not automatically provide access to every client, Property, Job, invoice, or Business record.
 
-### Trade Collaborator
-A person who previously participated in trade work but no longer has the active Trade role or Business affiliation through which that work was performed.
-
-Trade Collaborator is not an initial signup role. It is a resulting state that preserves access to the person's own trade history and portfolio without preserving former authority over the Business, Property, Job, or client.
+There is **no Trade Viewer role**. Public or otherwise authorized viewing of a Trade Business or Trade Professional does not require someone to become a participant in that Trade Entity. A former Trade participant retains their own legitimate historical work and portfolio through their permanent Identity and historical attribution rather than being converted into a Trade Viewer.
 
 ### Commercial Management
 A person responsible for managing a commercial Property or facility according to the authority they have been given.
 
 ### Commercial Team Member
 Someone participating under Commercial Management. Access can be limited to particular Properties, areas, Jobs, records, or responsibilities.
-
-### Collaborator
-A neutral participant who does not currently have an active Home, Trade, or Commercial role. Collaborator can also serve as a resting operational state while the person's permanent identity and historical participation remain intact.
 
 ### Supplier
 A person or Business providing materials, products, or recurring goods or services. Access is limited to the information and functions necessary for their participation.
@@ -54,7 +48,9 @@ A person or Business providing materials, products, or recurring goods or servic
 
 An active role represents a person's current authority and access. Losing an active role does not erase the person's identity or the work they legitimately performed while holding that role.
 
-A person who no longer has an active role may still see their own historical contributions through the appropriate Collaborator state. Historical visibility does not reopen access to the Property, Business, Job, client information, or other records that belonged to the former active role.
+A person who no longer has an active role may still see their own legitimate historical contributions through their permanent Identity and historical attribution. Historical visibility does not reopen access to the Property, Business, Job, client information, or other records that belonged to the former active role.
+
+Viewer is an active, view-only Role where authorized visibility is intentionally granted. It is not a generic resting state for every former participant.
 
 A historical record can continue to identify the role and Entity through which the person originally participated.
 
@@ -77,9 +73,9 @@ Examples include:
 - **Commercial Pro**
 - **Commercial Team Pro**
 
-A Home Pro may add a **Home Team Member** without making that person a Home Pro. If that person is removed from the Home Team, their authority ends while their historical participation can remain through Home Collaborator.
+A Home Pro may add a **Home Team Member** without making that person a Home Pro. If that person is removed from the Home Team, their authority ends; where appropriate, the Homeowner may retain them as a Viewer with limited visibility.
 
-A person whose Trade Pro status exists through a Trade Business loses that Business-derived Pro status when that participation ends unless another basis for active Trade Pro status exists.
+A person whose Trade Pro status exists through a Trade Business loses that Business-derived Pro status when that participation ends unless another basis for active Trade Pro status exists. Their legitimate historical Trade work remains attributed to them without requiring a Trade Viewer role.
 
 Ownership does not automatically make someone the operating Lead or Manager. Lead and Manager authority do not transfer ownership.
 
@@ -239,6 +235,6 @@ Current access and historical record are separate.
 
 ## Governing Rule
 
-**Role identifies how someone is participating. Authority determines what they can control. Permissions determine what they can see and do. Management may be delegated without transferring ownership, and one participant has one active Manager for the same scope. Active roles and authority can end without erasing historical participation.**
+**Role identifies how someone is participating. Authority determines what they can control. Permissions determine what they can see and do. Management may be delegated without transferring ownership, and one participant has one active Manager for the same scope. Active roles and authority can end without erasing historical participation. Viewer is an explicitly view-only Role; no Trade Viewer role is required.**
 
 Access should be sufficient for the interaction without automatically exposing everything belonging to the Property, Business, client, or other participants.
