@@ -38,7 +38,7 @@ Roundhouse searches for the Property.
 - Co-Owner
 - Manager / Caretaker
 - Home Team Member
-- Home Collaborator
+- Viewer
 
 ## Screen 4 — Your Home
 
