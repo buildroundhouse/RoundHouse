@@ -134,9 +134,9 @@ Public work records should not automatically expose a private Property's street 
 
 Losing an active role does not erase a person's legitimate historical participation.
 
-A former Home participant can retain their Home history through **Home Collaborator** without retaining former Property authority.
+A former Home participant retains their own legitimate Home history through their permanent Identity and historical attribution. Where continued access to the Property itself is appropriate, an authorized Owner may give that person the **Viewer** Role, which provides only the visibility specifically granted and does not restore former Team authority.
 
-A former Trade participant can retain their Trade history through **Trade Collaborator** without retaining access to the former Business, Property, Job, or client information.
+A former Trade participant retains their own legitimate Trade history and portfolio through their permanent Identity and historical attribution without becoming a Trade Viewer and without retaining access to the former Business, Property, Job, or client information.
 
 The same principle applies when someone leaves Commercial Management, a Commercial Team, or a Supplier Business: **their legitimate historical contribution remains even though their current authority ends.**
 
