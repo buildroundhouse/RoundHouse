@@ -55,18 +55,20 @@ A bare authenticated user does not create operational records.
 
 ## 3. Roles
 
-Roundhouse has eight base roles:
+Roundhouse base roles include:
 
 1. **Homeowner**
-2. **Home Team**
-3. **Trade Professional**
-4. **Trade Team**
-5. **Commercial Management**
-6. **Commercial Team**
-7. **Collaborator**
+2. **Home Team Member**
+3. **Viewer**
+4. **Trade Professional**
+5. **Trade Team Member**
+6. **Commercial Management**
+7. **Commercial Team Member**
 8. **Supplier**
 
-A role describes the person's relationship to an Entity. It does not by itself establish ownership, leadership, or paid membership.
+A role describes how a person participates through an Entity. It does not by itself establish ownership, leadership, or paid membership.
+
+**Viewer** is an explicitly view-only Role used where an authorized person is given limited visibility without Team participation or contribution authority. There is **no Trade Viewer role**. Viewing a Trade Business or Trade Professional does not require membership in that Trade Entity, and former Trade participants retain their own legitimate historical work through attribution rather than becoming Trade Viewers.
 
 ### Pro Designations
 
@@ -75,13 +77,13 @@ A role describes the person's relationship to an Entity. It does not by itself e
 When applicable, the public-facing designation changes:
 
 - Homeowner → **Home Pro**
-- Home Team → **Home Team Pro**
+- Home Team Member → **Home Team Pro**
 - Trade Professional → **Trade Pro**
-- Trade Team → **Trade Pro**
+- Trade Team Member → **Trade Pro**
 - Commercial Management → **Commercial Pro**
-- Commercial Team → **Commercial Team Pro**
+- Commercial Team Member → **Commercial Team Pro**
 
-Collaborator and Supplier remain their base designations unless a separate Pro designation is established for them.
+Viewer and Supplier remain their base designations unless a separate Pro designation is established for them.
 
 ### Authority
 
@@ -116,15 +118,13 @@ The people who own, manage, or work for a Business may change without creating a
 
 A Business is not simply a person's profile operating under a company name.
 
-## 6. Relationships
+## 6. Participation and Access
 
-People participate in Entities through roles and relationships.
+People participate in Entities through Roles, authority, and permissions.
 
-Relationships determine what someone may do within an Entity.
+These determine what someone may do or see within an Entity and can be granted, changed, delegated, or removed without changing the underlying identity of the Person or Entity.
 
-Relationships can be requested, granted, changed, transferred, or removed without changing the underlying identity of the Person or Entity.
-
-**Collaborator** is a neutral relationship. It allows someone to be given access to an Entity without making that person part of the Home, Trade, or Commercial team.
+**Viewer** provides explicitly authorized visibility without making the person a Team Member or giving them contribution or management authority.
 
 ## 7. Records and Attribution
 
@@ -152,7 +152,7 @@ Detailed rules governing these relationships belong in **ROUNDHOUSE — Ownershi
 
 Roundhouse preserves what happened over time: who participated, what work occurred, what was documented, and in what capacity each person was acting.
 
-Current roles, relationships, ownership, leadership, permissions, and membership may change.
+Current roles, ownership, leadership, permissions, and membership may change.
 
 **Historical attribution remains.**
 
