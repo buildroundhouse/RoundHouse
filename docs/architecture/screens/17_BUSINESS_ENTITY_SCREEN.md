@@ -72,6 +72,8 @@ The tabs are Business-scoped:
 3. **Properties**
 4. **Vault**
 
+These controls should ultimately be icon-first. Their governing text labels remain available for accessibility, tooltips, expanded states, and documentation.
+
 ---
 
 ## 4.1 Work
@@ -221,9 +223,17 @@ Verification should mean someone with legitimate authority confirmed the result;
 
 ## 4.2 Team
 
-Team is the Business-scoped working roster.
+Team is the Business-scoped operating roster.
 
-It is not the person's full People directory.
+It answers:
+
+**Who operates through this Business?**
+
+The visible label is **Team**, not **Business Team**. The right-edge control should ultimately be icon-first using a custom Roundhouse crew / roster symbol rather than a businessman, tie, briefcase, office-building, or generic single-person icon.
+
+The preferred icon direction is a compact **connected crew mark**: three simple avatar-like circular nodes arranged as a group and subtly connected by one shared line / base. It should communicate people working together without implying gender, hierarchy, or corporate status, and it should remain visually distinct from the broader bottom-bar People icon.
+
+Team is not the person's full People directory.
 
 ### Team hierarchy
 
@@ -245,9 +255,10 @@ The Team tab opens a Business-scoped working sheet over the Timeline.
 
 At the top:
 
+- **Team**
 - Business name
-- Search Team
-- Add / Invite control when the current person has authority
+- **Search Team**
+- **+ Add / Invite** when the current person has authority
 
 Each person can show:
 
@@ -256,8 +267,9 @@ Each person can show:
 - title / position
 - relationship to the Business
 - current authority / membership state where appropriate
+- concise current assignment context where useful
 
-Pending invitations may appear separately at the bottom or in a dedicated pending area.
+Pending invitations appear separately from the active roster.
 
 ### Person action card
 
@@ -279,6 +291,10 @@ For authorized Owners / Managers, Business members may additionally expose appro
 - membership state
 
 Subcontractors / outside partners do **not** receive internal Business-member authority controls.
+
+The full Team screen, icon direction, roster structure, invitation behavior, and Team-vs-People boundary are governed by:
+
+**`27_BUSINESS_TEAM.md`**
 
 ---
 
@@ -400,7 +416,7 @@ Primary context signals include:
 - Business Timeline;
 - **Work** rather than personal Daily Grind;
 - tiered Business Work Flow Rail across Properties;
-- Business-scoped **Team**;
+- icon-first **Team** control using a connected-crew visual rather than a businessman metaphor;
 - Business-scoped **Properties**;
 - Business **Vault**;
 - absence of personal Points / Status in the Entity top area.
@@ -415,16 +431,18 @@ The goal is familiar operation with unmistakable Business context.
 2. Business Work is collective workload; Daily Grind remains personal.
 3. Business Work uses a lean tiered Work Flow Rail for **Requested → Open → Assigned → In Progress → Complete → Verified** rather than a dense full Kanban board or literal tournament bracket.
 4. **Needs Attention** is a priority condition across lifecycle stages, not another Work stage.
-5. Team distinguishes Business members from subcontractors / outside trade partners while keeping both operationally visible.
-6. Team does not replace the broader People system.
-7. Properties shows the jobsites / Properties the Business legitimately works with and provides the doorway into each Property Entity.
-8. Vault owns durable Business information and Business-owned shared assets.
-9. Shared equipment may expose custody, location, availability, and service history to authorized workers without granting administrative authority.
-10. Work Orders / assignments remain useful architecture but must integrate with CAPTURE, Calendar, Resolution, Property Records, and Timelines rather than forming an isolated parallel system.
-11. Work comments are work-record discussion; Roundhouse Mail remains the communication system between people.
-12. Personal Points / Status remain outside the Business Entity top area.
-13. Familiar tool positions should be preserved where doing so improves muscle memory, but all Entity controls operate within Entity scope and permissions.
-14. The Business Entity must remain visually distinct enough that the person never mistakes it for their personal Command Center.
+5. Team is the Business operating roster and answers who operates through the Business.
+6. Team uses the governing label **Team** and should ultimately be represented by an icon-first connected-crew mark, not a businessman / corporate stereotype.
+7. Team distinguishes Business members from subcontractors / outside trade partners while keeping both operationally visible.
+8. Team does not replace the broader People system.
+9. Properties shows the jobsites / Properties the Business legitimately works with and provides the doorway into each Property Entity.
+10. Vault owns durable Business information and Business-owned shared assets.
+11. Shared equipment may expose custody, location, availability, and service history to authorized workers without granting administrative authority.
+12. Work Orders / assignments remain useful architecture but must integrate with CAPTURE, Calendar, Resolution, Property Records, and Timelines rather than forming an isolated parallel system.
+13. Work comments are work-record discussion; Roundhouse Mail remains the communication system between people.
+14. Personal Points / Status remain outside the Business Entity top area.
+15. Familiar tool positions should be preserved where doing so improves muscle memory, but all Entity controls operate within Entity scope and permissions.
+16. The Business Entity must remain visually distinct enough that the person never mistakes it for their personal Command Center.
 
 ---
 
