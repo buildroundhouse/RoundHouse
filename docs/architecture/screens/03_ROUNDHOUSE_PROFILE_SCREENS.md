@@ -6,7 +6,7 @@ The **Profile Page** is a long, vertically scrollable page with a definite botto
 
 At the **upper-left corner** is a large, obvious **Back arrow** with **Back to Command Center**.
 
-This always returns directly to the Command Center for the currently active Role/Entity. The Profile is not another landing page or dashboard.
+This always returns directly to the Command Center for the currently active Role / Entity. The Profile is not another operating dashboard.
 
 **Profile** appears at the upper-right as the page title.
 
@@ -16,7 +16,7 @@ This always returns directly to the Command Center for the currently active Role
 
 Directly beneath the navigation is a **large, full-width horizontal banner image**.
 
-The banner is part of the person's Profile rather than the Entity's branding. The user can choose an image that represents them personally or professionally—a finished project, themselves working, something personal, etc.
+The banner belongs to the person's Profile rather than the Entity's branding. The user can choose an image that represents them personally or professionally.
 
 The banner is editable.
 
@@ -24,17 +24,17 @@ The banner is editable.
 
 ## 3. Profile Identity Area
 
-The **large circular Profile Photo** sits toward the **lower-left of the banner and overlaps its bottom edge**. Roughly half of the photograph extends below the banner.
+The **large circular Profile Photo** sits toward the lower-left of the banner and overlaps its bottom edge.
 
-Immediately **to the right of the Profile Photo**, below the banner, is the smaller **Entity Logo**.
+Immediately to the right of the Profile Photo is the smaller **Entity Logo**.
 
-To the right of the Entity Logo is the person's basic identity information:
+To the right of the Entity Logo is:
 
 **Name**  
 **Role / Title**  
 **Entity Name**
 
-The Entity Logo and Entity Name make clear which version of the person's Profile is being edited. A person participating through another Business or Property may have a different Role context.
+The Entity Logo and Entity Name show the context in which this version of the person's Profile is participating.
 
 The **person remains visually dominant**. The Entity logo is intentionally smaller than the Profile Photo.
 
@@ -42,187 +42,204 @@ The **person remains visually dominant**. The Entity logo is intentionally small
 
 ## 4. Profile Actions
 
-On the **same horizontal area as the Entity Logo and identity information**, extending toward the right side of the screen, is the Profile action area. The actions shown here depend on whether the person is editing their own Profile or someone else is viewing the outward-facing Profile.
+The action area depends on whether the person is editing their own Profile or another authorized person is viewing the outward-facing Profile.
 
 ### Editable / Private Profile
 
 The Profile owner sees **View Profile** and **Share Roundhouse**.
 
-#### View Profile
+### View Profile
 
-**View Profile** opens the person's outward-facing Profile.
+**View Profile** opens the person's outward-facing Profile so they can immediately verify what another authorized viewer can see.
 
-It allows the user to immediately see the Profile as another authorized person would see it, including only information designated as publicly visible or otherwise visible to that viewer.
+### Share Roundhouse
 
-This makes it possible to edit something, tap **View Profile**, and immediately verify the result.
+**Share Roundhouse** sits beside View Profile and can display the **point value earned for a qualifying successful share / activation**.
 
-#### Share Roundhouse
+Share Roundhouse is not a separate invitation system. Tapping it opens the same **Invitation Center** governed by **`33_INVITATIONS.md`**, focused on the Share Roundhouse action.
 
-**Share Roundhouse** sits directly beside View Profile and displays the **point value earned for a qualifying share/invitation**.
+The Invitation Center can carry the intended Entity, Role, Business relationship, pending Property approval, or setup context so the recipient does not arrive as a context-free new user.
 
-Share Roundhouse does not create a generic invitation with no destination. The invitation begins from the user's current Entity context and ultimately identifies the Entity and appropriate Role/context through which the invited person will participate.
-
-For example, it can be used to invite someone to participate through a Business, connect a Trade Professional, invite a Viewer, or invite someone to claim/participate in a Property.
-
-The exact available choices depend upon the current Entity and the authority of the person sending the invitation.
+Points are tied to a qualifying successful activation rather than simply sending large numbers of invitations.
 
 ### Outward-Facing Profile
 
-When another person views the outward-facing Profile, **View Profile** and **Share Roundhouse** are not shown. Their action area is occupied by a **Message** button so the outward-facing layout does not leave an empty space.
+When another person views the outward-facing Profile, **View Profile** and **Share Roundhouse** are not shown.
 
-**Message** provides the familiar action of messaging a person directly from their Profile. It opens or begins communication with that person through Roundhouse's messaging system while retaining the appropriate **Entity context** for the interaction.
-
-The Message button does not create a separate Profile mailbox or a context-free person-to-person messaging system. The resulting conversation is part of the same Roundhouse Mail system and remains associated with the Entity through which the interaction occurs.
+Where legitimate shared Entity context exists, the action area may expose **Message** and other permitted actions. Roundhouse does not create a context-free social connection merely because one person can see another person's Profile.
 
 ---
 
-## 4A. Find — Three Search Bars
+## 4A. Invitation Center
 
-On the editable/private Profile, directly below the identity/action area is **Find**.
+On the editable/private Profile, the first outward-looking control directly beneath the identity/action area is:
 
-Find uses **three distinct search bars**, not one generic Entity-search bar:
+**Invite / Share Roundhouse →**
+
+This appears **before Find a Trade Professional**.
+
+Tapping it opens the dedicated Invitation Center governed by:
+
+**`33_INVITATIONS.md`**
+
+The Invitation Center contains the person's invitation and access activity, including:
+
+- **Invite / Add Someone**;
+- **Requests to You**;
+- **Invitations You Sent**;
+- **Pending Property / Facility approvals**;
+- **Share Roundhouse**;
+- accepted / declined / cancelled / expired / setup-required states;
+- resend / cancel where appropriate;
+- Entity, Role, inviter / requester, Business source, authority source, and permission scope where relevant.
+
+The prominent Share Roundhouse control near the Profile identity area and this Profile row are two doorways into the **same system**.
+
+### Viewer Invitations
+
+**Viewer** is the neutral view-only Role.
+
+A person may have a neutral Viewer-facing identity, but Viewer participation is not a free-floating social relationship. A Viewer must be added to a legitimate:
+
+- Residential Property; or
+- Commercial Facility.
+
+A Viewer invitation always identifies the Property / Facility and the view-only scope being granted.
+
+There is no Trade Viewer Role.
+
+---
+
+## 4B. Find — Three Search Bars
+
+Directly beneath **Invite / Share Roundhouse** is **Find**.
+
+Find uses three distinct search bars:
 
 1. **Find a Trade Professional**
 2. **Residential Home Search**
 3. **Commercial Facility Search**
 
-These are direct lookup tools for finding existing Roundhouse people / Entities beyond the user's current People relationships.
+These are direct lookup tools beyond the user's current People relationships.
 
 ### Find a Trade Professional
 
-Searches for Trade Professionals and Trade Businesses using useful public search information such as:
+Searches Trade Professionals and Trade Businesses using appropriate public search information such as:
 
 - professional / owner name;
 - Business name;
 - trade / category;
 - service area / ZIP where appropriate.
 
+A found professional can be brought into the appropriate Entity through the Invitation Center / Add-to-Entity flow rather than creating a person-to-person connection.
+
 ### Residential Home Search
 
-Searches deliberately searchable residential Home / Property Entities using appropriate identifiers and privacy rules.
+Searches deliberately searchable residential Property Entities under Roundhouse privacy rules.
 
-It is not a way to browse private homes indiscriminately. Only information intentionally searchable under Roundhouse's governing visibility rules can be returned.
+It is not a way to browse private homes indiscriminately.
 
 ### Commercial Facility Search
 
-Searches deliberately searchable Commercial Facility / commercial Property Entities using appropriate identifiers and visibility rules.
+Searches deliberately searchable Commercial Facility / commercial Property Entities under governing visibility rules.
 
-### When a Search Does Not Find the Entity
+### When Search Does Not Find the Entity
 
-If the intended person or Entity is genuinely missing, the relevant search can offer the legitimate next step rather than forcing the user to leave Roundhouse.
-
-Depending on the search and current authority, this can include:
+If the intended person or Entity is genuinely missing, the relevant search can offer a legitimate next step such as:
 
 - **Invite Trade Professional / Business**;
+- **Share Roundhouse**;
 - **Create Residential Home / Property**;
 - **Create Commercial Facility / Property**;
-- begin an appropriate **claim / setup** path.
+- an appropriate **claim / setup** path.
 
-Search never allows someone to manufacture ownership, authority, or private access simply because an Entity did not appear.
-
-This area is different from **People**:
+Search never allows someone to manufacture ownership, authority, or private access merely because an Entity did not appear.
 
 **People = relationships I already have.**  
-**Find = search for a Trade Professional, Residential Home, or Commercial Facility beyond my current relationship directory.**
+**Find = direct lookup beyond my existing relationship directory.**  
+**Invite = establish legitimate participation.**
 
 ---
 
-## 4B. Discover
+## 4C. Discover
 
 Directly beneath the three Find search bars is a visually stronger **Discover** card.
 
-The three search bars are practical utilities. **Discover should feel more exciting, visual, and alive**—a doorway into the broader public side of Roundhouse.
+The search bars are practical utilities. **Discover should feel more exciting, visual, and alive**—a doorway into the broader public side of Roundhouse.
 
-The Profile card should read approximately:
+The card should read approximately:
 
 **Discover**  
 **Find pros and success stories in your area.**  
 **Q&A · Message Board**
 
-The card can use representative project imagery, professional/story previews, category cues, or other editorial visual treatment so it clearly feels different from the utility search bars above it.
+Tapping Discover opens the page governed by **`31_DISCOVER.md`** with its own **Back → Profile** control.
 
-The Profile card itself is the doorway; the full **Coming Soon** treatment belongs on the page it opens.
-
-Tapping **Discover** opens a dedicated new page governed by:
-
-**`31_DISCOVER.md`**
-
-That page has its own **Back button** returning to Profile.
-
-During MVP, the Discover page prominently says **Coming Soon** and visually previews what will eventually live there.
-
-Future Discover includes concepts such as:
+During MVP, Discover prominently says **Coming Soon** and visually previews future public capabilities such as:
 
 - public homeowner Project / Success Stories;
 - search by problem / trade / area;
 - professional discovery;
 - **Ask a Pro** public Q&A;
-- public message-board style discussions;
+- public message-board discussions;
 - Best Answer / professional reputation;
 - Roundhouse Spotlight / hero stories;
 - clearly labeled sponsored content.
 
-The full public Discover ecosystem is intentionally post-MVP, but its permanent doorway and preview page exist in MVP.
+The full Discover ecosystem remains post-MVP.
 
 ---
 
 # 5. Editable Personal Information
 
-Below the Find / Discover area begins the main vertically scrolling Profile information.
+Below Invite / Find / Discover begins the main vertically scrolling personal information.
 
-These are **personal/Role fields**, not Business Entity information. Company services, company marketing information, years in business, and similar Business-level information belong to the Business Entity page.
+These are **personal / Role fields**, not Business Entity information.
 
-Each appropriate editable field has its **Public / Private control positioned on the far-right side of that field or section**.
+Each appropriate editable field has its **Public / Private control positioned on the far-right side** of that field or section.
 
-There is therefore **no separate Privacy & Visibility page needed for ordinary Profile information**. Visibility is controlled where the information is edited.
+The Profile information can include:
 
-Not every piece of information necessarily receives a Public/Private option. Certain information required to identify the person, their Role, or the Entity through which they are participating may have visibility governed by Roundhouse.
+**About / Bio**  
+**Contact Information**  
+**Social / Web Links**  
+**Experience**  
+**Strengths / Specialties**  
+**Certifications / Licenses**
 
-The Profile information includes:
-
-**About / Bio** — the person's editable introduction or personal/professional description.
-
-**Contact Information** — phone, email, address and other applicable personal contact information. Individual information can have appropriate visibility controls rather than treating all contact information as one all-or-nothing public record.
-
-**Social / Web Links** — Instagram, personal or professional website, and other supported links. Public links become directly accessible from the outward-facing Profile.
-
-**Experience** — years of experience and other appropriate personal experience information.
-
-**Strengths / Specialties** — things the individual considers particular strengths, specialties or areas of expertise.
-
-**Certifications / Licenses** — credentials belonging to the individual rather than credentials belonging to the Business Entity.
-
-Additional personal information can be added as the Profile architecture develops, provided it actually describes the **person** rather than duplicating information belonging to an Entity.
+Additional information can be added provided it describes the **person** rather than duplicating information belonging to an Entity.
 
 ---
 
 # 6. Authority & Permissions
 
-Farther down the Profile is a full-width row labeled **Authority & Permissions**, with a navigation arrow on its right side.
+Farther down the Profile is:
 
-This **opens a separate Authority & Permissions page** rather than expanding all of those controls inside Profile.
+**Authority & Permissions →**
 
-It is primarily relevant when the person has authority within the current Entity—for example an Owner, Co-Owner, Lead or Manager.
+This opens a separate page.
 
-The separate page shows the person's authority within that Entity and the permissions associated with it. Where the person has sufficient authority, it also provides the appropriate controls for **granting, delegating, changing or taking back authority and permissions for other participants**.
+It shows the person's authority in the current Entity and the permissions associated with that authority. Where permitted, it also allows an authorized person to grant, delegate, change, or take back authority and permissions for other participants.
 
-This is about the structure of control and permission. Day-to-day assignment of work does not need to be performed from Profile.
+This includes governing controls such as **Manager authority to manage Property participants**.
+
+Where a Homeowner delegates participant-management authority to a Trade Professional / Business Manager, that authority can allow the Manager to approve appropriate Business participants into the Property without a redundant second Owner approval. The action remains permanently attributable and the Homeowner receives an informational Notification.
+
+Role, authority, and permission source remain separate.
 
 ---
 
 # 7. Subscription & Account
 
-Immediately below Authority & Permissions is another full-width navigation row:
+Immediately below Authority & Permissions is:
 
 **Subscription & Account →**
 
-It opens a dedicated page containing the person's Roundhouse subscription and account controls.
+It contains subscription status, billing/payment management where applicable, changing or canceling the subscription, and **Cancel Account**.
 
-This includes the current subscription level, subscription status, billing/payment management where applicable, changing or canceling the subscription, and **Cancel Account**.
+Canceling a subscription and canceling a Roundhouse account are different actions.
 
-Canceling a subscription and canceling a Roundhouse account are explicitly different actions.
-
-Account cancellation does not allow someone to erase legitimate historical records already contributed to another person's Property, a Business Entity, work history, Resolution, or other permanent Roundhouse record. What happens to the former user's personal information, identity and ability to reclaim/reconnect with historical participation will need its own governing rules.
+Account cancellation does not erase legitimate historical Records already contributed to Properties, Businesses, Work, Resolution, or other permanent Roundhouse history.
 
 ---
 
@@ -232,9 +249,7 @@ Near the bottom is:
 
 **Other Settings →**
 
-This opens the remaining personal application settings that do not belong directly on the Profile itself—for example **notifications, application preferences, display/appearance options, communication preferences, help/support and other account-level settings** as those systems are defined.
-
-This prevents the Profile from turning into a long settings menu while still giving those controls a predictable home.
+This contains remaining personal application settings such as notification preferences, application preferences, appearance, communication preferences, and help/support.
 
 ---
 
@@ -246,7 +261,9 @@ Visually, from top to bottom:
 ↓  
 **Full-width Banner**  
 ↓  
-**Overlapping Profile Photo → Entity Logo → Name / Role / Entity → Profile Action Area**  
+**Profile Photo → Entity Logo → Name / Role / Entity → Profile Action Area**  
+↓  
+**Invite / Share Roundhouse →**  
 ↓  
 **Find**  
 **Find a Trade Professional**  
@@ -256,7 +273,7 @@ Visually, from top to bottom:
 **Discover**  
 **Find pros and success stories in your area. · Q&A · Message Board**  
 ↓  
-**Editable personal information with Public/Private controls on the far right**  
+**Editable personal information with Public / Private controls**  
 ↓  
 **Authority & Permissions →**  
 **Subscription & Account →**  
@@ -264,11 +281,13 @@ Visually, from top to bottom:
 ↓  
 **Definite bottom of Profile**
 
-For the Profile owner, the **Profile Action Area** contains **View Profile → Share Roundhouse + Points**. On the outward-facing Profile, that same area contains **Message**.
+For the Profile owner, the Profile Action Area contains **View Profile → Share Roundhouse + Points**. Share Roundhouse and the dedicated Invite row both enter the same Invitation Center.
 
-The important visual hierarchy is that **the person dominates the page**. The banner and large Profile Photo establish the person; the smaller Entity Logo establishes the context in which that version of the person is participating. Company information does not take over the person's Profile.
+The important visual hierarchy remains that **the person dominates the page** while the Entity establishes operating context.
 
-The Find / Discover area gives the person a predictable doorway outward from their private Roundhouse relationships without turning Profile itself into a public feed.
+## Governing Rule
+
+**Profile places Invite / Share Roundhouse before Find a Trade Professional. All Share Roundhouse doorways enter the same Invitation Center. Viewer is the neutral view-only Role and only becomes an active participation relationship when attached to a legitimate Residential Property or Commercial Facility.**
 
 ## Profile Wireframe
 
