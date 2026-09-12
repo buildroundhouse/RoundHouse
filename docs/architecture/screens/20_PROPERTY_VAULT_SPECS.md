@@ -60,7 +60,19 @@ Asset Detail is governed by:
 
 ### Documents
 
-Durable Property files such as warranties, manuals, permits, inspection reports, plans, receipts, installation documents, and other records that should remain retrievable with the Property.
+Documents is the clear durable file home for the Property.
+
+The governing path is:
+
+**Property Entity → Vault → Documents**
+
+It contains durable Property files such as warranties, manuals, disclaimers, permits, plans, surveys, easements, inspection reports, water / soil reports, installation records, and other formal Property documentation.
+
+A document may also be reached from the Asset, Work item, Maintenance record, Timeline event, Estimate / Invoice, or other legitimate Record that produced or uses it, but those pathways point to the same underlying document rather than creating copies.
+
+The full Documents and permanent-record logic is governed by:
+
+**`21_PROPERTY_VAULT_DOCUMENTS_RECORDS.md`**
 
 ### Property History / Records
 
@@ -280,6 +292,7 @@ When appropriate for a newly authorized person, Roundhouse can generate a Proper
 
 - important Specs
 - key Assets
+- relevant Documents
 - pinned / deliberately shared Property information
 - recent relevant Work
 - current Maintenance / Standards state
@@ -296,7 +309,7 @@ Handoff follows the current person's permissions. It never expands visibility me
 
 The legacy Property Knowledge system included free-form Property notes, pinned notes, attachments, and visibility controls.
 
-That capability should be preserved, but not every note automatically becomes a permanent Property Spec.
+That capability should be preserved, but not every note automatically becomes a permanent Property Spec or Document.
 
 Useful durable notes may be:
 
@@ -317,10 +330,11 @@ Different users may legitimately see different parts of the same Property Vault.
 Examples:
 
 - a Homeowner may manage broad Property records;
-- an authorized Trade Professional may need Specs, Asset details, manuals, and service history relevant to their work;
+- an authorized Trade Professional may need Specs, Asset details, manuals, reports, and service history relevant to their work;
 - a Viewer remains view-only and sees only information permitted to that relationship;
 - restricted Access information can have narrower visibility than ordinary Specs;
-- private Business/internal notes remain excluded unless deliberately shared.
+- sensitive Documents can have narrower visibility than ordinary Vault records;
+- private Business/internal notes and files remain excluded unless deliberately shared.
 
 The presence of a record in Vault does not mean universal visibility.
 
@@ -330,7 +344,7 @@ The presence of a record in Vault does not mean universal visibility.
 
 **Specs = durable facts about the Property itself.**  
 **Assets = durable service passports for physical equipment.**  
-**Documents = durable files.**  
+**Documents = the predictable durable filing cabinet for Property files.**  
 **Property History / Records = durable evidence of what happened.**  
 **Handoff = a permission-aware briefing assembled from existing truth.**
 
@@ -338,4 +352,4 @@ The presence of a record in Vault does not mean universal visibility.
 
 ## Governing Rule
 
-**Vault is where the Property remembers. Specs provide the exact answer about the place; Assets remember the equipment; Documents preserve the files; History preserves what happened; Handoff assembles what a person needs to know without creating a second copy of the truth.**
+**Vault is where the Property remembers. Specs provide the exact answer about the place; Assets remember the equipment; Documents preserve the files without duplicating them; History preserves what happened; Handoff assembles what a person needs to know without creating a second copy of the truth.**
