@@ -76,9 +76,20 @@ The full Documents and permanent-record logic is governed by:
 
 ### Property History / Records
 
-A durable retrieval view for completed maintenance, service events, Standard evidence, significant Property records, and other historical material that should survive beyond the active Work or Maintenance view.
+Property History / Records is the durable archival view of what happened at the Property.
 
-The final label may be shortened during UI refinement, but the purpose is permanent history rather than current tasks.
+It is intentionally distinct from the living Property Timeline:
+
+**Property Timeline = what is happening here.**  
+**Property History = what happened here.**
+
+History can surface completed Work, maintenance, Standards evidence, installations, inspections, Asset lifecycle events, major Property changes, ownership / authority changes where appropriate, disclaimers and resolving Records, and other significant historical events.
+
+History does not duplicate those systems. It references the same underlying Records and gives the Property a predictable long-term retrieval view.
+
+The full Property History architecture is governed by:
+
+**`22_PROPERTY_HISTORY_RECORDS.md`**
 
 ---
 
@@ -297,7 +308,7 @@ When appropriate for a newly authorized person, Roundhouse can generate a Proper
 - recent relevant Work
 - current Maintenance / Standards state
 - unresolved items the person is permitted to see
-- recent Property history relevant to their role
+- recent Property History relevant to their role
 
 This preserves the useful legacy Handoff behavior without creating duplicate knowledge that can become stale.
 
@@ -334,6 +345,7 @@ Examples:
 - a Viewer remains view-only and sees only information permitted to that relationship;
 - restricted Access information can have narrower visibility than ordinary Specs;
 - sensitive Documents can have narrower visibility than ordinary Vault records;
+- Property History follows underlying Record permissions;
 - private Business/internal notes and files remain excluded unless deliberately shared.
 
 The presence of a record in Vault does not mean universal visibility.
@@ -345,11 +357,11 @@ The presence of a record in Vault does not mean universal visibility.
 **Specs = durable facts about the Property itself.**  
 **Assets = durable service passports for physical equipment.**  
 **Documents = the predictable durable filing cabinet for Property files.**  
-**Property History / Records = durable evidence of what happened.**  
+**Property History / Records = the durable archival view of what happened.**  
 **Handoff = a permission-aware briefing assembled from existing truth.**
 
 ---
 
 ## Governing Rule
 
-**Vault is where the Property remembers. Specs provide the exact answer about the place; Assets remember the equipment; Documents preserve the files without duplicating them; History preserves what happened; Handoff assembles what a person needs to know without creating a second copy of the truth.**
+**Vault is where the Property remembers. Specs provide the exact answer about the place; Assets remember the equipment; Documents preserve the files without duplicating them; History preserves what happened without duplicating the underlying Records; Handoff assembles what a person needs to know without creating a second copy of the truth.**
