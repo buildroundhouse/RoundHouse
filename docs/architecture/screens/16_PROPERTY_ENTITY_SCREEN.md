@@ -60,6 +60,8 @@ The Timeline Search control remains in the familiar upper-left area of the Timel
 **Avatar Timeline = what I am doing.**  
 **Property Timeline = what is happening here.**
 
+The Property Timeline is the living chronological view. The durable archival view of significant past Records lives in **Vault → Property History / Records**.
+
 ---
 
 ## 4. Right Edge — Four Property Tabs
@@ -126,9 +128,9 @@ Vault's primary internal sections are:
 
 **Documents** is the clear durable file home for the Property. The governing path is **Property Entity → Vault → Documents**. Warranties, manuals, disclaimers, surveys, easements, inspections, reports, permits, plans, installation records, and other durable Property files live here as one underlying Record even when they are also reachable from an Asset, Work item, Timeline event, or other legitimate context. Documents is governed by **`21_PROPERTY_VAULT_DOCUMENTS_RECORDS.md`**.
 
-**Property History / Records** provides durable retrieval of completed maintenance, service history, Standard evidence, and other important Property records after they are no longer active work.
+**Property History / Records** is the durable archival view of what happened at the Property. It can surface completed Work, Maintenance, Standards evidence, installations, inspections, Asset lifecycle events, major Property changes, relevant ownership / authority changes, disclaimers and resolving Records, and other significant historical Records. It references the same underlying Records rather than creating an archive copy. Property History is governed by **`22_PROPERTY_HISTORY_RECORDS.md`**.
 
-Property Handoff does **not** become another Vault folder containing duplicate knowledge. Handoff assembles a permission-aware briefing from existing Specs, Assets, Documents, records, Maintenance, Work, and deliberately shared information.
+Property Handoff does **not** become another Vault folder containing duplicate knowledge. Handoff assembles a permission-aware briefing from existing Specs, Assets, Documents, Property History, Maintenance, Work, and deliberately shared information.
 
 The full Vault and Specs architecture is governed by:
 
@@ -208,8 +210,9 @@ The goal is familiar operation with unmistakable context.
 8. Maintenance governs recurring care and Property Standards; due work and drift can feed Work rather than becoming parallel task systems.
 9. Vault is the permanent Property-information destination, with Specs, Assets & Equipment, Documents, and Property History / Records as its primary internal sections.
 10. Property Documents has one clear home: **Property Entity → Vault → Documents**. Other valid pathways reference the same underlying files rather than creating copies.
-11. Handoff assembles current permitted Property truth and does not maintain a duplicate permanent copy of that truth.
-12. The Property Entity should feel visually distinct from the personal Command Center while preserving useful positional familiarity.
+11. Property Timeline is the living view; **Vault → Property History / Records** is the durable archival view. Both can present the same underlying Record without duplication.
+12. Handoff assembles current permitted Property truth and does not maintain a duplicate permanent copy of that truth.
+13. The Property Entity should feel visually distinct from the personal Command Center while preserving useful positional familiarity.
 
 ---
 
