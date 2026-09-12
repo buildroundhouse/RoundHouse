@@ -12,9 +12,9 @@ It answers:
 
 **Who operates through this Business?**
 
-The visible product language is **Team**, not **Business Team** and not a businessman / executive metaphor.
-
 Team is the Business operating roster. It is intentionally distinct from the broader **People** system.
+
+Invitation behavior is governed by **`33_INVITATIONS.md`**.
 
 ---
 
@@ -29,38 +29,21 @@ The Business Entity right-edge order remains:
 
 Team occupies the second right-edge position.
 
-The right-edge control should ultimately be **icon-first**. The word **Team** remains the governing label for accessibility, tooltips, expanded states, documentation, and any context where text is needed.
+The right-edge control should ultimately be icon-first. The word **Team** remains the governing label for accessibility, tooltips, expanded states, documentation, and any context where text is needed.
 
 ---
 
 # 2. Team Icon Direction
 
-The Team icon should not use:
+The Team icon should not use a businessman silhouette, tie, briefcase, corporate-building symbol, or generic single-person icon.
 
-- a businessman silhouette;
-- a tie;
-- a briefcase;
-- a corporate-building symbol;
-- a generic single-person icon.
+The preferred Roundhouse icon direction is a **small connected crew mark**: three simple avatar-like nodes arranged as a compact working group and subtly connected by one shared line / base.
 
-Those symbols either imply the wrong kind of person or fail to communicate a working group.
-
-The preferred Roundhouse icon direction is a **small connected crew mark**:
-
-- three simple circular / avatar-like nodes;
-- arranged as a compact group rather than a hierarchy pyramid;
-- subtly connected by one shared line / base so the symbol reads as people operating together;
-- visually distinct from the broader People icon.
-
-The icon should communicate **crew / roster / working together**, not management status.
-
-If the icon is shown without text, tapping or hovering should reveal **Team**.
+It should communicate **crew / roster / working together**, not management status.
 
 ---
 
 # 3. Team vs People
-
-This distinction is governing.
 
 ## Team
 
@@ -70,7 +53,7 @@ Examples:
 
 - Owners / Managers;
 - Trade Team Members;
-- approved Subcontractors / Outside Trade Partners.
+- accepted Subcontractors / Outside Trade Professionals.
 
 ## People
 
@@ -87,6 +70,8 @@ Examples:
 A person can appear in People without being part of Team.
 
 Team should never become a duplicate full Business contact directory.
+
+**Viewer is not a Business Team category.** Viewer is the neutral view-only Role used when someone is deliberately added to a Residential Property or Commercial Facility.
 
 ---
 
@@ -112,28 +97,26 @@ The roster is organized into three clear groups:
 
 1. **Owners / Managers**
 2. **Trade Team Members**
-3. **Subcontractors / Outside Trade Partners**
+3. **Subcontractors / Outside Trade Professionals**
 
 This distinction is intentional.
 
 **Trade Team Members belong to the Business. Subcontractors work with the Business.**
 
-Outside trade partners remain operationally visible without receiving internal Business authority merely because they appear in Team.
+A subcontractor remains a Trade Professional in their own right. Their outside-Business relationship does not turn them into an internal employee merely because the Business uses them on a job.
 
 ---
 
 # 6. Team Rows
 
-Each person appears as a compact row or card.
-
-A Team row may show:
+Each person appears as a compact row or card showing appropriate information such as:
 
 - Avatar;
 - name;
-- title / position when useful;
+- title / trade when useful;
 - Business relationship;
 - current authority / membership state where appropriate;
-- concise current assignment context when useful.
+- concise current assignment context.
 
 Example:
 
@@ -144,7 +127,7 @@ Lead Carpenter
 Example:
 
 **Carlos Hernandez**  
-HVAC · Outside Trade Partner  
+HVAC · Outside Trade Professional  
 Spring Lake Residence
 
 The screen should not expose unrelated personal information simply because the person is on the roster.
@@ -155,13 +138,7 @@ The screen should not expose unrelated personal information simply because the p
 
 **Search Team** searches only the Business operating roster available to the current person.
 
-Search may match:
-
-- name;
-- title / position;
-- trade;
-- relationship type;
-- relevant Property / assignment context where permitted.
+Search may match name, title / position, trade, Business relationship, and relevant Property / assignment context where permitted.
 
 Search does not expand permissions.
 
@@ -169,7 +146,7 @@ Search does not expand permissions.
 
 # 8. Person Action Card
 
-Tapping a Team member opens a compact **Person Action Card** rather than immediately navigating away from the Team screen.
+Tapping a Team member opens a compact **Person Action Card** rather than immediately navigating away.
 
 Depending on relationship and permission, actions may include:
 
@@ -180,14 +157,9 @@ Depending on relationship and permission, actions may include:
 - **Email**;
 - relevant Property / job relationships.
 
-For authorized Owners / Managers, internal Business members may additionally expose controls for:
+For authorized Owners / Managers, internal Business members may additionally expose controls for Business authority, assignment responsibility, and membership state.
 
-- Business authority;
-- role / operating title;
-- assignment responsibility;
-- membership state.
-
-Subcontractors / Outside Trade Partners do **not** receive internal Business-member authority controls.
+Subcontractors / Outside Trade Professionals do **not** receive internal Business-member authority merely because they are on the roster.
 
 ---
 
@@ -195,148 +167,204 @@ Subcontractors / Outside Trade Partners do **not** receive internal Business-mem
 
 Assigned Work is a shortcut into the same underlying Business Work records.
 
-Example:
-
-Tapping **Assigned Work** for Mike filters or opens Business Work to the Work currently assigned to Mike.
-
-This does not create a separate worker-specific Work datastore.
-
 **Team identifies who is operating. Work identifies what they are responsible for.**
+
+No separate worker-specific Work datastore is created.
 
 ---
 
 # 10. Add / Invite
 
-Authorized people can use **+ Add / Invite** to bring someone into the appropriate Business relationship.
+Authorized people use **+ Add / Invite** to establish a real Business relationship.
 
-The flow should first establish what kind of relationship is being created rather than treating every person as the same kind of Business member.
+The flow must first establish **how the person is participating**, rather than treating everyone as the same kind of Business member.
 
-Useful relationship choices include:
+Typical choices include:
 
-- internal Business member;
 - Trade Team Member;
-- Subcontractor / Outside Trade Partner.
+- Subcontractor / Outside Trade Professional;
+- Supplier or other supported Business relationship where applicable.
 
-The invitation flow should collect only the information necessary to establish the relationship and authority.
+Owner, Lead, and Manager are authority designations layered separately from the person's base Role.
 
-Detailed profile information can be completed later.
+Before sending, Roundhouse should show a plain-language confirmation such as:
+
+**Invite Carlos Hernandez to JD Design Studios as an Outside Trade Professional?**
+
+The invitation appears in the global Invitation Center as well as the Business's Pending area.
 
 ---
 
-# 11. Pending Invitations
+# 11. Subcontractor / Outside Trade Professional Flow
 
-Pending invitations should appear in a separate compact area, normally below the active roster or behind a simple **Pending** control.
+When the Business intends to use a subcontractor on a Property, the person is first established through the **Business relationship**.
+
+The governing sequence is:
+
+**Business invites Sub → Sub accepts Business relationship → Business assigns / proposes Sub to Property → Property access is resolved**
+
+The Business is responsible for bringing its participant forward.
+
+Roundhouse should not require the subcontractor to:
+
+- search for the homeowner's Property;
+- independently request access;
+- wait for the Business to approve a request that the Business itself caused.
+
+Roundhouse should not require the Homeowner to search for the subcontractor and rebuild the Business's staffing decision either.
+
+---
+
+# 12. Claimed Property Approval
+
+When a claimed Property is governed by a Homeowner and the Business does **not** have delegated participant-management authority, assigning a subcontractor creates a simple Homeowner approval request.
+
+Example:
+
+**JD Design Studios wants to add Carlos Hernandez to Spring Lake Residence.**  
+Kitchen project · HVAC  
+**Approve | Decline**
+
+The request identifies the Business, participant, Property, Work context, requested access scope, and person who initiated it.
+
+The homeowner approves the Property participation, not the Business membership. The subcontractor already accepted the Business relationship.
+
+---
+
+# 13. Delegated Manager Authority
+
+A Homeowner may explicitly give the Trade Professional / Business **Manager authority** that includes permission to manage Property participants.
+
+When that authority is active:
+
+**Business assigns accepted Sub → authorized Manager approves Property access on Owner's behalf → Homeowner is informed**
+
+The Homeowner is not asked to approve the same participant again.
+
+The informational Notification should make the authority source clear, for example:
+
+**JD Design Studios added Carlos Hernandez to Spring Lake Residence.**  
+**Authorized through JD's Manager authority.**
+
+Roundhouse permanently records who performed the action, which delegated authority allowed it, the Business relationship, Property, permission scope, and time.
+
+Removing or narrowing Manager authority stops future automatic approvals outside the remaining scope.
+
+---
+
+# 14. Unclaimed Properties
+
+When the Business legitimately manages an **Unclaimed Property**, it may assign accepted Business participants directly within its legitimate operational authority.
+
+The system should not create a circular request / approval loop against a Property the Business itself is currently stewarding operationally.
+
+When the legitimate owner later claims the Property, the same Property and its history remain. Current participant permissions are reevaluated under claimed-owner governance.
+
+---
+
+# 15. Business-Derived Property Access
+
+Property access created because a person is working through this Business is **Business-derived**.
+
+Roundhouse must preserve the source of that permission.
+
+If the Business later removes that person from the governing Business relationship, the person's current Property permissions that depend **only** on that Business relationship are automatically removed.
+
+The Homeowner should not have to clean up the Business's former worker manually.
+
+Historical Work, CAPTURE evidence, Timeline activity, communications, Resolutions, and attribution remain intact.
+
+---
+
+# 16. Independent Homeowner Relationship
+
+A former Business-derived participant can later have a separate direct relationship with the Homeowner.
+
+If the Homeowner independently wants to keep working with that Trade Professional, Roundhouse creates a **new independent Property authorization**.
+
+Ending the original Business relationship then removes only Business-derived access; it does not destroy the new independent Property relationship.
+
+---
+
+# 17. Pending Invitations
+
+Pending invitations appear separately from the active roster, normally below active Team or behind a simple **Pending** control.
 
 A pending row may show:
 
-- invited person / email / phone as available;
-- intended relationship;
+- invited person / phone / email where available;
+- intended Business relationship;
 - invited by;
 - invitation date;
+- setup-required state;
+- accepted Business but awaiting Property approval;
 - resend / cancel controls when authorized.
 
-Pending invitations should not look like active Team members before they accept.
+Pending invitations must not look like active Team members before they accept.
 
 ---
 
-# 12. Authority vs Role
+# 18. Authority vs Role
 
-Team must preserve the Roundhouse distinction between **Role** and **authority**.
+Team preserves the Roundhouse distinction between **Role** and **authority**.
 
-A person's base Role describes the kind of participant they are.
+A person's base Role describes how they participate. Authority describes what they are allowed to control.
 
-Authority describes what they are permitted to do within this Business.
-
-Examples of authority may include:
-
-- Owner;
-- Manager;
-- limited operational authority.
-
-These should not be confused with separate base roles.
+Examples of authority include Owner, Lead, Manager, and limited operational authority.
 
 The Team screen can surface authority where useful without turning every row into a permissions matrix.
 
 ---
 
-# 13. Subcontractors / Outside Trade Partners
+# 19. Relationship to Properties
 
-Subcontractors and outside trade partners remain visible because they are legitimately part of how the Business gets work done.
+A Team member may have legitimate relationships to one or more Properties through assigned Work or Business-derived participation.
 
-Their Team presentation should make the outside relationship clear.
+The Person Action Card may show relevant Properties / jobs and the source of current access when useful.
 
-They may have:
-
-- assigned Work;
-- relevant Property access;
-- Mail communication;
-- contact actions;
-- limited visibility into the Work they are authorized to perform.
-
-They do not automatically gain:
-
-- internal Business administration;
-- unrelated team visibility;
-- unrelated Property access;
-- company-wide private information.
+Tapping a Property follows the established Property doorway.
 
 ---
 
-# 14. Relationship to Properties
+# 20. Relationship to Mail
 
-A Team member may have legitimate relationships to one or more Properties through assigned Work or Business participation.
-
-The Person Action Card may show relevant Properties / jobs.
-
-Tapping a Property follows the established Property doorway rather than creating a new Team-specific Property screen.
-
----
-
-# 15. Relationship to Mail
-
-Team offers convenient Message / Call / Email actions, but it does not become a communication system.
+Team offers convenient communication actions but does not become a communication system.
 
 **Team = roster and operating relationships.**  
 **Mail = communication.**
 
-Message opens the same Roundhouse Mail system in the appropriate context.
+Mail remains Entity-contextual and permission-aware.
 
 ---
 
-# 16. Relationship to Calendar
+# 21. Relationship to Calendar
 
-Team may surface assignment context, but it should not display another person's full private schedule.
+Team may surface assignment context but should not expose another person's full private schedule.
 
 Business scheduling and dispatch remain governed by Calendar.
 
-Where authority permits, a manager can reach relevant scheduled Work through the Work / Calendar relationship rather than through a private-person calendar view embedded inside Team.
-
 ---
 
-# 17. Permissions
+# 22. Permissions
 
 Team is permission-aware.
 
-Examples:
-
-- Owners / Managers may see and manage broader Business roster information according to authority;
+- Owners / authorized Managers may manage broader Business roster information according to authority;
 - Trade Team Members see only roster information legitimately available to them;
-- Outside Trade Partners see only the people / contacts necessary for their authorized Business relationship;
-- Viewers remain view-only when Team visibility is permitted.
-
-Being a Team member does not automatically expose every other participant's private information.
+- Outside Trade Professionals see only the Business and Property information necessary for their authorized work;
+- Business membership alone does not grant unrelated Property access;
+- Business authority alone does not grant the right to approve Property participants unless the Property Owner delegated that authority.
 
 ---
 
-# 18. Visual Direction
+# 23. Visual Direction
 
 Team should feel like a clean, approachable operating roster.
 
 Visual priorities:
 
 - icon-first right-edge control;
-- no businessman / corporate stereotype;
-- compact connected-crew icon direction;
+- compact connected-crew symbol;
 - simple roster groups;
 - generous Avatar recognition;
 - name and relationship first;
@@ -346,8 +374,6 @@ Visual priorities:
 - no dense HR tables;
 - no org-chart hierarchy unless future requirements genuinely need one.
 
-The screen should answer **who operates through this Business** within seconds.
-
 ---
 
 ## Governing Relationship
@@ -355,10 +381,11 @@ The screen should answer **who operates through this Business** within seconds.
 **Team = the Business operating roster.**  
 **People = the broader Business relationship network.**  
 **Work = what the Team is responsible for.**  
+**Invitation Center = how legitimate participation is established.**  
 **Mail = how people communicate.**
 
 ---
 
 ## Governing Rule
 
-**Team shows the people who belong to or actively operate with the Business, using an icon-first connected-crew identity rather than a businessman metaphor. It remains a lightweight operating roster, while broader relationships stay in People and responsibility stays in Work.**
+**Team shows the people who belong to or actively operate with the Business. A subcontractor is first invited into the Business relationship; the Business then brings that accepted participant forward to a Property. Claimed Properties require Owner approval unless explicitly delegated Manager authority allows the Business to approve participants on the Owner's behalf. Unclaimed Properties allow the legitimate managing Business to establish necessary participant access directly. Business-derived Property access ends automatically when its governing Business relationship ends, while historical records and independently authorized relationships remain. Viewer is not a Business Team category.**
