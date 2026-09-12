@@ -2,7 +2,7 @@
 
 ## Purpose
 
-**Request Work** is the homeowner / Property-side front door for asking an authorized Business for help at a Property.
+**Request Work** is the Property-side front door for asking an authorized Business to actually do work at a Property.
 
 Its home is:
 
@@ -10,19 +10,37 @@ Its home is:
 
 It answers:
 
-**Something at this Property needs attention. How do I ask the right Business for help without creating a separate request system?**
+**Something at this Property needs to be done. How do I ask the right Business to take responsibility for the work?**
 
-The legacy **Ask a Pro** concept is preserved here, but it is integrated into the governing Property Work / Business Work architecture rather than remaining a parallel questions application.
+A legitimate Work Request enters the shared Work architecture at **Requested** and can continue through the normal lifecycle:
 
-A request begins in the **Requested** stage. If it becomes actual work, the same underlying Record continues through the Work lifecycle.
+**Requested → Open → Assigned → In Progress → Complete → Verified**
 
-**Request → Requested Work → Open / Accepted → Assigned → In Progress → Complete → Verified**
-
-A request that is answered without requiring Work can close without forcing a fake job into the Work system.
+There is no separate Client Requests system and no duplicate Work Order.
 
 ---
 
-# 1. Placement
+# 1. Governing Boundary
+
+Roundhouse separates three different kinds of interaction:
+
+**Work Request** = I am asking an authorized Business to do actual work.  
+**Resolution** = I need a specific person or group to answer, decide, approve, clarify, select, provide information, or complete some other required outcome.  
+**Discover → Ask a Pro** = a future public question to the broader professional ecosystem.
+
+Examples:
+
+**Please repair the leaking upstairs sink.** → Work Request  
+**Is this water-heater sound normal?** → Resolution when directed to someone in an existing relationship  
+**Which tile do you want?** → Resolution  
+**Can we access the house Tuesday?** → Resolution  
+**Public question to plumbers in my area** → Discover → Ask a Pro
+
+Work must not become a second Q&A or messaging system.
+
+---
+
+# 2. Placement
 
 Request Work is not another Property right-edge tab.
 
@@ -30,48 +48,28 @@ The permanent path is:
 
 **Property Entity → Work → Request Work**
 
-Property Work remains the governing place for requested, open, assigned, active, and recently completed work.
-
 For an authorized Homeowner / Property authority, the Work screen can expose a clear **Request Work** action.
 
-For Trade Professionals / Managers with creation authority, the existing **+ Create Work** action remains appropriate.
+For Trade Professionals / Managers with operational creation authority, the existing **+ Create Work** action remains appropriate.
 
-These actions can create the same underlying Work-family Record but represent different intent:
+These actions reach the same Work architecture from different intent:
 
-- **Request Work** = ask an authorized Business for help;
-- **Create Work** = create operational Work directly when the acting person has authority to do so.
-
----
-
-# 2. Governing Principle
-
-Roundhouse should not maintain three competing concepts for the same real-world need:
-
-- Ask a Pro;
-- Client Request;
-- Work Order.
-
-The governing architecture is:
-
-**A legitimate Property request enters the Work system at Requested.**
-
-The request relationship and original question remain preserved even after the Business accepts the request and begins managing it as Work.
-
-No duplicate Work Order is required.
+- **Request Work** = homeowner / Property participant asks an authorized Business to take on real work;
+- **Create Work** = authorized operational participant creates Work directly.
 
 ---
 
-# 3. Who Can Receive a Request
+# 3. Who Can Receive a Work Request
 
-Request Work is normally sent to a Business that already has a legitimate relationship to the Property.
+Request Work is normally addressed to a Business that already has a legitimate relationship to the Property.
 
 If only one appropriate Business is authorized / connected, Roundhouse should preselect it.
 
 If multiple Businesses are legitimately connected, the requester chooses the intended Business.
 
-Request Work should not quietly expose unrelated Businesses or create a new Property relationship merely because a Business exists in search.
+Request Work should not quietly expose unrelated Businesses or create a new Property relationship merely because a Business exists in global search.
 
-Future Business discovery / Find architecture may help establish a new relationship, but discovery remains separate from the Property Work Request flow.
+Finding a new Business belongs to the Profile's Find / Entity Search and future Discover ecosystem.
 
 ---
 
@@ -83,49 +81,48 @@ Because the person is already inside the Property Entity, the Property is automa
 
 Useful fields include:
 
-- **What do you need help with?**
+- **What needs to be done?**
 - short description;
 - area / room when useful;
 - related Asset / Equipment when known;
 - photos / files;
 - urgency / priority when appropriate;
-- preferred Business when more than one legitimate Business is available.
+- receiving Business when more than one legitimate Business is available.
 
-The requester should not need to understand Work categories, internal assignment, operational status taxonomy, or Business scheduling before submitting a legitimate request.
+The requester should not need to understand internal assignment or Business workflow states before submitting a legitimate Work Request.
 
 ---
 
-# 5. The Request Record
+# 5. The Work Request Record
 
 The request preserves useful source information such as:
 
 - requester;
 - Property;
 - receiving Business;
-- original question / description;
+- original work request / description;
 - submitted photos / files;
 - area / Asset relationship;
 - submission time;
 - request source;
-- current request / Work state;
-- Business response;
-- resulting Work, Calendar, Tasks / Lists, or Resolution relationships when applicable.
+- current Work state;
+- resulting Calendar, Estimate / Invoice, CAPTURE, Resolution, or other legitimate relationships.
 
-The original request should remain visible after acceptance so nobody has to reconstruct why the Work exists.
+The original request remains visible after acceptance so nobody has to reconstruct why the Work exists.
 
 ---
 
 # 6. Business Work Intake
 
-A submitted request appears to the authorized receiving Business in:
+A submitted Work Request appears to the authorized receiving Business in:
 
 **Business Entity → Work → Requested**
 
-It uses the same underlying Record visible in Property Work.
+It is the same underlying Work Record visible in Property Work.
 
 The Business Work card should make useful intake context obvious:
 
-- request title / question;
+- Work request title;
 - Property;
 - requester;
 - age of request;
@@ -134,35 +131,36 @@ The Business Work card should make useful intake context obvious:
 
 Example:
 
-**Upstairs sink is leaking**  
+**Repair upstairs sink leak**  
 Spring Lake Residence  
 Requested by Sarah Miller  
 12 min ago  
 **Requested**
 
-The Business should not need to open a separate Client Requests application to discover the request.
+The Business should not need a separate Client Requests application to discover the request.
 
 ---
 
-# 7. Business Response
+# 7. Business Intake Actions
 
-An authorized Business participant can open the Requested item and choose an appropriate response.
+An authorized Business participant can open the Requested item and take an appropriate operational action.
 
-The main outcomes are:
+Typical actions include:
 
-- **Accept as Work**;
-- **Answer / Resolve**;
-- **Schedule Visit**;
-- **Need More Information**;
+- **Accept / Open Work**;
+- **Assign** when responsibility is known;
+- **Schedule Visit** when inspection or service time is required;
+- **Prepare Estimate** when scope / price must be established;
+- **Create Resolution** when an answer, approval, selection, clarification, access decision, or other dependency is required;
 - **Decline / Close** when legitimate.
 
-The UI should present only the actions relevant to the situation rather than a large decision matrix.
+A question or dependency should not be managed through ad hoc comments merely to keep the Work moving. When a real answer or decision is required, use Resolution.
 
 ---
 
-# 8. Accept as Work
+# 8. Acceptance
 
-When the Business accepts the request as actual Work, the same Record moves forward in the governing Work lifecycle.
+When the Business accepts the request as actual Work, the same Record moves forward in the governing lifecycle.
 
 Typical transition:
 
@@ -183,77 +181,48 @@ Roundhouse does not create a second Work item merely because a request was accep
 
 ---
 
-# 9. Answer / Resolve Without Work
+# 9. Resolution Integration
 
-Some Ask-a-Pro-style requests are genuine questions that do not require a job.
+If the Business needs an answer, decision, approval, selection, clarification, information, or required action from another person, that dependency belongs in **Resolution**.
 
-Example:
+Examples:
 
-**Is this sound from my water heater normal?**
+- Which fixture do you want?
+- Can we enter the Property Tuesday morning?
+- Please approve this change.
+- Send the model number from the equipment label.
+- Is this finish acceptable?
+- Do you want repair or replacement?
 
-A qualified Business participant may provide a concise response and resolve the request without creating unnecessary operational Work.
+The Work item remains the job.
 
-This preserves the useful legacy Ask-a-Pro behavior without forcing every question through assignment, CAPTURE, and verification.
+The Resolution represents the unresolved matter affecting that job.
 
-The resolved request remains a legitimate Record according to retention and permissions.
+The Resolution may pass responsibility back and forth until the creator can verify the required outcome and close it.
 
----
+When the Resolution is completed, Work can continue without creating a second job or losing the decision history.
 
-# 10. What Next? — Preserving the Useful Ask-a-Pro Next Step
-
-The legacy Ask-a-Pro flow allowed the requester to decide what should happen after receiving an answer.
-
-Roundhouse preserves that useful idea, but maps it into the current architecture.
-
-After an answer, the requester may see a simple **What next?** choice such as:
-
-- **Schedule a Visit** → Calendar;
-- **Add to Tasks / Lists** → Property Tasks / Lists;
-- **Request the Work** → the same Request continues into operational Work;
-- **No Action Needed** → close as answered / resolved.
-
-This replaces the older internal concepts of `appointment`, `list`, and `curious` with clearer Roundhouse destinations while preserving their intent.
-
-A simple informational question should be able to end cleanly without creating Work.
+**Work = the job. Resolution = the thing that must be settled so the job can move forward.**
 
 ---
 
-# 11. Need More Information
+# 10. Scheduling
 
-The Business may need a photo, measurement, model number, clarification, or other information before deciding what should happen.
-
-The Requested item remains in the Requested stage while waiting for the requester.
-
-The request can show a compact **Waiting on requester** condition.
-
-If the missing information becomes a genuine unresolved dependency requiring structured follow-up, a Resolution may be linked according to Resolution architecture.
-
-Do not invent a separate permanent "Waiting" Work lifecycle merely for request clarification.
-
----
-
-# 12. Schedule Visit
-
-A Business may need to inspect before accepting a full repair / project scope.
+A Business may need to inspect or perform work before the full scope is complete.
 
 **Schedule Visit** creates or links the appropriate Calendar appointment.
 
-The Request remains the source Record and should not disappear.
+Calendar governs time.
 
-After the visit, the Business may:
+The Work Record governs why the appointment exists.
 
-- answer / resolve the request;
-- accept it as Work;
-- prepare an Estimate;
-- create a Resolution if a real dependency exists.
-
-Calendar governs time. The Request governs why the visit exists.
+A confirmed appointment should not be silently rewritten merely because Work metadata changes.
 
 ---
 
-# 13. Decline / Close
+# 11. Decline / Close
 
-A Business may legitimately decline a request when it cannot or should not perform the requested work.
+A Business may legitimately decline or close a Requested Work item when it cannot or should not perform the requested work.
 
 Examples:
 
@@ -263,83 +232,80 @@ Examples:
 - duplicate request;
 - requester withdraws the request.
 
-Decline / Close should preserve an appropriate reason when useful.
+The reason can be preserved when useful.
 
-Closing a request does not erase the original request Record.
+Closing does not erase the original request Record.
 
 ---
 
-# 14. Requester View
+# 12. Requester View
 
-The Homeowner / requester should see a simple status rather than the Business's internal operational complexity.
+The Homeowner / requester should see understandable progress rather than the Business's full internal workflow complexity.
 
 Useful requester-facing states may include:
 
 - **Sent**;
-- **Business Reviewing**;
-- **More Information Needed**;
+- **Reviewing**;
 - **Accepted**;
 - **Scheduled**;
 - **In Progress**;
 - **Completed**;
-- **Answered / Resolved**;
 - **Closed**.
 
-These can map intelligently to the underlying Work lifecycle and relationships.
-
-The requester does not need to see every internal distinction such as Open versus Assigned unless it materially helps them understand what is happening.
+When a Resolution requires the requester's response, the Work view may clearly surface that there is a matter needing attention, while Resolution remains the governing responsibility system.
 
 ---
 
-# 15. Responses, Comments, and Mail
+# 13. Comments and Mail
 
-A request may preserve a focused answer / response because the response belongs to the request Record itself.
-
-Work-focused comments may continue once the request becomes operational Work.
+Work-focused comments may exist because they concern execution of the Work item.
 
 Roundhouse Mail remains the communication system between people.
 
-**Request response = answer attached to the request.**  
-**Work comments = execution discussion attached to the job.**  
-**Mail = broader communication between people.**
+Resolution remains the system for matters that must stay visibly unresolved until a required answer or outcome is obtained.
 
-Do not recreate a separate chat product inside Requests.
+**Work comments = execution discussion.**  
+**Mail = communication.**  
+**Resolution = responsibility for an unresolved question / decision / required outcome.**
 
----
-
-# 16. Notifications
-
-The legacy Ask-a-Pro system generated useful alerts when:
-
-- a new question arrived;
-- a response was provided;
-- another person needed something.
-
-That behavioral value should be preserved when the broader Roundhouse Notifications architecture is reconciled.
-
-However:
-
-- Request alerts are not Roundhouse Mail;
-- Mail unread counts should not be reused as general notification counts;
-- notification delivery should follow user notification preferences.
-
-This document governs the Request / Work relationship, not the final global notification UI.
+Do not recreate a Q&A thread inside Work Requests.
 
 ---
 
-# 17. Reward / Points Separation
+# 14. Discover / Ask a Pro Separation
 
-The legacy Ask-a-Pro implementation awarded provider points for answering and for confirmed-helpful answers.
+The legacy **Ask a Pro** idea does not belong in Property Work Requests.
 
-That legacy behavior should not silently dictate Work architecture.
+Its intended future home is:
 
-If Roundhouse later rewards helpful professional responses, the reward belongs to the person's Points / Status system and remains outside the Property / Business Entity top area.
+**Profile → Discover → Ask a Pro**
 
-A Request Record may serve as evidence for a reward event without making Points part of the Request screen itself.
+There, a homeowner may eventually ask a public question to the broader professional community and receive answers from multiple relevant professionals.
+
+That public discussion is separate from the private Property Work system.
+
+If a public Discover interaction later establishes a legitimate relationship and actual work is requested, Roundhouse can then create the appropriate private Work, Resolution, Calendar, or Estimate relationship.
 
 ---
 
-# 18. Permissions and Privacy
+# 15. Notifications
+
+Useful request events may generate notifications according to the broader Notifications architecture.
+
+Examples:
+
+- new Work Request received;
+- Work Request accepted;
+- assignment established;
+- appointment scheduled;
+- linked Resolution needs the person's attention;
+- Work completed.
+
+Notifications are not Mail and should follow user notification preferences.
+
+---
+
+# 16. Permissions and Privacy
 
 Property Work Requests are permission-aware.
 
@@ -349,48 +315,47 @@ Examples:
 - a Home Team Member may request work only when permitted;
 - a Business receives only requests legitimately addressed to it through the Property relationship;
 - Trade Team Members see Requests according to Business authority / assignment;
-- outside Trade Partners see only Requests deliberately shared / assigned to them;
-- Viewers remain view-only where request visibility is permitted.
+- outside Trade Partners see only Work deliberately shared / assigned to them;
+- Viewers remain view-only where Work visibility is permitted.
 
-Submitting a Request does not grant the receiving Business unrelated Property visibility.
+Submitting a Work Request does not grant the receiving Business unrelated Property visibility.
 
-Accepting a Request does not grant the requester unrelated Business visibility.
+Accepting Work does not grant the requester unrelated Business visibility.
 
 ---
 
-# 19. Property and Business Timelines
+# 17. Property and Business Timelines
 
-Meaningful Request events may appear in the relevant Property / Business Timeline according to permissions.
+Meaningful Work Request events may appear in the relevant Property / Business Timeline according to permissions.
 
 Examples:
 
 - Work requested;
 - request accepted;
 - inspection scheduled;
-- request answered / resolved;
 - resulting Work completed.
 
 Routine internal metadata edits should not flood the Timeline.
 
-The same underlying Record should be surfaced rather than copied.
+The same underlying Work Record should be surfaced rather than copied.
 
 ---
 
-# 20. Visual Direction
+# 18. Visual Direction
 
-Request Work should feel like asking a trusted service professional for help, not filling out a commercial work-order form.
+Request Work should feel like a simple way to ask a trusted Business to take care of something, not like filling out a commercial work-order form.
 
 Visual priorities:
 
 - one clear **Request Work** action inside Property Work;
 - Property already known;
-- plain-language problem description;
+- plain-language work description;
 - easy photo attachment;
 - optional area / Asset selection;
 - clear receiving Business;
-- simple requester-facing status;
+- simple requester-facing progress;
 - no project-management jargon;
-- no separate Ask-a-Pro dashboard;
+- no Ask-a-Pro discussion thread;
 - no duplicate Client Requests system;
 - clean handoff into Business Work → Requested.
 
@@ -398,11 +363,11 @@ Visual priorities:
 
 ## Governing Relationships
 
-**Request Work = the Property-side intake for asking an authorized Business for help.**  
+**Request Work = ask an authorized Business to do actual work.**  
 **Requested = the Business Work intake stage.**  
-**Work = operational responsibility and execution after acceptance.**  
+**Resolution = any specific unresolved question, decision, approval, clarification, information request, or required outcome.**  
+**Discover → Ask a Pro = future public professional Q&A.**  
 **Calendar = agreed time.**  
-**Tasks / Lists = lightweight follow-up.**  
 **CAPTURE = actual work-session evidence.**  
 **Mail = communication between people.**
 
@@ -410,4 +375,4 @@ Visual priorities:
 
 ## Governing Rule
 
-**A Property Work Request is not a parallel request application. It enters the shared Work architecture at Requested, preserves the original requester and question, can be answered or resolved without unnecessary Work, and can continue as the same underlying Record through acceptance, assignment, scheduling, CAPTURE, completion, and verification when real work is required.**
+**A Property Work Request exists only when actual work is being requested. Questions, approvals, selections, clarifications, and other required responses belong in Resolution; public Ask a Pro questions belong in Discover. A legitimate Work Request enters the shared Work architecture at Requested and remains one underlying Record through acceptance, assignment, scheduling, CAPTURE, completion, and verification.**
