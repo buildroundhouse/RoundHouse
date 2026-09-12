@@ -56,8 +56,9 @@ The Concierge does **not** follow the person into:
 
 - **Mail / Messages**
 - **Reward Center**
+- **Profile**
 
-Those are separate experiences where an active assistant would feel intrusive. Entering either ends or removes the active Concierge presence.
+Those are separate experiences where an active assistant would feel intrusive. Entering any of them ends or removes the active Concierge presence.
 
 ## Daily Grind Appearance
 
@@ -90,6 +91,6 @@ Daily Grind should reference information from Roundhouse systems rather than dup
 6. Concierge can use photographs and notations created during the active session as working context.
 7. Concierge should help convert useful answers into durable Roundhouse actions, lists, documentation, reminders, or Records where appropriate.
 8. Concierge may travel through Command Center work tools and appropriate deeper work destinations while already active.
-9. Concierge does not follow the person into Mail / Messages or Reward Center.
+9. Concierge does not follow the person into Mail / Messages, Reward Center, or Profile.
 10. Daily Grind is the Concierge's proactive morning appearance, not the Concierge's permanent home.
 11. Concierge is focused on Roundhouse work, practical planning, research, documentation, purchasing needs, and related assistance—not unrestricted general conversation.
