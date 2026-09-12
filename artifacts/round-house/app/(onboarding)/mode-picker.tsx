@@ -16,23 +16,51 @@ import {
   useCompleteModeIntake,
   type UserModeKind,
 } from "@workspace/api-client-react";
-import { MODE_LABELS, MODE_TAGLINES, COLLAB_MODES } from "@/lib/intake-schemas";
+import { MODE_LABELS, MODE_TAGLINES } from "@/lib/intake-schemas";
 import { useProfile } from "@/lib/profile";
 
-type PickerEntry =
-  | { kind: UserModeKind; description: string; icon: keyof typeof Feather.glyphMap; sentinel?: false }
-  | { kind: "__collab__"; description: string; icon: keyof typeof Feather.glyphMap; sentinel: true };
+type PickerEntry = {
+  kind: UserModeKind;
+  description: string;
+  icon: keyof typeof Feather.glyphMap;
+};
 
-// Canonical order shown in every account picker / switcher across the
-// app. Mirrors USER_MODE_KIND_ORDER in @workspace/api-zod.
+/**
+ * Product-facing operating roles. The historical `collab` storage kind is not
+ * a selectable operating role; it backs the neutral Viewer profile used when
+ * a person has not yet joined a Home, Facility, or Business context.
+ */
 const ENTRIES: PickerEntry[] = [
-  { kind: "home", description: "I run a place I care about. Track work, history, people.", icon: "home" },
-  { kind: "home_teammate", description: "I help out at someone's home.", icon: "home" },
-  { kind: "trade_pro", description: "I do the work. Run my day, log jobs, manage clients.", icon: "tool" },
-  { kind: "trade_pro_teammate", description: "I work at a Trade Pro business.", icon: "tool" },
-  { kind: "facilities", description: "I keep operations running. Work orders, team, standards.", icon: "grid" },
-  { kind: "facilities_teammate", description: "I work at a commercial facility.", icon: "grid" },
-  { kind: "__collab__", description: "I collaborate with a Trade Pro or Facilities team.", icon: "users", sentinel: true },
+  {
+    kind: "home",
+    description: "I care for a home or property and want its work and history in one place.",
+    icon: "home",
+  },
+  {
+    kind: "home_teammate",
+    description: "I help care for a home as part of its Home Team.",
+    icon: "home",
+  },
+  {
+    kind: "trade_pro",
+    description: "I perform trade work and manage jobs, Properties, and clients.",
+    icon: "tool",
+  },
+  {
+    kind: "trade_pro_teammate",
+    description: "I work as part of a Trade Business team.",
+    icon: "tool",
+  },
+  {
+    kind: "facilities",
+    description: "I manage commercial Properties, operations, standards, and work.",
+    icon: "grid",
+  },
+  {
+    kind: "facilities_teammate",
+    description: "I work as part of a Commercial Management team.",
+    icon: "grid",
+  },
 ];
 
 export default function ModePickerScreen() {
@@ -43,33 +71,31 @@ export default function ModePickerScreen() {
   const activate = useActivateMode();
   const completeIntake = useCompleteModeIntake();
   const [picking, setPicking] = useState<string | null>(null);
-  const [showCollab, setShowCollab] = useState(false);
   const [skipping, setSkipping] = useState(false);
   const [error, setError] = useState("");
 
-  // #572: Reframe mode picker as optional. The Collaborator / Friend
-  // baseline is auto-provisioned for everyone, so a user who'd rather
-  // explore first can skip this step entirely. Confirms once so they
-  // know what landing-as-Collaborator means; they can still add a
-  // primary hat later from Profile → Add another hat.
+  /**
+   * Skip leaves the person with the neutral Viewer profile. Viewer is not an
+   * Entity relationship by itself: actual view access is granted later through
+   * a specific Residential Property or Commercial Facility invitation.
+   *
+   * `collab` remains the historical storage key until the data migration is
+   * complete, but that word is never shown to the person.
+   */
   const handleSkip = () => {
     Alert.alert(
-      "Skip for now?",
-      "You'll land in your Collaborator / Friend profile — a viewer-style account with social features. " +
-        "You can add a Trade Pro, Home, or Facilities hat anytime from your Profile.",
+      "Use a Viewer profile for now?",
+      "You'll enter Roundhouse with a neutral view-only profile. A Home or Facility must invite you before you can view its private information. You can add another Role anytime from Profile.",
       [
         { text: "Cancel", style: "cancel" },
         {
-          text: "Skip",
+          text: "Continue as Viewer",
           style: "default",
           onPress: async () => {
             setSkipping(true);
             setError("");
             try {
               const created = await activate.mutateAsync({ data: { kind: "collab" } });
-              // Collaborator / Friend has no required intake fields, so
-              // mark it complete immediately so the profile gate stops
-              // bouncing the user back to /(onboarding).
               await completeIntake.mutateAsync({
                 modeId: created.id,
                 data: { intakeData: {} },
@@ -78,7 +104,11 @@ export default function ModePickerScreen() {
               await refetchProfile();
               router.replace("/(tabs)");
             } catch (e) {
-              setError(e instanceof Error ? e.message : "Couldn't skip — try picking a hat.");
+              setError(
+                e instanceof Error
+                  ? e.message
+                  : "Couldn't set up the Viewer profile. Please try again.",
+              );
               setSkipping(false);
             }
           },
@@ -88,8 +118,6 @@ export default function ModePickerScreen() {
   };
 
   const activatedKinds = new Set(modes.map((m) => m.kind));
-  const allCollabActivated =
-    activatedKinds.has("trade_pro_collab") && activatedKinds.has("facilities_collab");
 
   const handlePick = async (kind: UserModeKind) => {
     setPicking(kind);
@@ -97,62 +125,38 @@ export default function ModePickerScreen() {
     try {
       const created = await activate.mutateAsync({ data: { kind } });
       await refetchModes();
-      router.replace({ pathname: "/(onboarding)/intake", params: { modeId: String(created.id), kind } });
+      router.replace({
+        pathname: "/(onboarding)/intake",
+        params: { modeId: String(created.id), kind },
+      });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't activate that mode.");
+      setError(e instanceof Error ? e.message : "Couldn't activate that Role.");
       setPicking(null);
     }
   };
 
-  if (showCollab) {
-    return (
-      <View style={[styles.root, { backgroundColor: colors.background, paddingTop: insets.top + 24 }]}>
-        <ScrollView contentContainerStyle={styles.scroll}>
-          <Pressable onPress={() => setShowCollab(false)} style={styles.back}>
-            <Feather name="arrow-left" size={20} color={colors.foreground} />
-            <Text style={[styles.backText, { color: colors.foreground }]}>Back</Text>
-          </Pressable>
-          <Text style={[styles.title, { color: colors.foreground }]}>What kind of collaborator?</Text>
-          <Text style={[styles.intro, { color: colors.mutedForeground }]}>
-            We'll set up the right tools for the team you work in.
-          </Text>
-
-          {COLLAB_MODES.map((kind) => (
-            <ModeTile
-              key={kind}
-              icon={kind === "trade_pro_collab" ? "tool" : "grid"}
-              description={
-                kind === "trade_pro_collab"
-                  ? "I work under a Trade Pro on jobs."
-                  : "I work inside a facilities team."
-              }
-              tagline={MODE_TAGLINES[kind]}
-              label={MODE_LABELS[kind]}
-              onPress={() => handlePick(kind)}
-              disabled={activatedKinds.has(kind)}
-              loading={picking === kind}
-            />
-          ))}
-
-          {error ? <Text style={[styles.error, { color: colors.destructive }]}>{error}</Text> : null}
-        </ScrollView>
-      </View>
-    );
-  }
-
-  // #572: the auto-provisioned Collaborator / Friend baseline doesn't
-  // count as a "real" hat — users still need to pick one (or skip) on
-  // their first visit. Treat the picker as "first run" until they've
-  // activated something other than the baseline collab.
-  const workingModes = modes.filter((m) => m.kind !== "collab");
+  // The neutral Viewer baseline does not count as an operational Role for this
+  // picker. A person still chooses a Home / Trade / Commercial role when they
+  // actually operate through one of those contexts.
+  const workingModes = modes.filter(
+    (m) =>
+      m.kind !== "collab" &&
+      m.kind !== "trade_pro_collab" &&
+      m.kind !== "facilities_collab",
+  );
   const hasExistingModes = workingModes.length > 0;
-  const title = hasExistingModes ? "Add another hat" : "Pick your first hat";
+  const title = hasExistingModes ? "Add another Role" : "How do you use Roundhouse?";
   const intro = hasExistingModes
-    ? "Wear more than one hat in Roundhouse. Pick the next one to set up."
-    : "We all wear different hats. Pick the one that fits right now — or skip and just look around.";
+    ? "Choose another way you legitimately participate."
+    : "Choose the Role that fits what you're doing now, or continue with a neutral Viewer profile until a Home or Facility invites you.";
 
   return (
-    <View style={[styles.root, { backgroundColor: colors.background, paddingTop: insets.top + 16 }]}>
+    <View
+      style={[
+        styles.root,
+        { backgroundColor: colors.background, paddingTop: insets.top + 16 },
+      ]}
+    >
       {hasExistingModes ? (
         <Pressable
           onPress={() => {
@@ -166,39 +170,23 @@ export default function ModePickerScreen() {
           <Text style={[styles.backText, { color: colors.foreground }]}>Profile</Text>
         </Pressable>
       ) : null}
+
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={[styles.title, { color: colors.foreground }]}>{title}</Text>
         <Text style={[styles.intro, { color: colors.mutedForeground }]}>{intro}</Text>
 
-        {ENTRIES.map((p) => {
-          if (p.sentinel) {
-            return (
-              <ModeTile
-                key="__collab__"
-                icon={p.icon}
-                description={p.description}
-                tagline="Work assigned by someone else"
-                label="Collaborator"
-                onPress={() => setShowCollab(true)}
-                disabled={allCollabActivated}
-                disabledLabel="All collaborator modes activated"
-                loading={false}
-              />
-            );
-          }
-          return (
-            <ModeTile
-              key={p.kind}
-              icon={p.icon}
-              description={p.description}
-              tagline={MODE_TAGLINES[p.kind]}
-              label={MODE_LABELS[p.kind]}
-              onPress={() => handlePick(p.kind)}
-              disabled={activatedKinds.has(p.kind)}
-              loading={picking === p.kind}
-            />
-          );
-        })}
+        {ENTRIES.map((p) => (
+          <ModeTile
+            key={p.kind}
+            icon={p.icon}
+            description={p.description}
+            tagline={MODE_TAGLINES[p.kind]}
+            label={MODE_LABELS[p.kind]}
+            onPress={() => handlePick(p.kind)}
+            disabled={activatedKinds.has(p.kind)}
+            loading={picking === p.kind}
+          />
+        ))}
 
         {!hasExistingModes ? (
           <Pressable
@@ -206,18 +194,29 @@ export default function ModePickerScreen() {
             disabled={skipping}
             style={({ pressed }) => [
               styles.skipBtn,
-              { borderColor: colors.border, opacity: pressed || skipping ? 0.7 : 1 },
+              {
+                borderColor: colors.border,
+                opacity: pressed || skipping ? 0.7 : 1,
+              },
             ]}
             accessibilityRole="button"
-            accessibilityLabel="Skip mode picker for now"
+            accessibilityLabel="Continue with Viewer profile"
           >
-            <Text style={[styles.skipText, { color: colors.mutedForeground }]}>
-              {skipping ? "Setting up…" : "Skip for now — I'll just look around"}
-            </Text>
+            <Feather name="eye" size={17} color={colors.mutedForeground} />
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.skipTitle, { color: colors.foreground }]}>Viewer</Text>
+              <Text style={[styles.skipText, { color: colors.mutedForeground }]}>
+                {skipping
+                  ? "Setting up…"
+                  : "Neutral view-only profile. Private Home or Facility access still requires an invitation."}
+              </Text>
+            </View>
           </Pressable>
         ) : null}
 
-        {error ? <Text style={[styles.error, { color: colors.destructive }]}>{error}</Text> : null}
+        {error ? (
+          <Text style={[styles.error, { color: colors.destructive }]}>{error}</Text>
+        ) : null}
       </ScrollView>
     </View>
   );
@@ -231,7 +230,6 @@ function ModeTile({
   onPress,
   disabled,
   loading,
-  disabledLabel,
 }: {
   icon: keyof typeof Feather.glyphMap;
   description: string;
@@ -240,7 +238,6 @@ function ModeTile({
   onPress: () => void;
   disabled?: boolean;
   loading?: boolean;
-  disabledLabel?: string;
 }) {
   const colors = useColors();
   return (
@@ -262,7 +259,7 @@ function ModeTile({
       <View style={{ flex: 1 }}>
         <Text style={[styles.tileTitle, { color: colors.foreground }]}>{label}</Text>
         <Text style={[styles.tileTagline, { color: colors.mutedForeground }]}>
-          {disabled ? disabledLabel ?? "Already activated" : description}
+          {disabled ? "Already active" : description}
         </Text>
         <Text style={[styles.tileFeel, { color: colors.primary }]}>{tagline}</Text>
       </View>
@@ -278,10 +275,21 @@ function ModeTile({
 const styles = StyleSheet.create({
   root: { flex: 1 },
   scroll: { paddingHorizontal: 20, paddingBottom: 32, gap: 12 },
-  back: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 4 },
+  back: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 4,
+    paddingHorizontal: 20,
+  },
   backText: { fontSize: 14, fontFamily: "Inter_500Medium" },
   title: { fontSize: 26, fontFamily: "Inter_700Bold", marginTop: 4 },
-  intro: { fontSize: 14, fontFamily: "Inter_400Regular", lineHeight: 20, marginBottom: 12 },
+  intro: {
+    fontSize: 14,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 20,
+    marginBottom: 12,
+  },
   tile: {
     borderWidth: 1,
     borderRadius: 16,
@@ -290,26 +298,47 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 14,
   },
-  tileIcon: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center" },
+  tileIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   tileTitle: { fontSize: 16, fontFamily: "Inter_700Bold" },
-  tileTagline: { fontSize: 13, fontFamily: "Inter_400Regular", lineHeight: 18, marginTop: 2 },
-  tileFeel: { fontSize: 12, fontFamily: "Inter_500Medium", marginTop: 4, fontStyle: "italic" },
-  error: { fontSize: 13, fontFamily: "Inter_400Regular", textAlign: "center", marginTop: 8 },
+  tileTagline: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 18,
+    marginTop: 2,
+  },
+  tileFeel: {
+    fontSize: 12,
+    fontFamily: "Inter_500Medium",
+    marginTop: 4,
+    fontStyle: "italic",
+  },
+  error: {
+    fontSize: 13,
+    fontFamily: "Inter_400Regular",
+    textAlign: "center",
+    marginTop: 8,
+  },
   skipBtn: {
     marginTop: 12,
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderWidth: StyleSheet.hairlineWidth,
     borderRadius: 12,
+    flexDirection: "row",
     alignItems: "center",
+    gap: 12,
   },
-  skipText: { fontSize: 14, fontFamily: "Inter_500Medium" },
-  sectionHeading: {
+  skipTitle: { fontSize: 15, fontFamily: "Inter_700Bold" },
+  skipText: {
     fontSize: 12,
-    fontFamily: "Inter_600SemiBold",
-    textTransform: "uppercase",
-    letterSpacing: 0.6,
-    marginTop: 16,
-    marginBottom: 4,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 17,
+    marginTop: 2,
   },
 });
