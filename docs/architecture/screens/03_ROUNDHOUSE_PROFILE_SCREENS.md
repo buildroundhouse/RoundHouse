@@ -76,9 +76,90 @@ The Message button does not create a separate Profile mailbox or a context-free 
 
 ---
 
+## 4A. Find / Entity Search
+
+On the editable/private Profile, directly below the identity/action area is a global Roundhouse search area.
+
+This restores the useful legacy idea that Profile is also the doorway for locating a person or Entity that is **not already in the user's People relationships**.
+
+The search should feel like one clear utility rather than several disconnected search products.
+
+A suitable prompt is:
+
+**Find a person, Home, Business, or Trade Pro…**
+
+Search can locate deliberately searchable Roundhouse identities such as:
+
+- people;
+- Home / Property Entities;
+- Trade Businesses;
+- Trade Professionals;
+- other supported public Entities as the model expands.
+
+Useful search inputs can include name, Business name, trade/category, username, and area / ZIP where appropriate.
+
+This search is explicitly different from **People**.
+
+**People = people and Entities I already have a legitimate Roundhouse relationship with.**  
+**Find / Entity Search = locate someone or something beyond my existing relationship directory.**
+
+### When the Entity Is Missing
+
+If the intended person or Entity is not found, the search flow can offer the appropriate next step according to Entity type and the current person's authority.
+
+Examples include:
+
+- **Invite Person**;
+- **Invite Business**;
+- **Create Home / Property Entity** where legitimate;
+- begin an appropriate **claim / setup** path for an Entity that should exist but is not yet represented.
+
+The system must not let one person improperly create ownership, authority, or private access merely because a search returned no result.
+
+The governing rule is:
+
+**Search first. If the intended Entity is genuinely missing, offer the legitimate create / invite / claim path instead of forcing the user to leave Roundhouse.**
+
+---
+
+## 4B. Discover Entry
+
+Directly beneath Find / Entity Search is a visually stronger **Discover** entry.
+
+Unlike the quiet utility of Entity Search, Discover should feel more energetic and editorial—something new is happening there.
+
+During MVP, the card prominently carries the banner:
+
+**DISCOVERY CENTER — COMING SOON**
+
+The card can preview future content visually with representative story imagery, trade/category labels, professional cards, or other sample editorial elements.
+
+Tapping it opens the dedicated **Discover preview page** governed by:
+
+**`31_DISCOVER.md`**
+
+The full public Discover ecosystem is intentionally post-MVP, but its place in the product exists from the beginning.
+
+Future Discover includes concepts such as:
+
+- public homeowner Project Stories;
+- search by problem / trade / area;
+- professional discovery;
+- **Ask a Pro** public Q&A;
+- Best Answer / professional reputation;
+- Roundhouse Spotlight / hero stories;
+- clearly labeled sponsored content.
+
+Discover does not replace the Profile's direct Find / Entity Search.
+
+**Find = I am looking for someone or something specific.**  
+**Discover = show me useful stories, professionals, answers, and possibilities around a problem or need.**
+
+---
+
 # 5. Editable Personal Information
 
-Below the identity area begins the main vertically scrolling Profile information.
+Below the Find / Discover area begins the main vertically scrolling Profile information.
 
 These are **personal/Role fields**, not Business Entity information. Company services, company marketing information, years in business, and similar Business-level information belong to the Business Entity page.
 
@@ -158,6 +239,10 @@ Visually, from top to bottom:
 ↓  
 **Overlapping Profile Photo → Entity Logo → Name / Role / Entity → Profile Action Area**  
 ↓  
+**Find / Entity Search**  
+↓  
+**Discover — Discovery Center Coming Soon preview card**  
+↓  
 **Editable personal information with Public/Private controls on the far right**  
 ↓  
 **Authority & Permissions →**  
@@ -169,6 +254,8 @@ Visually, from top to bottom:
 For the Profile owner, the **Profile Action Area** contains **View Profile → Share Roundhouse + Points**. On the outward-facing Profile, that same area contains **Message**.
 
 The important visual hierarchy is that **the person dominates the page**. The banner and large Profile Photo establish the person; the smaller Entity Logo establishes the context in which that version of the person is participating. Company information does not take over the person's Profile.
+
+The Find / Discover area gives the person a predictable doorway outward from their private Roundhouse relationships without turning Profile itself into a public feed.
 
 ## Profile Wireframe
 
