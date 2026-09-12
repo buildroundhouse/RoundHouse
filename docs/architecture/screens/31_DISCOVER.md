@@ -2,7 +2,7 @@
 
 ## Status
 
-**MVP shell / Post-MVP feature set**
+**MVP preview page / Post-MVP feature set**
 
 Roundhouse should ship the **Discover** destination as a visible, intentional preview during MVP, but the full public discovery ecosystem is deferred until after MVP.
 
@@ -14,7 +14,7 @@ The MVP version should make the future direction obvious without forcing the cor
 
 **Discover** is Roundhouse's public discovery layer.
 
-It is where someone goes when they are looking beyond the people and Entities they already know.
+It is where someone goes when they want to explore beyond a direct search for a specific Trade Professional, Residential Home, or Commercial Facility.
 
 It answers questions such as:
 
@@ -28,42 +28,75 @@ Discover is not the user's private working system.
 
 **Private Roundhouse = Property, Business, Work, Resolution, Mail, CAPTURE, Calendar, Records.**
 
-**Discover = public search, stories, professional discovery, public questions, reputation, and intentionally published content.**
+**Discover = public success stories, professional discovery, public Q&A / message-board discussion, reputation, and intentionally published content.**
 
 ---
 
-# 1. Placement
+# 1. Entry From Profile
 
 Discover is reached from the **Profile Page**.
 
-The Profile Page retains a global **Find / Entity Search** area for locating a Trade Business, professional, Home / Property Entity, or other legitimately searchable Roundhouse identity.
+The Profile Page first contains the three direct **Find** search bars:
 
-Directly beneath that search area is a more visually energetic **Discover** entry card.
+1. **Find a Trade Professional**
+2. **Residential Home Search**
+3. **Commercial Facility Search**
 
-During MVP, the card should prominently say:
+Directly beneath those three search bars is a visually stronger **Discover** card.
 
-**DISCOVERY CENTER — COMING SOON**
+The Profile card should read approximately:
 
-The product-facing destination name remains **Discover**. The phrase **Discovery Center — Coming Soon** is the launch banner / promotional treatment shown during MVP.
+**Discover**  
+**Find pros and success stories in your area.**  
+**Q&A · Message Board**
 
-Tapping the card opens the Discover preview page.
+The card should feel more energetic and editorial than the utility search bars above it.
+
+The **Coming Soon** banner belongs primarily on the Discover page after the person taps the card, rather than turning the Profile card into a dead placeholder.
 
 ---
 
-# 2. MVP Discover Preview
+# 2. Discover Page Navigation
 
-The MVP page is not a dead placeholder.
+Tapping the Discover card opens a **dedicated Discover page**.
+
+At the upper-left is a clear **Back button**.
+
+**Back → Profile**
+
+The user should never be trapped inside the preview or have to return through the Command Center to leave Discover.
+
+The page title is:
+
+**Discover**
+
+Near the top is a prominent launch treatment:
+
+**COMING SOON**
+
+or
+
+**DISCOVERY CENTER — COMING SOON**
+
+The page itself explains and visually previews the future Discover experience.
+
+---
+
+# 3. MVP Discover Preview
+
+The MVP page is not a blank placeholder.
 
 It should visually explain what is coming through a polished preview of the future experience.
 
-The page can contain representative, non-interactive or clearly preview-labeled modules such as:
+Representative preview modules can include:
 
-- **Stories Near You**
+- **Success Stories Near You**
 - **Ask a Pro**
 - **Find Great Pros**
+- **Q&A / Message Board**
 - **Roundhouse Spotlight**
 - example trade/category chips such as Roofing, Drywall, HVAC, Plumbing, Electrical, Landscaping, Remodeling;
-- sample story cards showing the type of public information that may eventually appear;
+- sample success-story cards showing the type of public information that may eventually appear;
 - a clear **Coming Soon** state wherever a feature is not live.
 
 The preview should feel more exciting and editorial than the operational screens in Roundhouse.
@@ -72,35 +105,28 @@ It is a promise of a future public ecosystem, not another dashboard.
 
 ---
 
-# 3. Find / Entity Search Is Different From Discover
+# 4. Find Is Different From Discover
 
-The Profile's global Entity search and Discover are related, but they are not the same thing.
+The Profile's three Find search bars and Discover are related, but they do different jobs.
 
-**Find / Entity Search** is the direct utility:
+**Find** is direct lookup:
 
-**I know what person, Home / Property Entity, Trade Business, or professional I am looking for.**
+- Find a Trade Professional;
+- search a Residential Home;
+- search a Commercial Facility;
+- if the intended Entity is genuinely missing, offer the legitimate create / invite / claim path.
 
-It may search by useful identifiers such as:
+**Discover** is exploration:
 
-- person or Entity name;
-- Business name;
-- trade / category;
-- service area / ZIP or location where appropriate;
-- other deliberately searchable public identity information.
+**I have a problem, interest, or need and want to see useful people, stories, and public knowledge around it.**
 
-If the intended Entity is not yet present in Roundhouse, the appropriate flow may allow the user to **create, invite, or begin a claim/setup path**, depending on Entity type and authority.
-
-Discover is broader:
-
-**I have a problem, interest, or need and want to see what Roundhouse knows about it.**
-
-This distinction keeps simple lookup fast while allowing Discover to become richer later.
+This distinction keeps direct search fast while allowing Discover to become richer later.
 
 ---
 
-# 4. Public Project Stories
+# 5. Public Success Stories
 
-A major future Discover surface is **public Project Stories**.
+A major future Discover surface is **public Success Stories**.
 
 A homeowner may deliberately choose to publish a story derived from a real Roundhouse job or Property experience.
 
@@ -115,7 +141,7 @@ Examples:
 - water heater replacement;
 - electrical upgrade.
 
-A Story can eventually include intentionally shared information such as:
+A Success Story can eventually include intentionally shared information such as:
 
 - problem / goal;
 - selected before / during / after photographs;
@@ -124,7 +150,7 @@ A Story can eventually include intentionally shared information such as:
 - approximate cost range when the homeowner chooses to share it;
 - trade category;
 - general area / market;
-- participating professional or Business when both visibility and permissions allow;
+- participating professional or Business when visibility and permissions allow;
 - homeowner review / takeaway;
 - related public professional profile.
 
@@ -136,7 +162,7 @@ Exact Property addresses, private documents, internal notes, private messages, r
 
 ---
 
-# 5. Search by Problem and Area
+# 6. Search by Problem and Area
 
 Future Discover search should support the way homeowners naturally think.
 
@@ -150,9 +176,10 @@ Examples:
 
 Search can return a useful blend of public results such as:
 
-- Project Stories;
+- Success Stories;
 - relevant Trade Businesses / professionals;
 - Ask a Pro discussions;
+- message-board discussions;
 - Roundhouse Spotlight stories;
 - applicable categories.
 
@@ -160,15 +187,17 @@ The system should favor useful local relevance without exposing precise private 
 
 ---
 
-# 6. Ask a Pro
+# 7. Ask a Pro / Q&A Message Board
 
 **Ask a Pro belongs in Discover, not inside Property Work and not inside Roundhouse Mail.**
 
-It is a future public / community professional Q&A surface similar in spirit to a focused Reddit-style question thread.
+It is a future public professional Q&A / message-board surface similar in spirit to a focused Reddit-style discussion.
 
 A homeowner can post a question to an appropriate trade/category rather than directing it to one already-connected professional.
 
-Multiple qualified or relevant professionals may respond.
+Multiple relevant professionals may respond.
+
+Other users may be able to find the discussion later through keywords, trade category, and general area.
 
 This is fundamentally different from a private Resolution.
 
@@ -182,7 +211,7 @@ The public thread itself does not become the Work Record.
 
 ---
 
-# 7. Best Answer and Professional Reputation
+# 8. Best Answer and Professional Reputation
 
 A future Ask a Pro thread can allow the homeowner / original asker to choose a **Best Answer** after a reasonable opportunity for responses.
 
@@ -203,7 +232,7 @@ This reputation layer is **post-MVP**.
 
 ---
 
-# 8. Roundhouse Spotlight
+# 9. Roundhouse Spotlight
 
 Discover can eventually include **Roundhouse Spotlight** stories.
 
@@ -223,7 +252,7 @@ Sponsored content must remain separately and clearly labeled.
 
 ---
 
-# 9. Advertising
+# 10. Advertising
 
 Discover is the appropriate future location for **clearly labeled sponsored content** because it is a public discovery environment rather than the user's private operating workspace.
 
@@ -247,19 +276,19 @@ Advertising implementation is **post-MVP**.
 
 ---
 
-# 10. Relationship to People
+# 11. Relationship to People
 
 **People** remains the directory of people and Entities the user already legitimately knows through Roundhouse.
 
 Discover does not replace People.
 
 **People = who am I already connected to?**  
-**Find / Entity Search = locate a known or specifically sought Entity.**  
-**Discover = explore problems, stories, professionals, questions, and opportunities beyond my existing relationships.**
+**Find = direct search for a Trade Professional, Residential Home, or Commercial Facility.**  
+**Discover = explore problems, success stories, professionals, questions, and opportunities beyond my existing relationships.**
 
 ---
 
-# 11. Lead Generation
+# 12. Lead Generation
 
 Discover can naturally become a lead-generation surface for Trade Businesses, but it should not feel like a raw lead marketplace.
 
@@ -269,7 +298,7 @@ A professional can be discovered because of:
 - service category / area;
 - useful Ask a Pro participation;
 - Best Answers;
-- published Project Stories;
+- published Success Stories;
 - homeowner reviews / Spotlight recognition;
 - legitimate sponsored placement when clearly labeled.
 
@@ -277,16 +306,17 @@ The homeowner should feel that they are **finding evidence and useful people**, 
 
 ---
 
-# 12. MVP Boundary
+# 13. MVP Boundary
 
 For MVP, build only enough Discover presence to establish its permanent home and future direction.
 
 MVP should include:
 
-- Discover entry on Profile;
-- **Discovery Center — Coming Soon** banner;
-- visually compelling preview page;
-- representative future modules / categories;
+- Discover card on Profile beneath the three Find search bars;
+- dedicated Discover page;
+- clear **Back → Profile** control;
+- prominent **Coming Soon** treatment on the Discover page;
+- visually compelling preview of future modules / categories;
 - clear separation from private Roundhouse systems.
 
 MVP does **not** require:
@@ -297,7 +327,7 @@ MVP does **not** require:
 - public reputation scoring;
 - Discover-specific badges;
 - ad marketplace / ad serving;
-- full public Story publishing;
+- full public Success Story publishing;
 - public feed moderation systems.
 
 Those are deliberate post-MVP expansions.
@@ -307,9 +337,9 @@ Those are deliberate post-MVP expansions.
 ## Governing Relationships
 
 **People = existing legitimate relationships.**  
-**Find / Entity Search = direct lookup and create/invite/claim path when the sought Entity is missing.**  
-**Discover = public exploration of stories, problems, professionals, and knowledge.**  
-**Ask a Pro = public professional Q&A inside Discover.**  
+**Find = direct lookup through the three Profile search bars.**  
+**Discover = public exploration of success stories, problems, professionals, and knowledge.**  
+**Ask a Pro = public professional Q&A / message board inside Discover.**  
 **Resolution = private responsibility for a specific question, decision, approval, clarification, or required outcome.**  
 **Work = actual operational work.**
 
@@ -317,4 +347,4 @@ Those are deliberate post-MVP expansions.
 
 ## Governing Rule
 
-**Roundhouse Discover is the public discovery layer for finding useful professionals, similar homeowner stories, public professional knowledge, and future lead opportunities. During MVP it exists as an exciting Profile-linked preview marked Discovery Center — Coming Soon; the public posting, Ask a Pro, reputation, Story publishing, advertising, and community mechanics remain intentionally post-MVP.**
+**Roundhouse Discover is a dedicated Profile-linked public discovery page with a Back button to Profile. During MVP it is visibly present as an exciting Coming Soon preview for finding pros, local Success Stories, public Q&A / message-board discussions, and future Spotlight content; the live public posting, reputation, advertising, and community mechanics remain intentionally post-MVP.**
