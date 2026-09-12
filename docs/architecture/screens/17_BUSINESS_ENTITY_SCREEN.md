@@ -2,14 +2,16 @@
 
 ## Purpose
 
-The Business Entity is the permanent digital place for one Business and also a legitimate workplace for authorized Owners, Managers, Trade Professionals, Trade Team Members, and approved outside trade partners.
+The Business Entity is the permanent digital place for one Business and a legitimate workplace for authorized Owners, Managers, Trade Professionals, Trade Team Members, and accepted outside Trade Professionals / subcontractors.
 
 It is not another personal Command Center.
 
 **Command Center = the person's working view.**  
 **Business Entity = what the Business is doing, who is operating through it, what Properties it is serving, and what Business-owned resources and records belong to it.**
 
-The Business Entity should preserve useful positional familiarity from the Command Center while remaining visually distinct enough that the person always understands they are inside the Business rather than on their personal Command Center.
+The Business Entity preserves useful positional familiarity from the Command Center while remaining visually distinct enough that the person always understands they are inside the Business.
+
+Invitation and participant behavior is governed by **`33_INVITATIONS.md`**, **`27_BUSINESS_TEAM.md`**, and **`28_BUSINESS_PROPERTIES.md`**.
 
 ---
 
@@ -17,15 +19,15 @@ The Business Entity should preserve useful positional familiarity from the Comma
 
 The person's Avatar remains visible in the upper-right so the interface always identifies who is operating.
 
-The Business Entity does **not** show the person's Points / Status control. Points belong to the person and remain part of the personal Command Center / Reward Center experience.
+The Business Entity does **not** show personal Points / Status. Points remain part of the personal Command Center / Reward Center experience.
 
-A Business-context Mail control remains available. Opening Mail from the Business Entity opens the same Roundhouse Mail system filtered to conversations associated with that Business and available to the current person.
+Business-context Mail remains available and opens the same Roundhouse Mail system filtered to conversations associated with that Business and available to the current person.
+
+Notifications remain available beside Mail according to **`32_NOTIFICATIONS.md`**.
 
 ---
 
 ## 2. Compact Business Header
-
-The Business Entity begins with the same compact Entity-header language used by the Property Entity.
 
 ### Left approximately one-third
 
@@ -36,25 +38,17 @@ Shows:
 
 If the person legitimately operates through more than one Business Entity, a small bright Roundhouse-blue **Switch** control appears beneath the Business identity.
 
-**Switch** opens the person's available Business choices and changes the current Business context.
-
-If the person has access to only one Business, **Switch** is hidden.
-
 ### Right approximately two-thirds
 
-Shows the representative company photograph / Business image / branding.
-
-The wider image area keeps the image visually useful without making the header tall enough to consume substantial working space.
+Shows the representative Business photograph / branding.
 
 ---
 
 ## 3. Business Timeline
 
-The Business Timeline is the collective chronological history of Business activity available to the current person according to Role, authority, and permissions.
+The Business Timeline is the collective chronological history of Business activity available to the current person according to Role, authority, permissions, and legitimate Business participation.
 
-It is not a dump of every employee's private personal Timeline.
-
-The familiar Timeline Search control remains in the upper-left area of the Timeline and filters the Business Timeline only.
+It is not a dump of every worker's private personal Timeline.
 
 **Avatar Timeline = what I am doing.**  
 **Business Timeline = what the Business is doing.**
@@ -63,16 +57,14 @@ The familiar Timeline Search control remains in the upper-left area of the Timel
 
 # 4. Right Edge — Four Business Tabs
 
-The Business Entity uses the same four-tab right-edge geometry as the Command Center and Property Entity so users retain positional familiarity.
-
-The tabs are Business-scoped:
+The Business Entity uses four right-edge tabs:
 
 1. **Work**
 2. **Team**
 3. **Properties**
 4. **Vault**
 
-These controls should ultimately be icon-first. Their governing text labels remain available for accessibility, tooltips, expanded states, and documentation.
+These controls are Business-scoped and should ultimately be icon-first while retaining governing text labels for accessibility and documentation.
 
 ---
 
@@ -82,254 +74,147 @@ Work answers:
 
 **What does this Business have on its plate across all Properties?**
 
-It is the Business-level integration home for the useful logic previously split across **My Jobs**, Work Orders, assignments, requests, due work, recurring work, and related execution systems.
-
-Work is a Business-scoped working sheet over the Timeline rather than another unrelated destination.
-
-### Work is not Daily Grind
-
-Daily Grind belongs to a person and answers what that person needs to do today.
-
-Business Work is collective and answers what the Business has on its plate.
-
-A manager may see work across the Business according to authority. A Trade Team Member sees only work they are permitted or assigned to see. Opening Business Work does not expose private personal schedule details or another person's private Timeline.
-
-### Business Work View
-
-The governing Business Work screen uses a lean tiered **Work Flow Rail** inspired by a timeline / bracket structure rather than a full Kanban board or literal tournament bracket.
-
-The lifecycle remains:
+The governing lifecycle remains:
 
 **Requested → Open → Assigned → In Progress → Complete → Verified**
 
 with **Cancelled** as a terminal exception.
 
-Each lifecycle stage appears as a tier on one slim rail. Compact Work cards sit beside the tier they currently occupy and connect with a short branch line. The bracket inspiration should be structural, not decorative.
+**Needs Attention** is a cross-stage priority condition, not another lifecycle stage.
 
-**Needs Attention** is a priority condition above the rail, not another lifecycle stage. It can surface overdue, blocked, failed-verification, urgent, or otherwise actionable Work while each item remains in its real stage.
+Business Work makes Property context, assignee, due date, and current state prominent.
 
-Business Work cards make **Property context** prominent because the screen spans many jobsites. Property, assignee, due date, and current state are the main scan points.
+Authorized Owners / Managers can assign or reassign work to appropriate Trade Team Members and accepted outside Trade Professionals according to Business and Property permissions.
 
-Stages can expand or collapse, and filters can narrow by Property, assignee, due date, priority, category, Asset, or attention state without changing the underlying rail.
-
-The full Business Work screen, Flow Rail, lifecycle, responsive layout, and execution relationships are governed by:
-
-**`26_BUSINESS_WORK.md`**
-
-### Work Item / Work Order Core Information
-
-A work item can retain the useful legacy Work Order structure where appropriate:
-
-- title / description
-- Property
-- category
-- priority
-- creator / requester
-- assignee
-- due date
-- optional related Asset / Equipment record
-- optional purchase-order or external reference number
-- status / current state
-- photographs
-- files
-- comments / discussion
-- chronological activity history
-
-Attachments may retain meaningful phase context such as:
-
-- created / starting condition
-- in progress
-- completion
-
-This preserves the useful visual evidence structure already present in the older Work Order system.
-
-### Assignment
-
-Authorized Owners / Managers can assign or reassign Business work to appropriate Trade Team Members or approved outside trade partners.
-
-The assigned person's own working views may surface that assignment, but the underlying work item remains attached to the Business and Property context rather than becoming a duplicate personal record.
-
-A person should be able to see their assigned work across Properties through their own working experience while managers can inspect the Business-wide work picture here.
-
-### Status / Execution Flow
-
-The governing lifecycle is:
-
-**Requested → Open → Assigned → In Progress → Complete → Verified**
-
-with **Cancelled** as a terminal state.
-
-Governing interpretation:
-
-- **Requested** — someone has legitimately requested work.
-- **Open** — accepted into the Business workload but not yet assigned.
-- **Assigned** — responsibility has been given to a person/team.
-- **In Progress** — actual work has begun.
-- **Complete** — worker says the requested work is finished.
-- **Verified** — an authorized manager / governing party confirms completion where verification is required.
-- **Cancelled** — the work will not proceed.
-
-The Flow Rail communicates this progression without forcing the user to manage six giant columns.
-
-### CAPTURE Integration
-
-A work item is not a competing replacement for CAPTURE.
+Assigning a person to Work at a Property does **not** silently grant unrestricted Property access. Property participation must resolve through the governing Property authorization path.
 
 **Work identifies and organizes the job. CAPTURE documents the real work session.**
 
-When an assigned work item is opened at a Property, an authorized worker can move into the Property / CAPTURE workflow. Real-time check-in, photographs, checklist changes, materials, shopping, breaks, estimates, invoices, and check-out remain governed by CAPTURE.
-
-Relevant CAPTURE results can update the work item's progress and become part of the Business and Property Timeline without creating duplicate records.
-
-### Calendar Integration
-
-Scheduled work belongs on Calendar.
-
-A Work item may be linked to an appointment, but Work does not become a second calendar. Scheduling negotiation and confirmed time remain governed by Calendar.
-
-### Resolution Integration
-
-A genuine unresolved problem can create or link to a Resolution.
-
-A Work item should not be used merely as a substitute for a Resolution when the core problem is waiting on another person, approval, decision, missing information, or another unresolved dependency.
-
-A blocked Work item stays in its actual lifecycle stage and can show a compact blocker / Needs Attention indicator.
-
-### Recurring Work
-
-Recurring maintenance or repeating Business work may generate future Work items according to an approved cadence.
-
-The recurring rule is the template; each generated occurrence becomes a real dated work item / Record so the Business can see whether that occurrence was completed, skipped, deferred, or remains outstanding.
-
-### Comments and Attachments
-
-Work can retain a focused work discussion area with photographs and files where useful.
-
-This is not a replacement for Roundhouse Mail. Comments stay attached to the Work item because they are part of executing that work; broader person-to-person communication remains in Mail.
-
-Comments and attachments follow the Work item's permissions.
-
-### Verification
-
-Where a Business uses manager verification, an authorized Owner / Manager may verify completed work.
-
-Verification should mean someone with legitimate authority confirmed the result; it must not be presented as automatic proof of workmanship or quality beyond what was actually reviewed.
-
-### Governing Work Rule
-
-**Business Work organizes responsibility and execution across the Business. Property Work narrows that same reality to one place. CAPTURE proves what actually happened during the work session.**
+The full Work architecture is governed by **`26_BUSINESS_WORK.md`**.
 
 ---
 
 ## 4.2 Team
 
-Team is the Business-scoped operating roster.
-
-It answers:
+Team answers:
 
 **Who operates through this Business?**
 
-The visible label is **Team**, not **Business Team**. The right-edge control should ultimately be icon-first using a custom Roundhouse crew / roster symbol rather than a businessman, tie, briefcase, office-building, or generic single-person icon.
-
-The preferred icon direction is a compact **connected crew mark**: three simple avatar-like circular nodes arranged as a group and subtly connected by one shared line / base. It should communicate people working together without implying gender, hierarchy, or corporate status, and it should remain visually distinct from the broader bottom-bar People icon.
-
-Team is not the person's full People directory.
-
-### Team hierarchy
-
-The primary organization is:
+Primary groups:
 
 1. **Owners / Managers**
 2. **Trade Team Members**
-3. **Subcontractors / Outside Trade Partners**
-
-This distinction is deliberate:
+3. **Subcontractors / Outside Trade Professionals**
 
 **Trade Team Members belong to the Business. Subcontractors work with the Business.**
 
-Subcontractors remain visible because they are part of how the Business gets work done, but they do not receive Business-member authority merely because they appear in Team.
+Viewer is **not** a Business Team category. Viewer is the neutral view-only Role used when a person is deliberately authorized to a Residential Property or Commercial Facility.
 
-### Team sheet
+### Add / Invite
 
-The Team tab opens a Business-scoped working sheet over the Timeline.
+Authorized people use **+ Add / Invite** to establish a Business relationship.
 
-At the top:
+The Business must determine how the person participates before sending the invitation, such as:
 
-- **Team**
-- Business name
-- **Search Team**
-- **+ Add / Invite** when the current person has authority
+- Trade Team Member;
+- Subcontractor / Outside Trade Professional;
+- Supplier or another supported Business relationship.
 
-Each person can show:
+Owner, Lead, and Manager are authority designations layered separately from base Role.
 
-- Avatar
-- name
-- title / position
-- relationship to the Business
-- current authority / membership state where appropriate
-- concise current assignment context where useful
+Pending invitations remain separate from active Team members and are also visible in the global Invitation Center.
 
-Pending invitations appear separately from the active roster.
+### Business → Subcontractor Flow
 
-### Person action card
+The governing sequence is:
 
-Tapping a person opens a compact action card rather than immediately navigating away.
+**Business invites Sub → Sub accepts Business relationship → Business assigns / proposes Sub to Property → Property access is resolved**
 
-Depending on relationship and permission, actions may include:
+The Business is responsible for bringing its participant forward.
 
-- View Profile / Entity
-- View Assigned Work
-- Message
-- Call
-- Email
-- view relevant Property / job relationships
+The subcontractor should not be required to find the Homeowner's Property and independently request access.
 
-For authorized Owners / Managers, Business members may additionally expose appropriate controls for:
+The Homeowner should not be required to search for the subcontractor and reconstruct the Business's staffing decision.
 
-- Business authority
-- assignments
-- membership state
-
-Subcontractors / outside partners do **not** receive internal Business-member authority controls.
-
-The full Team screen, icon direction, roster structure, invitation behavior, and Team-vs-People boundary are governed by:
-
-**`27_BUSINESS_TEAM.md`**
+The full Team architecture is governed by **`27_BUSINESS_TEAM.md`**.
 
 ---
 
 ## 4.3 Properties
 
-Properties is the Business-level doorway into the Properties where the Business has a legitimate current operational relationship.
-
-It answers:
+Properties answers:
 
 **Where is this Business legitimately authorized to work?**
 
-The screen is divided into two primary sections:
+The screen has two primary sections:
 
-**Owner-Connected** — a claimed owner / homeowner governs the Property and the Business is legitimately authorized to participate.
+### Owner-Connected
 
-**Unclaimed** — the Business has a legitimate operational relationship to the Property, but no owner has yet claimed the Property in Roundhouse.
+A claimed Owner governs the Property and the Business has a legitimate authorized relationship.
 
-This is an ownership / authority distinction, not a Work-status distinction. Within each section, Properties are sorted by most recent legitimate activity.
+### Unclaimed
 
-When an owner later claims an Unclaimed Property, the same Property Record moves into **Owner-Connected**. Roundhouse does not create a second Property or discard Work, CAPTURE evidence, Maintenance, Assets, Specs, Documents, History, or legitimate Business relationships.
+The Business has a legitimate operational relationship to the Property, but no Owner has yet claimed governance in Roundhouse.
 
-An Unclaimed Property does **not** mean the Business owns the real estate. It means Roundhouse does not yet have a claimed owner identity governing that Property.
+### Claimed Property Participant Approval
 
-The Properties right-edge control should ultimately be icon-first using a grouped-roofline / multiple-Properties mark rather than a generic map pin.
+When the Business assigns an accepted Business participant to an Owner-Connected Property and the Business does **not** hold delegated participant-management authority:
 
-Tapping a Property opens the established compact Property action card:
+**Business proposes participant → Homeowner reviews → Approve / Decline**
 
-- **Enter Property**
-- **Navigate** when an authorized usable address exists
+The Homeowner sees Business, participant, intended relationship, Property, Work context, requested permission scope, and requester.
 
-Entering the Property opens the separate Property Entity and its Property-scoped tools.
+### Delegated Manager Authority
 
-The full Business Properties screen, Owner-Connected / Unclaimed structure, claim transition, sorting, permissions, and icon direction are governed by:
+A Homeowner may explicitly give the Business / Trade Professional **Manager authority** that includes managing Property participants.
 
-**`28_BUSINESS_PROPERTIES.md`**
+When that authority is active:
+
+**Business assigns accepted participant → Manager approves within delegated scope → Property access activates → Homeowner is informed**
+
+The Homeowner receives an informational Notification rather than another approval task.
+
+The permanent Record identifies who exercised the delegated authority and why the person received access.
+
+### Unclaimed Property
+
+A legitimate managing Business may assign accepted Business participants directly to an Unclaimed Property within its operational authority.
+
+Roundhouse should not create a circular request-back-to-the-same-Business flow.
+
+When the legitimate Owner later claims the Property, the same Property and history remain while current permissions transition to Owner-governed rules.
+
+The full Properties architecture is governed by **`28_BUSINESS_PROPERTIES.md`**.
+
+---
+
+# 5. Permission Source and Derived Access
+
+Every Property permission created through Business participation retains its source.
+
+A participant can have access because of:
+
+- Owner direct authorization;
+- delegated Manager authorization;
+- Business-derived assignment;
+- independent Property authorization;
+- another legitimate governing source.
+
+## Business-Derived Access
+
+If a person's Property access exists only because they are working through this Business, the access is **Business-derived**.
+
+When the Business removes that person from the governing Business relationship, Roundhouse automatically removes current Property permissions that depend solely on that Business relationship.
+
+The Homeowner does not have to manually remove the Business's former worker from every Property.
+
+Historical Work, CAPTURE evidence, Timeline activity, communications, Resolutions, and attribution remain.
+
+## Independent Reconnection
+
+If the Homeowner independently wants to continue working with that Trade Professional, the Homeowner may establish a new direct Property relationship.
+
+That independent authorization has its own permission source and survives unrelated Business changes.
 
 ---
 
@@ -337,72 +222,20 @@ The full Business Properties screen, Owner-Connected / Unclaimed structure, clai
 
 Vault is the permanent Business-information and Business-asset destination.
 
-It answers:
-
-**What permanent things belong to this Business, and where are they now?**
-
-The two primary Vault sections are:
+Primary sections:
 
 - **Assets & Equipment**
 - **Business Records**
 
-### Assets & Equipment
+For shared assets, **Current Possession** remains a first-class truth separate from ownership, assignment, physical location, and availability.
 
-Business-owned shared Assets include vehicles, trailers, generators, ladders, specialty tools, measuring / diagnostic equipment, and other durable equipment.
-
-For shared assets, **Current Possession** is a first-class operational truth rather than hidden metadata.
-
-Current Possession answers:
-
-**Who or what currently has this asset?**
-
-Examples:
-
-- **Current Possession: Mike Rodriguez**
-- **Current Possession: Truck 2**
-- **Current Possession: Spring Lake Residence**
-- **Current Possession: Main Shop**
-
-Possession is distinct from Business ownership, assignment, physical location, and availability. An asset can remain Business-owned while currently possessed by a Team member, vehicle, trailer, Property / jobsite, or storage location.
-
-Asset cards should make Current Possession one of the strongest scan points so authorized workers can quickly answer practical questions such as:
-
-**Who has the laser measure?**  
-**Which truck is the generator in?**  
-**Where is the trailer?**
-
-Authorized people can use **Transfer Possession** to move the current custody state. Roundhouse preserves a chronological possession history while maintaining only one governing current holder at a time.
-
-Asset Detail may also show availability, condition, normal storage location, current physical location where useful, maintenance / service state, related Work, and documents.
-
-### Business Records
-
-Business Records contains durable company information such as:
-
-- licenses;
-- insurance certificates;
-- company documents;
-- policies;
-- approved templates;
-- equipment warranties / manuals;
-- registrations;
-- other permanent Business records.
-
-Sensitive Business Records may use tighter permission rules than ordinary shared-equipment possession information.
-
-The full Business Vault, Current Possession, custody-history, asset-detail, maintenance, documents, and permissions architecture is governed by:
-
-**`29_BUSINESS_VAULT.md`**
-
-### Visual direction
-
-Vault should ultimately use an icon-first custom Roundhouse visual symbol rather than a platform-standard emoji. **Vault** is the current governing label.
+The full Business Vault architecture is governed by **`29_BUSINESS_VAULT.md`**.
 
 ---
 
-# 5. Bottom Bar — Familiar Working Positions
+# 6. Bottom Bar — Familiar Working Positions
 
-The Business Entity preserves the established five-position bottom-bar geometry where the same core tools remain useful:
+The Business Entity preserves the five-position bottom-bar geometry:
 
 1. **Resolution**
 2. **People**
@@ -410,66 +243,67 @@ The Business Entity preserves the established five-position bottom-bar geometry 
 4. **Estimates / Invoices**
 5. **Calendar**
 
-These controls operate inside the Business context and according to Role, authority, and permissions.
-
-The bottom bar is not redesigned merely because the Business Entity has its own right-side tools. Preserving high-frequency muscle memory is intentional.
+These controls operate inside Business context and according to Role, authority, permissions, and current legitimate Property access.
 
 ### Team vs People
 
-These are not duplicates.
+**Team** = people who belong to or actively operate with this Business.  
+**People** = the broader legitimate relationship network around the Business, including clients / Homeowners, suppliers, Property contacts, and other authorized relationships.
 
-**Team** = people who belong to or actively work alongside this Business in the Business operating structure.
+A subcontractor / outside Trade Professional is a Team relationship while operating with the Business.
 
-**People** = the broader legitimate relationship network available in the current Business context, such as clients / homeowners, suppliers, authorized contacts, and other people connected through Business participation.
+A Viewer is not a Business Team relationship.
 
 ---
 
-# 6. Visual Distinction From the Command Center
+# 7. Invitations and Notifications
 
-The Business Entity may reuse familiar control positions, but it must not feel like the Owner's or worker's personal Command Center with a new title.
+The global Invitation Center lives from Profile according to **`33_INVITATIONS.md`**.
+
+Business Team can also expose local Add / Invite and Pending controls, but those are views into the same invitation / participation system rather than a separate Business invitation system.
+
+Meaningful invitation, approval, acceptance, delegated Manager, and access-removal events generate Notification Center entries and are eligible for phone push according to **`32_NOTIFICATIONS.md`**.
+
+---
+
+# 8. Visual Distinction From the Command Center
 
 Primary context signals include:
 
-- compact Business-specific header;
-- Business name / identity on the left;
-- blue **Switch** when multiple Businesses are available;
-- Business photograph / branding occupying the wider right side of the header;
+- compact Business header;
+- Business identity and image;
+- blue Switch when multiple Businesses are available;
 - Business Timeline;
-- **Work** rather than personal Daily Grind;
-- tiered Business Work Flow Rail across Properties;
-- icon-first **Team** control using a connected-crew visual rather than a businessman metaphor;
-- Business-scoped **Properties** with Owner-Connected and Unclaimed sections;
-- Business **Vault** with Current Possession visible for shared Assets;
-- absence of personal Points / Status in the Entity top area.
+- Work rather than personal Daily Grind;
+- Team operating roster;
+- Owner-Connected / Unclaimed Properties;
+- Business Vault;
+- absence of personal Points / Status.
 
 The goal is familiar operation with unmistakable Business context.
 
 ---
 
-# 7. Governing Rules
+# 9. Governing Rules
 
 1. The Business Entity is both a permanent Business record and a legitimate collective workplace.
 2. Business Work is collective workload; Daily Grind remains personal.
-3. Business Work uses a lean tiered Work Flow Rail for **Requested → Open → Assigned → In Progress → Complete → Verified** rather than a dense full Kanban board or literal tournament bracket.
-4. **Needs Attention** is a priority condition across lifecycle stages, not another Work stage.
-5. Team is the Business operating roster and answers who operates through the Business.
-6. Team uses the governing label **Team** and should ultimately be represented by an icon-first connected-crew mark, not a businessman / corporate stereotype.
-7. Team distinguishes Business members from subcontractors / outside trade partners while keeping both operationally visible.
-8. Team does not replace the broader People system.
-9. Properties shows only Properties where the Business has a legitimate current operational relationship.
-10. Business Properties separates **Owner-Connected** Properties from **Unclaimed** Properties; recency sorts within those sections rather than replacing that distinction.
-11. Claiming an Unclaimed Property changes governance / permissions around the same Property Record; it does not create a duplicate Property or erase legitimate history.
-12. Vault owns durable Business information and Business-owned shared assets.
-13. **Current Possession** is a first-class Business Asset state describing who or what currently has physical custody; it does not transfer ownership.
-14. Shared equipment may expose Current Possession, location, availability, and service history to authorized workers without granting administrative authority or exposing unrelated sensitive Business Records.
-15. Work Orders / assignments remain useful architecture but must integrate with CAPTURE, Calendar, Resolution, Property Records, and Timelines rather than forming an isolated parallel system.
-16. Work comments are work-record discussion; Roundhouse Mail remains the communication system between people.
-17. Personal Points / Status remain outside the Business Entity top area.
-18. Familiar tool positions should be preserved where doing so improves muscle memory, but all Entity controls operate within Entity scope and permissions.
-19. The Business Entity must remain visually distinct enough that the person never mistakes it for their personal Command Center.
+3. Team distinguishes internal Trade Team Members from subcontractors / Outside Trade Professionals.
+4. Viewer is not a Business Team category and is never a substitute for an outside Trade Professional.
+5. Business invitations and Profile invitations use one governing Invitation Center / participation system.
+6. A subcontractor is first established through the Business relationship, then brought forward to a Property.
+7. Claimed Properties require Owner approval unless delegated Manager authority explicitly permits participant approval on the Owner's behalf.
+8. Manager-authorized participant additions are permanently attributable and produce an informational Owner Notification rather than a redundant approval task.
+9. A legitimate managing Business may establish necessary participant access directly on an Unclaimed Property.
+10. Every Property permission retains its source.
+11. Business-derived Property access ends automatically when the governing Business relationship ends unless an independent authorization remains.
+12. Historical Records and attribution are never erased merely because current access ends.
+13. Independent Property relationships survive unrelated Business changes.
+14. Business Team does not replace People; Business Properties does not replace the Property Entity.
+15. Business Vault remains the permanent home for Business-owned assets and durable records.
 
 ---
 
 ## Governing Phrase
 
-**The Command Center tells me what I am doing. The Business Entity tells us what the Business is doing, who is doing it, where the work is happening, and what the Business owns.**
+**The Command Center tells me what I am doing. The Business Entity tells me what the Business is doing, who is operating through it, where it is authorized to work, and why each participant has access.**
