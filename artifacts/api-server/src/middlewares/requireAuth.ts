@@ -6,18 +6,7 @@ export interface AuthRequest extends Request {
   userEmail: string | null;
   userName: string | null;
   userAvatar: string | null;
-  // Active outward-facing account id for this request, resolved by
-  // `withActiveOutwardAccount` from either the `x-active-outward-account-id`
-  // header (when present and owned by the caller) or the user's stored
-  // `users.active_outward_account_id`. May be null briefly during signup
-  // before the user has any outward accounts.
   activeOutwardAccountId: number | null;
-  // When the caller is acting as a company skin they don't personally
-  // own — i.e. they hold a `team_seats` row on it — this carries the
-  // resolved seat + the skin's owner clerk id. Routes use this to
-  // gate sensitive surfaces (billing, contact details, etc.) and to
-  // stamp `acted_by_clerk_id` for internal attribution. NULL means the
-  // caller is acting as a skin they own directly (the common case).
   actingAsTeamSeat: {
     seatId: number;
     skinId: number;
@@ -32,7 +21,25 @@ export interface AuthRequest extends Request {
   } | null;
 }
 
-const FIREBASE_PROJECT_ID = process.env.FIREBASE_PROJECT_ID || process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
+function projectIdFromStorageBucket(): string | null {
+  const bucket = process.env.FIREBASE_STORAGE_BUCKET?.trim();
+  if (!bucket) return null;
+  const suffixes = [".firebasestorage.app", ".appspot.com"];
+  for (const suffix of suffixes) {
+    if (bucket.endsWith(suffix)) return bucket.slice(0, -suffix.length) || null;
+  }
+  return null;
+}
+
+// Codespaces no longer depends on Replit-injected server env. Prefer an
+// explicit server project id, but safely fall back to the same Firebase
+// project already identified by the configured storage bucket.
+const FIREBASE_PROJECT_ID =
+  process.env.FIREBASE_PROJECT_ID ||
+  process.env.GCLOUD_PROJECT ||
+  process.env.GOOGLE_CLOUD_PROJECT ||
+  process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID ||
+  projectIdFromStorageBucket();
 
 const JWKS = createRemoteJWKSet(
   new URL("https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com"),
@@ -48,7 +55,7 @@ interface FirebaseJWT extends JWTPayload {
 
 async function verifyFirebaseIdToken(token: string): Promise<FirebaseJWT> {
   if (!FIREBASE_PROJECT_ID) {
-    throw new Error("FIREBASE_PROJECT_ID is not configured on the server.");
+    throw new Error("Firebase project id is not configured on the server.");
   }
   const { payload } = await jwtVerify(token, JWKS, {
     issuer: `https://securetoken.google.com/${FIREBASE_PROJECT_ID}`,
@@ -57,13 +64,6 @@ async function verifyFirebaseIdToken(token: string): Promise<FirebaseJWT> {
   return payload as FirebaseJWT;
 }
 
-/**
- * Non-fatal token verification used by the global /api middleware. If the
- * Authorization header carries a valid Firebase ID token, attaches userId
- * and friends to the request. On any failure (missing token, invalid
- * token, missing project config), returns silently without touching the
- * response. Protected routes must still call `requireAuth` to enforce.
- */
 export const tryAttachAuth = async (req: Request): Promise<void> => {
   const header = req.headers.authorization || "";
   const token = header.startsWith("Bearer ") ? header.slice("Bearer ".length).trim() : "";
@@ -78,8 +78,7 @@ export const tryAttachAuth = async (req: Request): Promise<void> => {
     ar.userName = payload.name ?? null;
     ar.userAvatar = payload.picture ?? null;
   } catch {
-    // Silently ignore — public routes still work, protected routes will
-    // re-verify via requireAuth and 401 there.
+    // Public routes remain public; protected routes re-verify below.
   }
 };
 
@@ -111,7 +110,6 @@ export const requireAuth = async (
     next();
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    // Log full detail server-side only — never leak verification internals to clients.
     req.log?.warn({ err: msg }, "Firebase token verification failed");
     res.status(401).json({ error: "Unauthorized" });
   }
