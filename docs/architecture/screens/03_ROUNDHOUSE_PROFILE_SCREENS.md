@@ -76,84 +76,93 @@ The Message button does not create a separate Profile mailbox or a context-free 
 
 ---
 
-## 4A. Find / Entity Search
+## 4A. Find — Three Search Bars
 
-On the editable/private Profile, directly below the identity/action area is a global Roundhouse search area.
+On the editable/private Profile, directly below the identity/action area is **Find**.
 
-This restores the useful legacy idea that Profile is also the doorway for locating a person or Entity that is **not already in the user's People relationships**.
+Find uses **three distinct search bars**, not one generic Entity-search bar:
 
-The search should feel like one clear utility rather than several disconnected search products.
+1. **Find a Trade Professional**
+2. **Residential Home Search**
+3. **Commercial Facility Search**
 
-A suitable prompt is:
+These are direct lookup tools for finding existing Roundhouse people / Entities beyond the user's current People relationships.
 
-**Find a person, Home, Business, or Trade Pro…**
+### Find a Trade Professional
 
-Search can locate deliberately searchable Roundhouse identities such as:
+Searches for Trade Professionals and Trade Businesses using useful public search information such as:
 
-- people;
-- Home / Property Entities;
-- Trade Businesses;
-- Trade Professionals;
-- other supported public Entities as the model expands.
+- professional / owner name;
+- Business name;
+- trade / category;
+- service area / ZIP where appropriate.
 
-Useful search inputs can include name, Business name, trade/category, username, and area / ZIP where appropriate.
+### Residential Home Search
 
-This search is explicitly different from **People**.
+Searches deliberately searchable residential Home / Property Entities using appropriate identifiers and privacy rules.
 
-**People = people and Entities I already have a legitimate Roundhouse relationship with.**  
-**Find / Entity Search = locate someone or something beyond my existing relationship directory.**
+It is not a way to browse private homes indiscriminately. Only information intentionally searchable under Roundhouse's governing visibility rules can be returned.
 
-### When the Entity Is Missing
+### Commercial Facility Search
 
-If the intended person or Entity is not found, the search flow can offer the appropriate next step according to Entity type and the current person's authority.
+Searches deliberately searchable Commercial Facility / commercial Property Entities using appropriate identifiers and visibility rules.
 
-Examples include:
+### When a Search Does Not Find the Entity
 
-- **Invite Person**;
-- **Invite Business**;
-- **Create Home / Property Entity** where legitimate;
-- begin an appropriate **claim / setup** path for an Entity that should exist but is not yet represented.
+If the intended person or Entity is genuinely missing, the relevant search can offer the legitimate next step rather than forcing the user to leave Roundhouse.
 
-The system must not let one person improperly create ownership, authority, or private access merely because a search returned no result.
+Depending on the search and current authority, this can include:
 
-The governing rule is:
+- **Invite Trade Professional / Business**;
+- **Create Residential Home / Property**;
+- **Create Commercial Facility / Property**;
+- begin an appropriate **claim / setup** path.
 
-**Search first. If the intended Entity is genuinely missing, offer the legitimate create / invite / claim path instead of forcing the user to leave Roundhouse.**
+Search never allows someone to manufacture ownership, authority, or private access simply because an Entity did not appear.
+
+This area is different from **People**:
+
+**People = relationships I already have.**  
+**Find = search for a Trade Professional, Residential Home, or Commercial Facility beyond my current relationship directory.**
 
 ---
 
-## 4B. Discover Entry
+## 4B. Discover
 
-Directly beneath Find / Entity Search is a visually stronger **Discover** entry.
+Directly beneath the three Find search bars is a visually stronger **Discover** card.
 
-Unlike the quiet utility of Entity Search, Discover should feel more energetic and editorial—something new is happening there.
+The three search bars are practical utilities. **Discover should feel more exciting, visual, and alive**—a doorway into the broader public side of Roundhouse.
 
-During MVP, the card prominently carries the banner:
+The Profile card should read approximately:
 
-**DISCOVERY CENTER — COMING SOON**
+**Discover**  
+**Find pros and success stories in your area.**  
+**Q&A · Message Board**
 
-The card can preview future content visually with representative story imagery, trade/category labels, professional cards, or other sample editorial elements.
+The card can use representative project imagery, professional/story previews, category cues, or other editorial visual treatment so it clearly feels different from the utility search bars above it.
 
-Tapping it opens the dedicated **Discover preview page** governed by:
+The Profile card itself is the doorway; the full **Coming Soon** treatment belongs on the page it opens.
+
+Tapping **Discover** opens a dedicated new page governed by:
 
 **`31_DISCOVER.md`**
 
-The full public Discover ecosystem is intentionally post-MVP, but its place in the product exists from the beginning.
+That page has its own **Back button** returning to Profile.
+
+During MVP, the Discover page prominently says **Coming Soon** and visually previews what will eventually live there.
 
 Future Discover includes concepts such as:
 
-- public homeowner Project Stories;
+- public homeowner Project / Success Stories;
 - search by problem / trade / area;
 - professional discovery;
 - **Ask a Pro** public Q&A;
+- public message-board style discussions;
 - Best Answer / professional reputation;
 - Roundhouse Spotlight / hero stories;
 - clearly labeled sponsored content.
 
-Discover does not replace the Profile's direct Find / Entity Search.
-
-**Find = I am looking for someone or something specific.**  
-**Discover = show me useful stories, professionals, answers, and possibilities around a problem or need.**
+The full public Discover ecosystem is intentionally post-MVP, but its permanent doorway and preview page exist in MVP.
 
 ---
 
@@ -239,9 +248,13 @@ Visually, from top to bottom:
 ↓  
 **Overlapping Profile Photo → Entity Logo → Name / Role / Entity → Profile Action Area**  
 ↓  
-**Find / Entity Search**  
+**Find**  
+**Find a Trade Professional**  
+**Residential Home Search**  
+**Commercial Facility Search**  
 ↓  
-**Discover — Discovery Center Coming Soon preview card**  
+**Discover**  
+**Find pros and success stories in your area. · Q&A · Message Board**  
 ↓  
 **Editable personal information with Public/Private controls on the far right**  
 ↓  
