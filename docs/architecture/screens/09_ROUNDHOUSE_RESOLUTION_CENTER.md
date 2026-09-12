@@ -60,13 +60,19 @@ This gives Roundhouse a way to prompt someone to read the final outcome without 
 
 Each Resolution is represented by a distinctive physical control.
 
+The detailed visual reference for the control is maintained in:
+
+**`10_RESOLUTION_BUTTON_PHASES_APPEARANCE.md`**
+
+That document is the visual authority for the toggle's exact geometry and active appearance phases. This document governs the Resolution behavior and meaning of those visual states.
+
 ## Pill-Shaped Base Placard
 
-The base is a horizontal **pill-shaped placard**.
+The base is a narrow horizontal **pill-shaped placard**.
 
-It should be mostly flat and only lightly dimensional — not a heavy 3-D switch panel.
+It should be essentially flat gray with very little dimensional rendering. It is a clean interface symbol, not a realistic industrial switch panel.
 
-The base placard carries the escalation state. The gray toggle hardware itself does not change color.
+The base placard carries the escalation state.
 
 ### Escalation Around the Base
 
@@ -78,45 +84,49 @@ When repeated unanswered follow-up accumulates, the **rim around the pill-shaped
 - second unanswered follow-up: **Red rim**
 - third unanswered follow-up: **animated fire around the base**
 
-The fire should appear to engulf or animate around the pill base without turning the toggle hardware itself into a colored object.
+The fire should appear to engulf or animate around the pill base without changing the responsibility signal itself.
 
 The escalation treatment answers:
 
 **How much unanswered pressure has accumulated around this Resolution?**
 
-It is separate from the toggle position, which answers whose turn it is.
+It is separate from the toggle lean and top-face color, which answer whose turn it is.
 
-## Cylindrical Toggle
+## Center-Pivot Cylindrical Toggle
 
-On top of the pill-shaped base is the Resolution toggle.
+The Resolution toggle is **not a slider**.
 
-The switch is a **round cylindrical control with a flat collar/cap on top**.
+A short cylindrical post pivots from a **fixed point at the exact geometric center of the pill-shaped placard**.
 
-The toggle remains gray/neutral in every state. It does not become green, red, yellow, or gray based on responsibility.
+The pivot never moves horizontally. The post has no centered or upright resting state. It leans fully left or fully right from that same fixed center point.
 
-Its physical position carries the responsibility state.
+The shaft remains gray/neutral and roughly consistent in diameter. Only minimal light gray/white shading should be used to communicate that it is cylindrical and leaning.
 
-### Left Position — Green Indicator
+Viewed straight down, the circular top face travels almost into the rounded end of the pill without crossing the placard edge. A very thin crescent of gray placard remains visible beyond the outside edge of the colored face.
 
-When responsibility is on the other person — meaning the current user has answered, acted, or is waiting for the other side — the toggle rests to the **left**.
+The **entire flat circular top face** is the responsibility signal. It is not a small dot, separate indicator, glossy cap, or gradient.
 
-A small flat **green indicator at the left end of the placard** identifies the state.
+### Left Position — Green Top Face
+
+When responsibility is on the other person — meaning the current user has answered, acted, or is waiting for the other side — the post leans fully to the **left** from the fixed center pivot.
+
+The entire circular top face is flat **green**.
 
 Meaning:
 
 **Waiting on them.**
 
-### Right Position — Red Indicator
+### Right Position — Red Top Face
 
-When the current user owes the next answer or action, the toggle moves to the **right**.
+When the current user owes the next answer or action, the post leans fully to the **right** from the same fixed center pivot.
 
-A small flat **red indicator at the right end of the placard** identifies the state.
+The entire circular top face is flat **red**.
 
 Meaning:
 
 **Needs your attention.**
 
-The toggle itself remains gray. Only the small end indicator communicates Red or Green responsibility.
+There is no separate red or green indicator at the end of the placard. The colored circular top face is the responsibility signal.
 
 ### Resolved State
 
@@ -264,21 +274,23 @@ Participants who have not yet seen the final outcome receive the **Resolved — 
 
 1. **Resolution is the far-left bottom Command Center control.**
 2. Tapping the bottom Resolution control opens the Resolution Center.
-3. Each Resolution is represented by a lightly dimensional pill-shaped base placard with a gray cylindrical toggle and flat top collar.
-4. The toggle hardware itself does not change color.
-5. **Left + Green end indicator = waiting on the other person.**
-6. **Right + Red end indicator = the current user owes the next response/action.**
-7. Escalation belongs to the rim of the pill-shaped base: **Yellow → Red → animated Fire** as unanswered follow-up accumulates.
-8. Responsibility state and escalation state are two different signals and must remain visually separate.
-9. The Entity/Property context appears above the toggle.
-10. The Resolution creator appears below the toggle.
-11. **Only the creator can close the Resolution.**
-12. Tapping the visible toggle opens the Resolution; it does not directly turn the Resolution off.
-13. New questions, statements, or required actions can pass responsibility back and forth between participants.
-14. A response does not necessarily equal completion.
-15. Required actions such as scheduling can feed their completed result back into the Resolution for verification.
-16. A Resolution created from Messages retains a path back to the originating conversation.
-17. Closing a Resolution does not erase it; it becomes gray permanent Resolution history.
-18. A resolved item remains marked **New/Unread** for participants who have not yet opened the final outcome.
-19. Red active items sort first, Green waiting items below them, and Gray resolved items below the active group.
-20. **The goal of every Resolution is to make responsibility visible until the creator can verify that the matter is actually finished.**
+3. Each Resolution uses a narrow, essentially flat gray pill-shaped placard with a short cylindrical post pivoting from the exact geometric center.
+4. The Resolution control is **not a slider**; the pivot remains fixed while the post leans fully left or fully right.
+5. **Left lean + flat green circular top face = waiting on the other person.**
+6. **Right lean + flat red circular top face = the current user owes the next response/action.**
+7. The shaft remains gray/neutral; there is no separate red or green end indicator.
+8. Escalation belongs to the rim of the pill-shaped base: **Yellow → Red → animated Fire** as unanswered follow-up accumulates.
+9. Responsibility state and escalation state are two different signals and must remain visually separate.
+10. The Entity/Property context appears above the toggle.
+11. The Resolution creator appears below the toggle.
+12. **Only the creator can close the Resolution.**
+13. Tapping the visible toggle opens the Resolution; it does not directly turn the Resolution off.
+14. New questions, statements, or required actions can pass responsibility back and forth between participants.
+15. A response does not necessarily equal completion.
+16. Required actions such as scheduling can feed their completed result back into the Resolution for verification.
+17. A Resolution created from Messages retains a path back to the originating conversation.
+18. Closing a Resolution does not erase it; it becomes gray permanent Resolution history.
+19. A resolved item remains marked **New/Unread** for participants who have not yet opened the final outcome.
+20. Red active items sort first, Green waiting items below them, and Gray resolved items below the active group.
+21. **`10_RESOLUTION_BUTTON_PHASES_APPEARANCE.md` is the visual authority for exact toggle geometry and the five active appearance phases.**
+22. **The goal of every Resolution is to make responsibility visible until the creator can verify that the matter is actually finished.**
