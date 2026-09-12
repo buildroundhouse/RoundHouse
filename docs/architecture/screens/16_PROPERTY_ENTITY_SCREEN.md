@@ -62,6 +62,8 @@ The Timeline Search control remains in the familiar upper-left area of the Timel
 
 The Property Timeline is the living chronological view. The durable archival view of significant past Records lives in **Vault → Property History / Records**.
 
+When a person has newly received legitimate access to the Property, the Property Entity may show a compact **Property Handoff available** prompt. The prompt can open the formal Handoff briefing or be dismissed with **Not Now**; it does not permanently block entry to the Property.
+
 ---
 
 ## 4. Right Edge — Four Property Tabs
@@ -152,7 +154,7 @@ Vault's primary internal sections are:
 
 **Property History / Records** is the durable archival view of what happened at the Property. It can surface completed Work, Maintenance, Standards evidence, installations, inspections, Asset lifecycle events, major Property changes, relevant ownership / authority changes, disclaimers and resolving Records, and other significant historical Records. It references the same underlying Records rather than creating an archive copy. Property History is governed by **`22_PROPERTY_HISTORY_RECORDS.md`**.
 
-Property Handoff does **not** become another Vault folder containing duplicate knowledge. Handoff assembles a permission-aware briefing from existing Specs, Assets, Documents, Property History, Maintenance, Work, and deliberately shared information.
+Property Handoff has one permanent entry point: **Property Entity → Vault → Handoff**. Handoff is a persistent secondary action in the Vault header beside **Search Vault**; it is not a fifth Vault section and does not create another right-edge tab. It opens a role-aware briefing assembled from existing Specs, Assets, Documents, Property History, Maintenance, Work, relevant People relationships, and deliberately shared information. Handoff is governed by **`25_PROPERTY_HANDOFF.md`**.
 
 The full Vault and Specs architecture is governed by:
 
@@ -215,6 +217,7 @@ Primary context signals are:
 - lightweight Property-scoped **Tasks / Lists**;
 - **Maintenance** as the Property care workspace;
 - **Vault** as the Property memory / permanent-information destination;
+- contextual first-entry Handoff prompt when appropriate;
 - absence of personal Points / Status in the Entity top area.
 
 The goal is familiar operation with unmistakable context.
@@ -237,8 +240,10 @@ The goal is familiar operation with unmistakable context.
 12. Vault is the permanent Property-information destination, with Specs, Assets & Equipment, Documents, and Property History / Records as its primary internal sections.
 13. Property Documents has one clear home: **Property Entity → Vault → Documents**. Other valid pathways reference the same underlying files rather than creating copies.
 14. Property Timeline is the living view; **Vault → Property History / Records** is the durable archival view. Both can present the same underlying Record without duplication.
-15. Handoff assembles current permitted Property truth and does not maintain a duplicate permanent copy of that truth.
-16. The Property Entity should feel visually distinct from the personal Command Center while preserving useful positional familiarity.
+15. Property Handoff has one permanent home: **Property Entity → Vault → Handoff**. It is a Vault-header secondary action, not a fifth Vault section or right-edge tab.
+16. A newly authorized person may receive a contextual **Property Handoff available** prompt on first entry; Handoff remains manually reopenable from Vault afterward.
+17. Handoff assembles current permitted Property truth and does not maintain a duplicate permanent copy of that truth.
+18. The Property Entity should feel visually distinct from the personal Command Center while preserving useful positional familiarity.
 
 ---
 
