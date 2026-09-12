@@ -35,9 +35,11 @@ At the top:
 
 **Vault**  
 Property name beneath it  
-**Search Vault**
+**Search Vault**                 **Handoff**
 
-The primary Vault sections are:
+**Handoff** is a persistent secondary action in the Vault header area. It opens the role-aware Property briefing governed by **`25_PROPERTY_HANDOFF.md`**.
+
+Handoff is **not** a fifth Vault section. The primary Vault sections remain:
 
 - **Specs**
 - **Assets & Equipment**
@@ -295,24 +297,38 @@ Example searches:
 
 Handoff is **not** a permanent Vault folder containing a second copy of Property information.
 
+Its permanent entry point is:
+
+**Property Entity → Vault → Handoff**
+
+The Vault header keeps a persistent **Handoff** action beside **Search Vault**.
+
+When a newly authorized person first enters the Property, Roundhouse may also surface a compact **Property Handoff available** prompt with **Open Handoff** and **Not Now**. After opening or dismissing it, the Handoff remains available from Vault.
+
 Vault contains the durable truth.
 
 **Property Handoff assembles the truth for a person who needs to become oriented.**
 
-When appropriate for a newly authorized person, Roundhouse can generate a Property Handoff from existing records such as:
+When appropriate, Roundhouse can assemble a Property Handoff from existing records such as:
 
-- important Specs
-- key Assets
-- relevant Documents
-- pinned / deliberately shared Property information
-- recent relevant Work
-- current Maintenance / Standards state
-- unresolved items the person is permitted to see
-- recent Property History relevant to their role
+- Know Before You Start information;
+- important Specs;
+- key Assets;
+- relevant Documents;
+- pinned / deliberately shared Property information;
+- recent relevant Work;
+- current Maintenance / Standards state;
+- unresolved items the person is permitted to see;
+- recent Property History relevant to their role;
+- relevant People / contacts.
 
 This preserves the useful legacy Handoff behavior without creating duplicate knowledge that can become stale.
 
 Handoff follows the current person's permissions. It never expands visibility merely because the information is useful for orientation.
+
+The full Handoff screen, placement, first-entry behavior, and role-aware assembly are governed by:
+
+**`25_PROPERTY_HANDOFF.md`**
 
 ---
 
@@ -346,6 +362,7 @@ Examples:
 - restricted Access information can have narrower visibility than ordinary Specs;
 - sensitive Documents can have narrower visibility than ordinary Vault records;
 - Property History follows underlying Record permissions;
+- Handoff assembles only information the current person is already permitted to see;
 - private Business/internal notes and files remain excluded unless deliberately shared.
 
 The presence of a record in Vault does not mean universal visibility.
