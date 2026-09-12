@@ -78,7 +78,7 @@ The tabs are Business-scoped:
 
 Work answers:
 
-**What work does this Business currently have underway, waiting, assigned, requested, or needing attention?**
+**What does this Business have on its plate across all Properties?**
 
 It is the Business-level integration home for the useful logic previously split across **My Jobs**, Work Orders, assignments, requests, due work, recurring work, and related execution systems.
 
@@ -94,25 +94,25 @@ A manager may see work across the Business according to authority. A Trade Team 
 
 ### Business Work View
 
-The view should support useful grouping and filtering without becoming a heavy project-management application.
+The governing Business Work screen uses a lean tiered **Work Flow Rail** inspired by a timeline / bracket structure rather than a full Kanban board or literal tournament bracket.
 
-Primary working categories may include:
+The lifecycle remains:
 
-- **Needs Attention**
-- **Requested / Waiting**
-- **Assigned**
-- **In Progress**
-- **Completed / Awaiting Verification**
+**Requested → Open → Assigned → In Progress → Complete → Verified**
 
-The system may also filter by:
+with **Cancelled** as a terminal exception.
 
-- Property
-- assigned person / team
-- due date
-- priority
-- work category
+Each lifecycle stage appears as a tier on one slim rail. Compact Work cards sit beside the tier they currently occupy and connect with a short branch line. The bracket inspiration should be structural, not decorative.
 
-The interface should prioritize what needs action rather than forcing the user to navigate status taxonomy merely to find work.
+**Needs Attention** is a priority condition above the rail, not another lifecycle stage. It can surface overdue, blocked, failed-verification, urgent, or otherwise actionable Work while each item remains in its real stage.
+
+Business Work cards make **Property context** prominent because the screen spans many jobsites. Property, assignee, due date, and current state are the main scan points.
+
+Stages can expand or collapse, and filters can narrow by Property, assignee, due date, priority, category, Asset, or attention state without changing the underlying rail.
+
+The full Business Work screen, Flow Rail, lifecycle, responsive layout, and execution relationships are governed by:
+
+**`26_BUSINESS_WORK.md`**
 
 ### Work Item / Work Order Core Information
 
@@ -151,13 +151,11 @@ A person should be able to see their assigned work across Properties through the
 
 ### Status / Execution Flow
 
-The older implementation used:
+The governing lifecycle is:
 
 **Requested → Open → Assigned → In Progress → Complete → Verified**
 
 with **Cancelled** as a terminal state.
-
-That flow is useful and should be preserved conceptually, but Roundhouse should not force unnecessary status transitions when the newer CAPTURE / Resolution / Calendar architecture can express the real-world state more clearly.
 
 Governing interpretation:
 
@@ -169,7 +167,7 @@ Governing interpretation:
 - **Verified** — an authorized manager / governing party confirms completion where verification is required.
 - **Cancelled** — the work will not proceed.
 
-If future integration demonstrates that Open and Assigned can be simplified, that can be changed deliberately; the old behavior should not be silently discarded before reconciliation.
+The Flow Rail communicates this progression without forcing the user to manage six giant columns.
 
 ### CAPTURE Integration
 
@@ -192,6 +190,8 @@ A Work item may be linked to an appointment, but Work does not become a second c
 A genuine unresolved problem can create or link to a Resolution.
 
 A Work item should not be used merely as a substitute for a Resolution when the core problem is waiting on another person, approval, decision, missing information, or another unresolved dependency.
+
+A blocked Work item stays in its actual lifecycle stage and can show a compact blocker / Needs Attention indicator.
 
 ### Recurring Work
 
@@ -399,6 +399,7 @@ Primary context signals include:
 - Business photograph / branding occupying the wider right side of the header;
 - Business Timeline;
 - **Work** rather than personal Daily Grind;
+- tiered Business Work Flow Rail across Properties;
 - Business-scoped **Team**;
 - Business-scoped **Properties**;
 - Business **Vault**;
@@ -412,16 +413,18 @@ The goal is familiar operation with unmistakable Business context.
 
 1. The Business Entity is both a permanent Business record and a legitimate collective workplace.
 2. Business Work is collective workload; Daily Grind remains personal.
-3. Team distinguishes Business members from subcontractors / outside trade partners while keeping both operationally visible.
-4. Team does not replace the broader People system.
-5. Properties shows the jobsites / Properties the Business legitimately works with and provides the doorway into each Property Entity.
-6. Vault owns durable Business information and Business-owned shared assets.
-7. Shared equipment may expose custody, location, availability, and service history to authorized workers without granting administrative authority.
-8. Work Orders / assignments remain useful architecture but must integrate with CAPTURE, Calendar, Resolution, Property Records, and Timelines rather than forming an isolated parallel system.
-9. Work comments are work-record discussion; Roundhouse Mail remains the communication system between people.
-10. Personal Points / Status remain outside the Business Entity top area.
-11. Familiar tool positions should be preserved where doing so improves muscle memory, but all Entity controls operate within Entity scope and permissions.
-12. The Business Entity must remain visually distinct enough that the person never mistakes it for their personal Command Center.
+3. Business Work uses a lean tiered Work Flow Rail for **Requested → Open → Assigned → In Progress → Complete → Verified** rather than a dense full Kanban board or literal tournament bracket.
+4. **Needs Attention** is a priority condition across lifecycle stages, not another Work stage.
+5. Team distinguishes Business members from subcontractors / outside trade partners while keeping both operationally visible.
+6. Team does not replace the broader People system.
+7. Properties shows the jobsites / Properties the Business legitimately works with and provides the doorway into each Property Entity.
+8. Vault owns durable Business information and Business-owned shared assets.
+9. Shared equipment may expose custody, location, availability, and service history to authorized workers without granting administrative authority.
+10. Work Orders / assignments remain useful architecture but must integrate with CAPTURE, Calendar, Resolution, Property Records, and Timelines rather than forming an isolated parallel system.
+11. Work comments are work-record discussion; Roundhouse Mail remains the communication system between people.
+12. Personal Points / Status remain outside the Business Entity top area.
+13. Familiar tool positions should be preserved where doing so improves muscle memory, but all Entity controls operate within Entity scope and permissions.
+14. The Business Entity must remain visually distinct enough that the person never mistakes it for their personal Command Center.
 
 ---
 
