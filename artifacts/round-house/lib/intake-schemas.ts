@@ -18,12 +18,7 @@ export interface IntakeField {
   placeholder?: string;
   required?: boolean;
   maxLength?: number;
-  /**
-   * Where the value lives. Defaults to "mode" (stored in mode.intakeData).
-   * "user" routes the value to the user record (profile-level identity).
-   */
   scope?: "mode" | "user";
-  /** User profile field name when scope === "user" */
   userField?: "website" | "officePhone" | "cellPhone" | "instagram" | "bio";
 }
 
@@ -36,6 +31,11 @@ export interface ModeIntake {
   fields: IntakeField[];
 }
 
+/**
+ * Current product-facing labels. Historical `*_collab` / `collab` keys remain
+ * in the API while old rows migrate, but they are never rendered with the
+ * retired product vocabulary. They represent the neutral Viewer identity.
+ */
 export const MODE_LABELS: Record<UserModeKind, string> = {
   trade_pro: "Trade Pro",
   home: "Home",
@@ -43,9 +43,9 @@ export const MODE_LABELS: Record<UserModeKind, string> = {
   trade_pro_teammate: "Trade Teammate",
   facilities_teammate: "Facility Teammate",
   home_teammate: "Home Teammate",
-  trade_pro_collab: "Collaborator",
-  facilities_collab: "Collaborator",
-  collab: "Collaborator",
+  trade_pro_collab: "Viewer",
+  facilities_collab: "Viewer",
+  collab: "Viewer",
 };
 
 export const MODE_TAGLINES: Record<UserModeKind, string> = {
@@ -55,9 +55,9 @@ export const MODE_TAGLINES: Record<UserModeKind, string> = {
   trade_pro_teammate: "Teammate at a Trade Pro business",
   facilities_teammate: "Teammate at a commercial facility",
   home_teammate: "Teammate at a home",
-  trade_pro_collab: "Work assigned by a pro",
-  facilities_collab: "Take work, log progress",
-  collab: "Your social presence on Roundhouse",
+  trade_pro_collab: "View a Home or Facility you've been invited to",
+  facilities_collab: "View a Home or Facility you've been invited to",
+  collab: "Neutral view-only profile for authorized places",
 };
 
 export const MODE_INTAKES: Record<UserModeKind, ModeIntake> = {
@@ -295,50 +295,18 @@ export const MODE_INTAKES: Record<UserModeKind, ModeIntake> = {
     ],
   },
 
+  /**
+   * Historical keys retained only for old accounts. They now render as the
+   * neutral Viewer identity and collect no trade-worker intake. Work-capable
+   * people belong in Trade Professional / Trade Team Member roles instead.
+   */
   trade_pro_collab: {
     kind: "trade_pro_collab",
-    title: "Profile",
-    intro: "",
-    homeTitle: "Crew",
-    homeSubtitle: "Your assigned work and personal history.",
-    fields: [
-      {
-        key: "experience",
-        label: "Experience",
-        kind: "single-select",
-        required: true,
-        options: [
-          { value: "<1", label: "<1", sublabel: "year" },
-          { value: "1-3", label: "1–3", sublabel: "years" },
-          { value: "3-7", label: "3–7", sublabel: "years" },
-          { value: "7+", label: "7+", sublabel: "years" },
-        ],
-      },
-      {
-        key: "strengths",
-        label: "Strengths",
-        kind: "multi-select",
-        required: true,
-        options: [
-          { value: "framing", label: "Framing" },
-          { value: "finish", label: "Finish carpentry" },
-          { value: "electrical", label: "Electrical" },
-          { value: "plumbing", label: "Plumbing" },
-          { value: "paint", label: "Paint" },
-          { value: "demo", label: "Demo" },
-          { value: "tile", label: "Tile" },
-          { value: "drywall", label: "Drywall" },
-          { value: "exterior", label: "Exterior" },
-        ],
-      },
-      {
-        key: "growth",
-        label: "Goals",
-        kind: "longtext",
-        required: true,
-        maxLength: 240,
-      },
-    ],
+    title: "Viewer Profile",
+    intro: "View access is granted through a Home or Facility invitation.",
+    homeTitle: "Viewer",
+    homeSubtitle: "View authorized Home or Facility information.",
+    fields: [],
   },
 
   trade_pro_teammate: {
@@ -413,10 +381,10 @@ export const MODE_INTAKES: Record<UserModeKind, ModeIntake> = {
 
   collab: {
     kind: "collab",
-    title: "Profile",
-    intro: "",
-    homeTitle: "You",
-    homeSubtitle: "Your social presence on Roundhouse.",
+    title: "Viewer Profile",
+    intro: "View access is granted through a Home or Facility invitation.",
+    homeTitle: "Viewer",
+    homeSubtitle: "Neutral view-only profile for authorized places.",
     fields: [],
   },
 
@@ -457,51 +425,25 @@ export const MODE_INTAKES: Record<UserModeKind, ModeIntake> = {
 
   facilities_collab: {
     kind: "facilities_collab",
-    title: "Profile",
-    intro: "",
-    homeTitle: "Worker",
-    homeSubtitle: "Clock in, take work, log progress.",
-    fields: [
-      {
-        key: "experience",
-        label: "Experience",
-        kind: "single-select",
-        required: true,
-        options: [
-          { value: "<1", label: "<1", sublabel: "year" },
-          { value: "1-3", label: "1–3", sublabel: "years" },
-          { value: "3-7", label: "3–7", sublabel: "years" },
-          { value: "7+", label: "7+", sublabel: "years" },
-        ],
-      },
-      {
-        key: "strengths",
-        label: "Strengths",
-        kind: "multi-select",
-        required: true,
-        options: [
-          { value: "general", label: "General maintenance" },
-          { value: "electrical", label: "Electrical" },
-          { value: "plumbing", label: "Plumbing" },
-          { value: "hvac", label: "HVAC" },
-          { value: "groundskeeping", label: "Groundskeeping" },
-          { value: "janitorial", label: "Janitorial" },
-          { value: "security", label: "Security" },
-        ],
-      },
-      {
-        key: "learning",
-        label: "Goals",
-        kind: "longtext",
-        required: true,
-        maxLength: 240,
-      },
-    ],
+    title: "Viewer Profile",
+    intro: "View access is granted through a Home or Facility invitation.",
+    homeTitle: "Viewer",
+    homeSubtitle: "View authorized Home or Facility information.",
+    fields: [],
   },
 };
 
 export const PRIMARY_MODES: UserModeKind[] = ["trade_pro", "home", "facilities"];
-export const COLLAB_MODES: UserModeKind[] = ["trade_pro_collab", "facilities_collab"];
+
+/** Historical mode keys that now render as Viewer. */
+export const VIEWER_COMPAT_MODES: UserModeKind[] = [
+  "collab",
+  "trade_pro_collab",
+  "facilities_collab",
+];
+
+/** @deprecated Use VIEWER_COMPAT_MODES. Kept temporarily for old imports. */
+export const COLLAB_MODES: UserModeKind[] = VIEWER_COMPAT_MODES;
 
 const ZIP_RE = /^\d{5}$/;
 
