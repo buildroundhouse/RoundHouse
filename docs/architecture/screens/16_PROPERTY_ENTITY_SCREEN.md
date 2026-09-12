@@ -113,7 +113,7 @@ It answers:
 
 **What durable information belongs to this Property, and where can an authorized person reliably find it later?**
 
-Vault's primary internal sections are now:
+Vault's primary internal sections are:
 
 - **Specs**
 - **Assets & Equipment**
@@ -124,11 +124,11 @@ Vault's primary internal sections are now:
 
 **Assets & Equipment** stores serviceable physical equipment that has its own maintenance, work history, documents, and lifecycle. Asset Detail is governed by **`19_PROPERTY_ASSET_DETAIL.md`**.
 
-**Documents** stores durable Property files such as manuals, warranties, permits, inspections, plans, installation records, and related files.
+**Documents** is the clear durable file home for the Property. The governing path is **Property Entity → Vault → Documents**. Warranties, manuals, disclaimers, surveys, easements, inspections, reports, permits, plans, installation records, and other durable Property files live here as one underlying Record even when they are also reachable from an Asset, Work item, Timeline event, or other legitimate context. Documents is governed by **`21_PROPERTY_VAULT_DOCUMENTS_RECORDS.md`**.
 
 **Property History / Records** provides durable retrieval of completed maintenance, service history, Standard evidence, and other important Property records after they are no longer active work.
 
-Property Handoff does **not** become another Vault folder containing duplicate knowledge. Handoff assembles a permission-aware briefing from existing Specs, Assets, records, Maintenance, Work, and deliberately shared information.
+Property Handoff does **not** become another Vault folder containing duplicate knowledge. Handoff assembles a permission-aware briefing from existing Specs, Assets, Documents, records, Maintenance, Work, and deliberately shared information.
 
 The full Vault and Specs architecture is governed by:
 
@@ -207,8 +207,9 @@ The goal is familiar operation with unmistakable context.
 7. Mail opened from the Entity is the same Roundhouse Mail system filtered to that Entity context.
 8. Maintenance governs recurring care and Property Standards; due work and drift can feed Work rather than becoming parallel task systems.
 9. Vault is the permanent Property-information destination, with Specs, Assets & Equipment, Documents, and Property History / Records as its primary internal sections.
-10. Handoff assembles current permitted Property truth and does not maintain a duplicate permanent copy of that truth.
-11. The Property Entity should feel visually distinct from the personal Command Center while preserving useful positional familiarity.
+10. Property Documents has one clear home: **Property Entity → Vault → Documents**. Other valid pathways reference the same underlying files rather than creating copies.
+11. Handoff assembles current permitted Property truth and does not maintain a duplicate permanent copy of that truth.
+12. The Property Entity should feel visually distinct from the personal Command Center while preserving useful positional familiarity.
 
 ---
 
