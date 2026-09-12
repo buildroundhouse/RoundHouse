@@ -47,6 +47,33 @@ The recognizable Property image is important. People working across several home
 
 Search provides access to additional Properties the person legitimately has access to without cluttering the active working view.
 
+## Tapping a Property
+
+Tapping a Property does **not** immediately force the person into the Property record.
+
+It opens a small, clean Property action card with two primary choices:
+
+**Enter Property**  
+**Navigate to Property**
+
+### Enter Property
+
+**Enter Property** takes the person into that Property's Roundhouse context.
+
+The Command Center scope narrows to that Property and the large Property splash/hero makes the change in context obvious.
+
+### Navigate to Property
+
+**Navigate to Property** uses the Property's physical address to open the device's normal mapping/navigation behavior so the person can get directions to the location.
+
+This is especially useful for Trade Professionals moving between jobs, but it can be available to any authorized person for whom the Property address is visible.
+
+If Roundhouse does not have a usable address or the viewer is not permitted to access it, **Navigate to Property** is not shown.
+
+The Property action card should remain intentionally small. It is a quick decision point, not another Property menu.
+
+**Tap Property → Enter Property or Navigate to Property.**
+
 ## Homeowner Command Center
 
 A Homeowner has **one personal Command Center**. That Command Center can represent activity across all residential Properties the homeowner owns or manages in that Homeowner context.
@@ -83,7 +110,7 @@ The Command Center does not merge the Property records. It only assembles the Ho
 
 ## Switching Into One Property
 
-When a Homeowner deliberately selects one Property, Roundhouse narrows from the personal/multi-Property Command Center to that Property's context.
+When a Homeowner taps a Property and chooses **Enter Property**, Roundhouse narrows from the personal/multi-Property Command Center to that Property's context.
 
 The visual change should be obvious.
 
@@ -97,9 +124,9 @@ For example, after entering **Spring Lake**, activity from Dripping Springs no l
 
 The path is therefore:
 
-**Homeowner Command Center → Properties → Select Property → Property splash/hero → that Property's record and working context**
+**Homeowner Command Center → Properties → Tap Property → Enter Property → Property splash/hero → that Property's record and working context**
 
-For a single-Property homeowner, the Command Center may already display the home's identity in its top area for simplicity. Entering **View Property** still causes the clear Property splash/hero and moves the person into the permanent Property context.
+For a single-Property homeowner, the Command Center may already display the home's identity in its top area for simplicity. Choosing **Enter Property** still causes the clear Property splash/hero and moves the person into the permanent Property context.
 
 ## Trade Professional Command Center
 
@@ -108,6 +135,10 @@ A Trade Professional's Properties sheet shows the Properties/jobs where that Tra
 Their Command Center Timeline can similarly reflect their own attributable activity across multiple jobs.
 
 This does not merge the Properties themselves. It is simply the Trade Professional's personal working view across those contexts.
+
+For a Trade Professional, the Property action card provides a particularly direct workflow:
+
+**Tap Property → Enter Property** to work inside the Roundhouse Property context, or **Navigate to Property** to get directions to the job site.
 
 ## Commercial Property and Acting Context
 
@@ -121,7 +152,7 @@ The person's identity remains the same. Their acting Role/authority determines h
 
 ## Entering a Property
 
-The Properties working sheet is the doorway. Entering the actual Property changes the scope.
+The Properties working sheet is the doorway. Choosing **Enter Property** changes the scope.
 
 If the homeowner enters **Spring Lake**, Roundhouse stops presenting the combined view across Spring Lake and Dripping Springs and narrows to Spring Lake.
 
@@ -141,14 +172,14 @@ Likewise, when a Trade Professional enters 110 Dripping Springs, the view narrow
 
 The Properties tab and Property Entity must not become duplicates.
 
-**Properties working sheet = choose and work with a Property from the Command Center.**  
+**Properties working sheet = find a Property and choose whether to enter it or navigate to it.**  
 **Property Entity = the actual persistent digital place and permanent Property record.**
 
 The Properties working sheet should therefore stay lean. It should not recreate full Notes, Lists, Receipts, Calendar, Resolutions, Documents, or Timeline systems inside itself.
 
 Those systems retain their own homes and can be filtered/narrowed by Property context.
 
-A deliberate **View Property** action can take the person from the Command Center working sheet into the full Property Entity when they want the permanent Property view.
+A deliberate **Enter Property** action takes the person from the Command Center working sheet into the Property context when they want the permanent Property view.
 
 ## Property Context Does Not Mean Property Visibility
 
@@ -183,14 +214,18 @@ When the person deliberately leaves the Command Center working sheet and enters 
 1. **Properties is the fourth and lowest right-side Command Center working tab.**
 2. It opens as the same large working-sheet pattern used by Daily Grind, Tasks / Lists, and Receipts.
 3. The right-side rail, bottom controls, and CAPTURE/Concierge remain available while the Properties sheet is open.
-4. A Homeowner has one personal Command Center, not one personal Command Center per Property.
-5. A one-Property Homeowner Command Center may visually identify itself with that single Property because it is the simple/common case.
-6. A multi-Property Homeowner Command Center must visibly identify itself as a combined multi-Property view rather than pretending one Property is selected.
-7. The Homeowner Command Center may assemble relevant Timeline and working information across multiple Properties.
-8. The Command Center is a working view, **not the permanent Property record**.
-9. Entering a Property narrows the view to that single Property and introduces a recognizable Property splash/hero at the top.
-10. A Property Entity maintains its own Timeline, Records, documents, participants, and other Property-specific information.
-11. Trade Professionals can use one Command Center across the Properties/jobs where they are working.
-12. Different authority contexts, including commercial/facility management, must remain explicit rather than silently inheriting Homeowner authority.
-13. Property context does not automatically make internal Business information homeowner-visible.
-14. **Avatar Timeline = what I am doing across my contexts. Property Timeline = what is happening at this Property.**
+4. Property rows remain simple and recognizable through photo, name, and address.
+5. **Tapping a Property opens a compact action card with Enter Property and, when available, Navigate to Property.**
+6. **Enter Property** narrows Roundhouse into that Property's context and permanent record.
+7. **Navigate to Property** opens normal device mapping/navigation using the authorized Property address.
+8. A Homeowner has one personal Command Center, not one personal Command Center per Property.
+9. A one-Property Homeowner Command Center may visually identify itself with that single Property because it is the simple/common case.
+10. A multi-Property Homeowner Command Center must visibly identify itself as a combined multi-Property view rather than pretending one Property is selected.
+11. The Homeowner Command Center may assemble relevant Timeline and working information across multiple Properties.
+12. The Command Center is a working view, **not the permanent Property record**.
+13. Entering a Property narrows the view to that single Property and introduces a recognizable Property splash/hero at the top.
+14. A Property Entity maintains its own Timeline, Records, documents, participants, and other Property-specific information.
+15. Trade Professionals can use one Command Center across the Properties/jobs where they are working.
+16. Different authority contexts, including commercial/facility management, must remain explicit rather than silently inheriting Homeowner authority.
+17. Property context does not automatically make internal Business information homeowner-visible.
+18. **Avatar Timeline = what I am doing across my contexts. Property Timeline = what is happening at this Property.**
