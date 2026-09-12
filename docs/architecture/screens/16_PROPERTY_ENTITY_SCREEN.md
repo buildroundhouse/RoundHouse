@@ -74,9 +74,9 @@ Work answers:
 
 **What work is active, waiting, assigned, requested, or due at this Property?**
 
-This is the likely integration home for Property-scoped work such as work orders, homeowner requests, assigned work, recurring maintenance that is due, and other legitimate Property work requiring action.
+This is the Property-scoped home for work such as work orders, homeowner requests, assigned work, maintenance that has become due, corrective work created from Standards drift, and other legitimate Property work requiring action.
 
-The final internal structure of Work remains to be designed.
+Business-level Work and Property-level Work can reference the same underlying Record according to scope and permissions rather than creating duplicate work items.
 
 ### 2. Tasks / Lists
 
@@ -84,11 +84,26 @@ Uses the familiar Tasks / Lists position but shows only authorized Property-scop
 
 Private personal lists remain on the person's Command Center unless deliberately shared or otherwise governed by Entity permissions.
 
-### 3. Reserved / Undecided
+### 3. Maintenance
 
-The third Property tab remains intentionally undefined until the remaining legacy Property functions are integrated and compared.
+Maintenance is the Property's ongoing care workspace.
 
-Do not fill this position merely to complete the layout.
+It answers:
+
+**What should keep happening here, and is this Property staying in the condition we expect?**
+
+Maintenance contains two internal views:
+
+**Routine Maintenance | Standards**
+
+- **Routine Maintenance** manages repeating Property care and cadence.
+- **Standards** defines expected Property conditions and detects drift when those conditions are no longer being maintained.
+
+When routine care becomes due or a Standard drifts, Maintenance can surface actionable work into **Work**. CAPTURE documents actual work performed, Calendar handles scheduled time, Resolution handles genuine unresolved dependencies, and Vault preserves durable history.
+
+The full Maintenance and Standards experience is governed by:
+
+**`18_PROPERTY_MAINTENANCE_STANDARDS.md`**
 
 ### 4. Vault
 
@@ -100,6 +115,7 @@ Vault is intended to hold durable information that belongs with the Property rat
 - Assets & equipment
 - Property documents
 - Maintenance / service history
+- Standard evidence and related permanent records
 - Other durable Property records
 
 The final Vault information architecture will be developed through the legacy integration process.
@@ -158,7 +174,8 @@ Primary context signals are:
 - blue **Switch** control when multiple Properties are available;
 - Property-scoped Timeline;
 - **Work** rather than personal Daily Grind;
-- **Vault** as a Property-only destination;
+- **Maintenance** as the Property care workspace;
+- **Vault** as a Property-only permanent-information destination;
 - absence of personal Points / Status in the Entity top area.
 
 The goal is familiar operation with unmistakable context.
@@ -174,8 +191,8 @@ The goal is familiar operation with unmistakable context.
 5. Personal systems such as Daily Grind and personal Points do not become Property systems merely because the person entered a Property.
 6. The Property identity and blue **Switch** control provide Property switching; a separate permanent Properties tab is not required inside the Property Entity.
 7. Mail opened from the Entity is the same Roundhouse Mail system filtered to that Entity context.
-8. Vault is the permanent Property-information destination.
-9. The third right-edge Property tab remains deliberately unresolved until legacy Property systems are integrated.
+8. Maintenance governs recurring care and Property Standards; due work and drift can feed Work rather than becoming parallel task systems.
+9. Vault is the permanent Property-information destination.
 10. The Property Entity should feel visually distinct from the personal Command Center while preserving useful positional familiarity.
 
 ---
