@@ -300,18 +300,36 @@ The full Team screen, icon direction, roster structure, invitation behavior, and
 
 ## 4.3 Properties
 
-Properties is the Business-level doorway into the Properties this Business legitimately works with.
+Properties is the Business-level doorway into the Properties where the Business has a legitimate current operational relationship.
 
-It is not simply a copy of the person's personal Property list.
+It answers:
 
-The view may group Properties by client / customer where useful and should make it easy to identify the current jobsite.
+**Where is this Business legitimately authorized to work?**
+
+The screen is divided into two primary sections:
+
+**Owner-Connected** — a claimed owner / homeowner governs the Property and the Business is legitimately authorized to participate.
+
+**Unclaimed** — the Business has a legitimate operational relationship to the Property, but no owner has yet claimed the Property in Roundhouse.
+
+This is an ownership / authority distinction, not a Work-status distinction. Within each section, Properties are sorted by most recent legitimate activity.
+
+When an owner later claims an Unclaimed Property, the same Property Record moves into **Owner-Connected**. Roundhouse does not create a second Property or discard Work, CAPTURE evidence, Maintenance, Assets, Specs, Documents, History, or legitimate Business relationships.
+
+An Unclaimed Property does **not** mean the Business owns the real estate. It means Roundhouse does not yet have a claimed owner identity governing that Property.
+
+The Properties right-edge control should ultimately be icon-first using a grouped-roofline / multiple-Properties mark rather than a generic map pin.
 
 Tapping a Property opens the established compact Property action card:
 
 - **Enter Property**
-- **Navigate to Property** when an authorized usable address exists
+- **Navigate** when an authorized usable address exists
 
 Entering the Property opens the separate Property Entity and its Property-scoped tools.
+
+The full Business Properties screen, Owner-Connected / Unclaimed structure, claim transition, sorting, permissions, and icon direction are governed by:
+
+**`28_BUSINESS_PROPERTIES.md`**
 
 ---
 
@@ -417,7 +435,7 @@ Primary context signals include:
 - **Work** rather than personal Daily Grind;
 - tiered Business Work Flow Rail across Properties;
 - icon-first **Team** control using a connected-crew visual rather than a businessman metaphor;
-- Business-scoped **Properties**;
+- Business-scoped **Properties** with Owner-Connected and Unclaimed sections;
 - Business **Vault**;
 - absence of personal Points / Status in the Entity top area.
 
@@ -435,14 +453,16 @@ The goal is familiar operation with unmistakable Business context.
 6. Team uses the governing label **Team** and should ultimately be represented by an icon-first connected-crew mark, not a businessman / corporate stereotype.
 7. Team distinguishes Business members from subcontractors / outside trade partners while keeping both operationally visible.
 8. Team does not replace the broader People system.
-9. Properties shows the jobsites / Properties the Business legitimately works with and provides the doorway into each Property Entity.
-10. Vault owns durable Business information and Business-owned shared assets.
-11. Shared equipment may expose custody, location, availability, and service history to authorized workers without granting administrative authority.
-12. Work Orders / assignments remain useful architecture but must integrate with CAPTURE, Calendar, Resolution, Property Records, and Timelines rather than forming an isolated parallel system.
-13. Work comments are work-record discussion; Roundhouse Mail remains the communication system between people.
-14. Personal Points / Status remain outside the Business Entity top area.
-15. Familiar tool positions should be preserved where doing so improves muscle memory, but all Entity controls operate within Entity scope and permissions.
-16. The Business Entity must remain visually distinct enough that the person never mistakes it for their personal Command Center.
+9. Properties shows only Properties where the Business has a legitimate current operational relationship.
+10. Business Properties separates **Owner-Connected** Properties from **Unclaimed** Properties; recency sorts within those sections rather than replacing that distinction.
+11. Claiming an Unclaimed Property changes governance / permissions around the same Property Record; it does not create a duplicate Property or erase legitimate history.
+12. Vault owns durable Business information and Business-owned shared assets.
+13. Shared equipment may expose custody, location, availability, and service history to authorized workers without granting administrative authority.
+14. Work Orders / assignments remain useful architecture but must integrate with CAPTURE, Calendar, Resolution, Property Records, and Timelines rather than forming an isolated parallel system.
+15. Work comments are work-record discussion; Roundhouse Mail remains the communication system between people.
+16. Personal Points / Status remain outside the Business Entity top area.
+17. Familiar tool positions should be preserved where doing so improves muscle memory, but all Entity controls operate within Entity scope and permissions.
+18. The Business Entity must remain visually distinct enough that the person never mistakes it for their personal Command Center.
 
 ---
 
