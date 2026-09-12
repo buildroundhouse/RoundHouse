@@ -337,59 +337,62 @@ The full Business Properties screen, Owner-Connected / Unclaimed structure, clai
 
 Vault is the permanent Business-information and Business-asset destination.
 
-It is not limited to paperwork.
+It answers:
 
-**Property Vault = permanent things belonging to the Property.**  
-**Business Vault = permanent things belonging to the Business.**
+**What permanent things belong to this Business, and where are they now?**
 
-### Business-owned assets
+The two primary Vault sections are:
 
-Vault may contain shared Business assets such as:
+- **Assets & Equipment**
+- **Business Records**
 
-- vehicles
-- trailers
-- large equipment
-- generators
-- ladders
-- tents / canopies
-- specialty tools
-- estimating tools
-- measuring / diagnostic equipment
-- other durable shared Business equipment
+### Assets & Equipment
 
-Each Business asset can eventually show useful operational information such as:
+Business-owned shared Assets include vehicles, trailers, generators, ladders, specialty tools, measuring / diagnostic equipment, and other durable equipment.
 
-- asset name / type
-- photograph
-- identifier / serial / asset number where useful
-- normal storage location
-- current location or associated job when known
-- current custodian / person who has it
-- availability / in-use state
-- maintenance / service history
-- related documents
+For shared assets, **Current Possession** is a first-class operational truth rather than hidden metadata.
 
-This allows an authorized Trade Team Member to answer practical questions such as:
+Current Possession answers:
+
+**Who or what currently has this asset?**
+
+Examples:
+
+- **Current Possession: Mike Rodriguez**
+- **Current Possession: Truck 2**
+- **Current Possession: Spring Lake Residence**
+- **Current Possession: Main Shop**
+
+Possession is distinct from Business ownership, assignment, physical location, and availability. An asset can remain Business-owned while currently possessed by a Team member, vehicle, trailer, Property / jobsite, or storage location.
+
+Asset cards should make Current Possession one of the strongest scan points so authorized workers can quickly answer practical questions such as:
 
 **Who has the laser measure?**  
 **Which truck is the generator in?**  
-**Is the trailer available?**
+**Where is the trailer?**
 
-Owners / Managers may have deeper editing and lifecycle controls while authorized workers can still see enough information to locate and use shared equipment.
+Authorized people can use **Transfer Possession** to move the current custody state. Roundhouse preserves a chronological possession history while maintaining only one governing current holder at a time.
 
-### Business records and documents
+Asset Detail may also show availability, condition, normal storage location, current physical location where useful, maintenance / service state, related Work, and documents.
 
-Vault may also contain durable Business records such as:
+### Business Records
 
-- licenses
-- insurance certificates
-- company documents
-- equipment warranties / manuals
-- policies
-- approved templates
-- other permanent Business records
+Business Records contains durable company information such as:
 
-The final internal Vault architecture can evolve as legacy systems are reconciled, but Business-owned assets are a first-class part of Vault rather than an afterthought.
+- licenses;
+- insurance certificates;
+- company documents;
+- policies;
+- approved templates;
+- equipment warranties / manuals;
+- registrations;
+- other permanent Business records.
+
+Sensitive Business Records may use tighter permission rules than ordinary shared-equipment possession information.
+
+The full Business Vault, Current Possession, custody-history, asset-detail, maintenance, documents, and permissions architecture is governed by:
+
+**`29_BUSINESS_VAULT.md`**
 
 ### Visual direction
 
@@ -436,7 +439,7 @@ Primary context signals include:
 - tiered Business Work Flow Rail across Properties;
 - icon-first **Team** control using a connected-crew visual rather than a businessman metaphor;
 - Business-scoped **Properties** with Owner-Connected and Unclaimed sections;
-- Business **Vault**;
+- Business **Vault** with Current Possession visible for shared Assets;
 - absence of personal Points / Status in the Entity top area.
 
 The goal is familiar operation with unmistakable Business context.
@@ -457,12 +460,13 @@ The goal is familiar operation with unmistakable Business context.
 10. Business Properties separates **Owner-Connected** Properties from **Unclaimed** Properties; recency sorts within those sections rather than replacing that distinction.
 11. Claiming an Unclaimed Property changes governance / permissions around the same Property Record; it does not create a duplicate Property or erase legitimate history.
 12. Vault owns durable Business information and Business-owned shared assets.
-13. Shared equipment may expose custody, location, availability, and service history to authorized workers without granting administrative authority.
-14. Work Orders / assignments remain useful architecture but must integrate with CAPTURE, Calendar, Resolution, Property Records, and Timelines rather than forming an isolated parallel system.
-15. Work comments are work-record discussion; Roundhouse Mail remains the communication system between people.
-16. Personal Points / Status remain outside the Business Entity top area.
-17. Familiar tool positions should be preserved where doing so improves muscle memory, but all Entity controls operate within Entity scope and permissions.
-18. The Business Entity must remain visually distinct enough that the person never mistakes it for their personal Command Center.
+13. **Current Possession** is a first-class Business Asset state describing who or what currently has physical custody; it does not transfer ownership.
+14. Shared equipment may expose Current Possession, location, availability, and service history to authorized workers without granting administrative authority or exposing unrelated sensitive Business Records.
+15. Work Orders / assignments remain useful architecture but must integrate with CAPTURE, Calendar, Resolution, Property Records, and Timelines rather than forming an isolated parallel system.
+16. Work comments are work-record discussion; Roundhouse Mail remains the communication system between people.
+17. Personal Points / Status remain outside the Business Entity top area.
+18. Familiar tool positions should be preserved where doing so improves muscle memory, but all Entity controls operate within Entity scope and permissions.
+19. The Business Entity must remain visually distinct enough that the person never mistakes it for their personal Command Center.
 
 ---
 
