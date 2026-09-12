@@ -10,13 +10,14 @@ It answers:
 
 **What changed that I may want to know about?**
 
-It does **not** replace the systems that actually own the work, communication, responsibility, or schedule.
+It does not replace the systems that actually own the work, communication, responsibility, schedule, or participation relationship.
 
 **Notifications = awareness.**  
 **Mail = communication.**  
 **Resolution = what I owe / what remains unresolved.**  
 **Work = operational work.**  
-**Calendar = time.**
+**Calendar = time.**  
+**Invitation Center = participation / access setup.**
 
 ---
 
@@ -24,16 +25,10 @@ It does **not** replace the systems that actually own the work, communication, r
 
 A small **Notifications / bell icon** sits immediately beside the **Mail envelope** in the top utility area.
 
-The two controls remain visually compact and distinct:
-
 **Bell = what changed around Roundhouse.**  
 **Envelope = what somebody said to me.**
 
-The bell should not display a growing numeric badge.
-
-Instead it uses a simple **dot** when the person has unseen notifications.
-
-This is deliberate. Roundhouse should not create a screen full of competing red counts that trains the user to chase badges all day.
+The bell does not display a growing numeric badge. It uses a simple **dot** when the person has unseen notifications.
 
 The Mail envelope may continue to show an unread-message count because that number has one clear meaning: unread Mail.
 
@@ -41,15 +36,11 @@ The Mail envelope may continue to show an unread-message count because that numb
 
 The Notifications icon is available beside Mail from the personal Command Center.
 
-This newer Notification architecture supersedes older Command Center wording that described Mail and notifications as one combined Inbox.
-
 ### Entity Screens
 
 Where Property or Business screens expose the top Mail control, Notifications remain available beside it.
 
-Mail opened from an Entity may be filtered to that Entity.
-
-Notifications remain the person's broader Roundhouse notification history unless a future explicit filter is selected. Entering a Property or Business should not hide unrelated personal notifications.
+Notifications remain the person's broader Roundhouse history even while the person is operating inside an Entity.
 
 ---
 
@@ -57,9 +48,7 @@ Notifications remain the person's broader Roundhouse notification history unless
 
 Tapping the bell opens the **Notification Center**.
 
-The screen uses a simple chronological timeline / feed with newest events first.
-
-The person can continue scrolling backward through their available notification history rather than having notifications disappear after they are acknowledged.
+The screen is a chronological timeline / feed with newest events first. The person can continue scrolling backward through available history rather than having notifications disappear after acknowledgement.
 
 Example entries:
 
@@ -72,26 +61,18 @@ Kitchen tile selection · 9:18 AM
 **Appointment confirmed**  
 HVAC service · Tomorrow at 8:00 AM
 
-**New Work Request**  
-Repair upstairs sink leak · Yesterday
+**JD Design Studios wants to add Carlos Hernandez**  
+Spring Lake Residence · Approval needed
 
-**You were invited to a Property**  
-Spring Lake Residence · Monday
+**JD Design Studios added Carlos Hernandez**  
+Spring Lake Residence · Authorized through Manager authority
 
-Each notification is a doorway to the thing that actually owns the event.
+**You were invited as a Viewer**  
+Canyon Ridge Facility · Monday
 
-Tapping it deep-links directly to the relevant:
+Each notification is a doorway to the thing that owns the event.
 
-- Mail conversation;
-- Resolution;
-- Work item;
-- Calendar appointment;
-- invitation / relationship flow;
-- Estimate / Invoice;
-- Property or Business Record;
-- other legitimate Roundhouse destination.
-
-The Notification Center should not recreate the full controls of those systems inside the notification itself.
+Tapping it deep-links to the relevant Mail conversation, Resolution, Work item, Calendar appointment, Invitation Center item, Estimate / Invoice, Property / Business Record, or other legitimate destination.
 
 ---
 
@@ -99,36 +80,114 @@ The Notification Center should not recreate the full controls of those systems i
 
 The notification dot represents **unseen updates**, not unfinished obligations.
 
-Opening or viewing the Notification Center may clear the unseen dot as those events become seen.
-
-That does **not** mean the underlying item is complete.
+Opening or viewing Notification Center may clear the unseen dot. That does not complete the underlying action.
 
 Examples:
 
-- Seeing a notification that a Resolution needs an answer does not resolve the Resolution.
-- Seeing a notification about a new message does not necessarily mark that Mail conversation read unless the conversation itself is opened.
-- Seeing an appointment change does not confirm or decline the appointment.
-- Seeing a Work Request does not accept the Work.
+- Seeing a Resolution notification does not resolve it.
+- Seeing a Mail notification does not automatically clear Mail's unread state.
+- Seeing an appointment change does not confirm or decline it.
+- Seeing a participant approval request does not approve the participant.
 
 This prevents Notifications from becoming a second task-management system.
 
 ---
 
-# 4. Push Notifications
+# 4. Invitation and Access Notifications
+
+Invitation events are meaningful Notification Center events and are eligible for phone push.
+
+Examples include:
+
+- **Sarah Miller invited you to Spring Lake Residence as a Viewer.**
+- **JD Design Studios invited you to join its Trade Team.**
+- **JD Design Studios invited you to work with the Business as an Outside Trade Professional.**
+- **JD Design Studios wants to add Carlos Hernandez to your Property.**
+- **Carlos Hernandez accepted your Business invitation.**
+- **Your request to join Canyon Ridge Facility was approved.**
+- **Business-derived Property access ended because the governing Business relationship ended.**
+
+Invitation notifications should deep-link into the **Invitation Center** or directly into the specific approval / participation item.
+
+The governing invitation architecture is **`33_INVITATIONS.md`**.
+
+---
+
+# 5. Claimed Property Approval Notification
+
+When a Trade Business proposes an accepted Business participant for a claimed Property and the Business does **not** have delegated participant-management authority, the Homeowner receives an actionable notification.
+
+Example:
+
+**JD Design Studios wants to add Carlos Hernandez to Spring Lake Residence.**  
+Kitchen project · HVAC  
+**Review**
+
+Tapping **Review** opens the approval item showing:
+
+- Business;
+- participant;
+- base Role / Business relationship;
+- Property;
+- Work context;
+- requested permission scope;
+- requester.
+
+The actual Approve / Decline decision remains owned by the Invitation / participation system, not by the Notification row itself.
+
+---
+
+# 6. Delegated Manager Informational Notification
+
+When the Homeowner has already delegated Manager authority that explicitly includes participant management, an authorized Manager may approve the Business participant on the Homeowner's behalf.
+
+In that case the Homeowner should **not** receive another approval task.
+
+They receive an informational notification instead:
+
+**JD Design Studios added Carlos Hernandez to Spring Lake Residence.**  
+**Authorized through JD's Manager authority.**
+
+This notification deep-links to the participant / permission detail and preserves who exercised the delegated authority.
+
+The notification should not imply the Homeowner personally performed the approval.
+
+---
+
+# 7. Viewer Notifications
+
+Viewer is the neutral view-only Role and is always attached to a legitimate Residential Property or Commercial Facility.
+
+A Viewer notification should therefore always name the Entity.
+
+Good:
+
+**Sarah Miller invited you to Spring Lake Residence as a Viewer.**
+
+Not good:
+
+**Sarah added you as a Viewer.**
+
+The second version hides the only context that makes the Viewer relationship legitimate.
+
+---
+
+# 8. Push Notifications
 
 Meaningful Roundhouse notifications should also be eligible for **push notification delivery to the person's phone**.
 
-This includes important events such as:
+This includes:
 
-- new individual or group Mail;
-- a Resolution requiring the person's attention;
-- a response or meaningful state change on a Resolution;
-- new Work assigned or requested;
-- important Work status changes relevant to the person;
+- new Mail;
+- Resolution attention / responses;
+- new or changed Work relevant to the person;
 - Calendar invitations, confirmations, changes, or cancellations;
 - Estimate / Invoice actions requiring attention;
-- invitations into a Property, Business, Team, or other legitimate Entity relationship;
-- other meaningful events that genuinely warrant immediate awareness.
+- Business / Property / Facility invitations;
+- Property participant approval requests;
+- delegated Manager participant additions;
+- meaningful access changes;
+- other events that genuinely warrant immediate awareness.
 
 Roundhouse should not push every minor metadata edit or background system event.
 
@@ -136,71 +195,65 @@ Roundhouse should not push every minor metadata edit or background system event.
 
 ---
 
-# 5. Push Deep Linking
+# 9. Push Deep Linking
 
 A push notification should open the actual Roundhouse destination associated with the event whenever possible.
 
 Examples:
 
-**New message from Mike** → opens that Mail conversation.  
-**Sarah answered your Resolution** → opens that Resolution.  
-**Appointment confirmed** → opens that Calendar appointment.  
-**New Work Request** → opens that Work item.  
-**Property invitation** → opens the invitation / acceptance flow.
+**New message from Mike** → Mail conversation.  
+**Sarah answered your Resolution** → Resolution.  
+**Appointment confirmed** → Calendar appointment.  
+**New Work Request** → Work item.  
+**Business invitation** → Invitation Center item.  
+**Property participant approval needed** → approval item.  
+**Manager-added participant** → participant / permission detail.
 
-The person should not be forced through the Notification Center merely because the notification originated there.
+The person should not be forced through Notification Center merely because the event generated a notification.
 
 ---
 
-# 6. Message Push Notifications
+# 10. Message Push Notifications
 
-Mail remains its own communication system, but new messages can generate both:
-
-- an in-app notification event in Notification Center; and
-- a phone push notification.
+Mail remains its own communication system, but new messages can generate both an in-app Notification event and a phone push.
 
 The Mail envelope retains its own unread-message state.
 
-This does not merge Mail and Notifications.
-
-It simply means the notification system can tell the person that new communication arrived.
-
-Lock-screen message previews should respect the person's notification/privacy settings. Roundhouse should be able to show a minimal alert such as **New Roundhouse message** when message-content previews are disabled.
+Lock-screen previews should respect personal privacy settings. Roundhouse should be able to show a minimal **New Roundhouse message** when content previews are disabled.
 
 ---
 
-# 7. Notification History
+# 11. Notification History
 
-The Notification Center behaves more like a traditional chronological activity history than a disposable alert tray.
+Notification Center behaves like a chronological activity history rather than a disposable alert tray.
 
-The person can scroll backward through older notifications as far as their available notification history allows.
-
-Older notifications remain useful because they can help answer questions such as:
+Older notifications can help answer:
 
 - When was I invited?
+- Who requested this participant?
+- When was Manager authority used?
+- When did a Business-derived permission end?
 - When did this appointment change?
 - When did this person answer?
 - When did this Work Request arrive?
-- When was this Estimate approved?
 
-Notification history does not become the authoritative permanent Record of the underlying event. The linked Work, Resolution, Mail, Calendar, Entity, or other Record remains authoritative.
+Notification history is not the authoritative permanent Record. The linked Entity membership, permission, Work, Resolution, Mail, Calendar, or other Record remains authoritative.
 
-If the person no longer has permission to open a linked private Record, an old notification must not restore access to it.
+If current access has ended, an old notification must not restore it.
 
 ---
 
-# 8. Visual Behavior
-
-The Notification Center should be calm and highly scannable.
+# 12. Visual Behavior
 
 Use:
 
 - chronological grouping;
 - compact entries;
 - recognizable source icons / avatars where useful;
-- clear Entity or Property context;
+- clear Entity context;
+- clear actor / authority context where important;
 - date / time;
-- subtle distinction between seen and unseen entries;
+- subtle seen / unseen distinction;
 - direct deep linking.
 
 Avoid:
@@ -208,48 +261,43 @@ Avoid:
 - red numeric badges throughout the product;
 - gamified urgency;
 - multiple competing alert colors;
-- forcing the user to manually clear every notification;
+- forcing manual clearing of every notification;
 - treating Notifications as another inbox of obligations.
 
-Strong urgency states remain owned by the system that actually understands the obligation. For example, Resolution may use its own escalation mechanics when the person truly owes an answer.
+Strong urgency belongs to the system that understands the obligation.
 
 ---
 
-# 9. Notification Preferences
+# 13. Notification Preferences
 
-Roundhouse should support personal notification preferences so a person can control push behavior without breaking the underlying in-app history.
-
-Preferences can eventually include categories such as:
+Personal notification preferences can eventually include:
 
 - Mail;
 - Resolution;
 - Work;
 - Calendar;
 - Estimates / Invoices;
-- invitations / relationship events;
+- invitations / access events;
 - lower-priority informational updates.
 
-System-critical or security-related notices may follow separate product rules.
+Disabling a phone-push category does not necessarily remove the corresponding event from the in-app Notification Center.
 
-Disabling a phone push category does not necessarily remove the corresponding event from the in-app Notification Center.
-
-The Notification Center is the history; push is the delivery channel.
+**Notification Center = history. Push = delivery channel.**
 
 ---
 
-# 10. Relationship to Feature-Level Attention
+# 14. Relationship to Feature-Level Attention
 
-Individual Roundhouse features should avoid duplicating the Notification Center with large numeric counters everywhere.
+Individual Roundhouse features should avoid duplicating Notification Center with large numeric counters everywhere.
 
 A feature may use a subtle local state when necessary, especially when the person must act there.
-
-The strongest attention signal belongs to a genuine obligation, not merely to the fact that something changed.
 
 Therefore:
 
 **Notifications tell me something changed.**  
 **Resolution tells me something is waiting on me.**  
-**Mail tells me I have unread communication.**
+**Mail tells me I have unread communication.**  
+**Invitation Center tells me participation / access needs review or tracking.**
 
 This keeps Roundhouse informative without becoming notification whack-a-mole.
 
@@ -257,4 +305,4 @@ This keeps Roundhouse informative without becoming notification whack-a-mole.
 
 ## Governing Rule
 
-**Roundhouse uses one centralized, scrollable Notification Center reached by a bell beside Mail. The bell shows a simple unseen dot rather than a numeric badge. Meaningful notifications—including new messages and important Work, Resolution, Calendar, Estimate / Invoice, and invitation events—can also generate push notifications on the person's phone and deep-link directly to the owning Roundhouse record. Notifications provide awareness and history; they do not replace Mail, Resolution, Work, Calendar, or any other system that owns the underlying action.**
+**Roundhouse uses one centralized, scrollable Notification Center reached by a bell beside Mail. The bell shows a simple unseen dot rather than a numeric badge. Invitation, Viewer, Business-subcontractor, Property-approval, and delegated-Manager events participate in the same Notification and phone-push infrastructure. Approval-needed events deep-link to the Invitation Center; Manager-authorized additions generate informational notices instead of redundant approval tasks. Notifications provide awareness and history but never replace the underlying permission or Entity-participation record.**
