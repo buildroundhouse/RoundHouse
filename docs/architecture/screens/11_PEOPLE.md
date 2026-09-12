@@ -2,17 +2,19 @@
 
 ## Purpose
 
-**People** is the Command Center contact and relationship directory for the people a user legitimately knows through Roundhouse participation.
+**People** is the Command Center contact and relationship directory for people a user legitimately knows through Roundhouse participation.
 
-It is not a social network, friend list, or generic contact book.
+It is not a social network, friend list, invitation inbox, or generic contact book.
 
 People answers:
 
-**Who am I connected to through my Homes, Properties, Businesses, and work — and how do I reach or navigate to them?**
+**Who am I legitimately connected to through my Homes, Properties, Businesses, Facilities, and work — and what Entity relationship connects us?**
 
-People always respects the user's current Roundhouse context, Role, authority, and permissions.
+People always respects current Roundhouse context, Role, authority, permissions, and the source of access.
 
-There is no **Friends** section and there is no **Collaborator** Role. The applicable view-only Role is **Viewer**.
+**Viewer** is the neutral view-only Role. Viewer only appears through a legitimate Residential Property or Commercial Facility relationship.
+
+Invitation and access setup belongs in **`33_INVITATIONS.md`**, not in People.
 
 ---
 
@@ -20,69 +22,68 @@ There is no **Friends** section and there is no **Collaborator** Role. The appli
 
 People is the **second control from the left on the bottom Command Center bar**, immediately to the right of Resolution.
 
-The control is primarily icon-based and uses a simple **People/group silhouette** with the short label:
+The control uses a simple People/group symbol and the short label:
 
 **People**
 
-It should remain visually consistent with the other bottom Command Center controls and should not compete with the raised center **CAPTURE** control.
-
 Tapping People opens the People destination.
-
-The People screen keeps a clear **Back to Command Center** path so the user always understands that People is a deeper working destination rather than another Command Center.
 
 ---
 
 # People Screen Appearance
-
-The screen is clean, compact, and directory-like rather than social-media-like.
 
 At the top:
 
 **← Command Center**  
 **People**
 
-Directly beneath the title is a prominent search field:
+Directly beneath the title:
 
 **Search people / properties…**
 
-Below Search, people are presented in grouped rows or expandable relationship blocks according to the current user's Role and context.
+People are presented in compact grouped rows according to the current person's legitimate relationships.
 
-Individual person rows should be easy to scan and may show:
+Rows may show:
 
 - Profile photo
 - Person name
-- Role or relevant relationship
+- base Role or relevant relationship
 - Business name where applicable
-- Home / Property name where applicable
-- Property address where useful
-- A disclosure/expand affordance when the row contains multiple people
+- Home / Property / Facility name where applicable
+- Property address where useful and permitted
+- relationship / permission source when operationally useful
+- expansion affordance when multiple people share one useful grouping
 
-The screen should favor recognizable names, homes, businesses, and addresses over database-style identifiers.
+The screen favors recognizable names, Properties, Businesses, Facilities, and addresses over technical identifiers.
 
 ---
 
 # Search Behavior
 
-Search filters the People screen currently being viewed.
+Search filters only the People relationships currently available to the viewer.
 
-It can match relevant visible relationship information including:
+It may match:
 
 - Person name
-- Home / Property name
-- Street or address
+- Home / Property / Facility name
+- visible street or address
 - Trade Business name
 
-For example:
+Search never creates, grants, removes, or modifies a relationship.
 
-Typing **Johnson** shows only people, Homes, Properties, or grouped relationship rows containing Johnson.
+To establish a new relationship, the user enters the **Invitation Center** or an authorized Add / Invite flow.
 
-If several Johnson Homes match, all remain visible.
+---
 
-Typing **Main Street** shows all matching Main Street Properties and the people associated with those Properties.
+# Pending Invitations Are Not People
 
-Search does not remove, delete, or alter any relationship. It temporarily hides nonmatching rows until the search is cleared.
+A pending invitation does not make someone an active People relationship.
 
-When a grouped row contains a matching person or Property, that grouped result remains available so the user can expand it and reach the matching person.
+Pending items live in the **Invitation Center** and, where appropriate, in the relevant Business Team or Entity pending area.
+
+A person enters People only when a legitimate participation / relationship is active enough to make that person visible under governing permissions.
+
+This prevents the People directory from becoming a mixture of real relationships, cold invitations, and public search results.
 
 ---
 
@@ -97,106 +98,119 @@ This block contains:
 - **Home Team Members**
 - **Viewers**
 
-Home Team Members and Viewers appear together in the same Home Team area rather than being separated into unrelated social categories.
+Viewer is view-only and is always associated with a specific Residential Property or Commercial Facility authorization. A neutral Viewer profile by itself does not create a People relationship.
 
-For a Homeowner with multiple Properties, each person shows the **Home / Property they are associated with** so the relationship is immediately understandable.
-
-A Homeowner may therefore see people associated with several Homes in one People destination while remaining able to identify which Home connects them.
+For a Homeowner with multiple Properties, each person shows the Home / Property that connects the relationship.
 
 ## 2. Trade Professionals
 
-Trade Professionals are shown beneath Home Team.
+Trade Professionals appear beneath Home Team.
 
-In the multi-Property Homeowner Command Center, each Trade relationship also identifies the **Property/Home through which that Trade Professional is associated with the Homeowner**.
+In a multi-Property Command Center, each Trade relationship identifies the Property / Home through which the professional is associated with the Homeowner.
 
-Trade Professionals are organized by their **Trade Business Entity** when grouping is useful.
+Trade Professionals may be grouped by **Trade Business Entity** when useful.
 
 ### Multiple People From One Trade Business
 
-If more than one person from the same Trade Business is associated with the Homeowner or current Property, show a collapsed Business row such as:
+If more than one person from the same Trade Business is legitimately associated with the Homeowner or Property, show a collapsed Business row such as:
 
 **DMT DESIGN BUILD — 3 people**
 
-Tapping the row expands it and reveals only the individual people from that Business with whom the Homeowner is legitimately associated or permitted to communicate.
+Expanding reveals only the individual people from that Business the Homeowner is legitimately allowed to see or communicate with.
 
-The Homeowner does not automatically gain access to every employee of that Business.
+The Homeowner does not automatically gain access to every employee or subcontractor of that Business.
 
 ### One Person From a Trade Business
 
-If only one person from that Business is associated with the Homeowner, do not add an unnecessary expansion level.
-
-Show the person directly, with the company beneath or beside the name:
-
-**Mike Rodriguez**  
-DMT DESIGN BUILD
-
-In a multi-Property Command Center, the associated Home / Property is also shown.
+If only one person is associated, show that person directly with the Business name.
 
 ---
 
 # Homeowner Inside a Specific Property
 
-When the Homeowner enters a specific Property, the Command Center retains the same overall architecture but the context is visibly narrowed by the larger **Property splash/hero**, including the Property name and address.
-
-Opening People from that Property-scoped context shows only people associated with that Home.
+Opening People from a Property Entity shows only people legitimately associated with that Property.
 
 The structure remains:
 
-1. **Home Team** — Home Team Members + Viewers associated with this Property
-2. **Trade Professionals** — Trade Professionals associated with this Property
+1. **Home Team** — Home Team Members + Viewers
+2. **Trade Professionals** — Trade Professionals with current authorized Property participation
 
-Because the entire screen is already scoped to one Property, repeating the Property label on every person row is unnecessary unless needed for clarity.
+A person's row may, when useful, indicate how the current Property relationship was established:
 
-Trade Business grouping behaves the same way:
+- **Owner Authorized**
+- **Manager Authorized**
+- **Through JD Design Studios**
+- another concise legitimate source
 
-- multiple associated people from one Business → Business name + person count → expand
-- one associated person from one Business → show that person directly with Business name
+This is not shown as technical permission metadata by default. It appears when it helps the Homeowner understand why someone is there.
 
-**Homeowner Command Center → People = people across my Homes, labeled by Property.**  
-**Specific Property → People = only people associated with this Home.**
+---
+
+# Business-Derived Trade Participants
+
+A subcontractor / outside Trade Professional may appear in a Homeowner's Property People view because a Trade Business legitimately brought that person to the Property.
+
+When access is **Business-derived**, the relationship remains tied to the Business source.
+
+If the Business removes that participant and no independent Property authorization exists, the person's current Business-derived Property access ends automatically and they no longer appear as an active Property participant.
+
+Historical attribution remains.
+
+If the Homeowner later establishes an **independent Property relationship** with that Trade Professional, that new relationship has its own permission source and can remain after the original Business relationship ends.
+
+---
+
+# Delegated Manager Authority
+
+A Homeowner may delegate Manager authority that includes participant management.
+
+When an authorized Business Manager uses that authority to approve a participant into the Property, the participant appears in People like any other legitimate active Property participant.
+
+Where useful, the relationship detail can show that the person was authorized through the Business Manager rather than implying the Homeowner personally added them.
+
+The permanent audit record remains the authoritative source for who approved the access.
 
 ---
 
 # Trade Professional Command Center — People
 
-For a Trade Professional, People is organized around the **Homes / Properties and clients they are legitimately working with or connected to through Roundhouse**.
+For a Trade Professional, People is organized around the Homes / Properties, Facilities, and people they are legitimately working with through Roundhouse.
 
-The Trade Professional should immediately be able to identify:
+The Trade Professional should be able to identify:
 
 - Homeowner / client name
-- Home / Property name
-- Property address
-- People at that Home the Trade Professional is authorized to communicate with
+- Property / Facility name
+- address where permitted
+- people at that Entity the Trade Professional is authorized to communicate with
 
-## One Associated Person at a Property
+A Trade Professional does not automatically gain visibility into every Home Team Member or Viewer simply because the Business works at the Property.
 
-If only one authorized person is associated with the Trade Professional at that Home, show the person directly with the Home / Property information.
+---
 
-For example:
+# Business People vs Business Team
 
-**Sarah Johnson**  
-Spring Lake  
-110 Spring Lake Dr
+Inside Business context:
 
-## Multiple Associated People at a Property
+**Team = people who operate through the Business.**  
+**People = the broader legitimate relationship network around the Business.**
 
-If several people at the same Home are available to the Trade Professional, collapse them under the Property/Home rather than repeating the address several times.
+Examples in People may include:
 
-Example:
+- clients / Homeowners;
+- suppliers;
+- Property contacts;
+- referral relationships;
+- other legitimate Business-connected people.
 
-**Spring Lake — 110 Spring Lake Dr — 3 people**
+A subcontractor / outside Trade Professional belongs in **Team** while the Business relationship is active because they actively operate with the Business. A client Homeowner belongs in **People** rather than Business Team.
 
-Tapping expands the row and reveals the three people at that Home with whom the Trade Professional is legitimately associated or permitted to communicate.
-
-This may include the Homeowner, Home Team Members, or Viewers according to permissions.
-
-The Trade Professional does not automatically receive access to every person associated with the Property.
+Viewer is not a Business Team relationship.
 
 ---
 
 # Relationship Grouping Principle
 
-People uses the relationship structure that is most useful to the person viewing it.
+People uses the relationship structure most useful to the viewer.
 
 For a Homeowner:
 
@@ -204,47 +218,43 @@ For a Homeowner:
 
 For a Trade Professional:
 
-**Home / Property → associated Home people**
+**Home / Property / Facility → authorized people there**
 
 Grouping appears only when it reduces clutter.
-
-If there is only one relevant person beneath a Business or Property, show that person directly rather than forcing an unnecessary expansion step.
 
 ---
 
 # Tapping a Person
 
-Tapping a person's name opens a compact **Person Action Card** rather than immediately navigating away.
+Tapping a person opens a compact **Person Action Card**.
 
-The card shows the person's identity and only the actions currently available to the viewer.
-
-Possible actions include:
+Possible actions include, according to permission:
 
 ## View Entity
 
-Opens the relevant Business or other Entity the person represents when the viewer has a legitimate path to that Entity.
+Opens a relevant Business or other Entity when a legitimate path exists.
 
-## View Home / Property
+## View Home / Property / Facility
 
-Opens the associated Home / Property when the viewer has legitimate access to that Property.
+Opens the associated Entity when the viewer has legitimate access.
 
 ## Call
 
-Available only when an authorized phone number is available to the viewer.
-
-Tapping Call uses the device's normal calling behavior.
+Available only when an authorized phone number is visible.
 
 ## Email
 
-Available only when an authorized email address is available to the viewer.
+Available only when an authorized email address is visible.
 
 ## Message
 
-Opens or begins Roundhouse Mail with that person while retaining the correct **Entity / Property context** for the relationship.
+Opens Roundhouse Mail while retaining the correct Entity context.
 
-People does not create a separate messaging system.
+## Relationship / Access Detail
 
-The action card should omit unavailable actions rather than showing dead or unauthorized controls.
+Where useful and authorized, the card may explain the active relationship source, such as direct Owner authorization or Business-derived participation.
+
+People does not itself edit permissions. Those controls belong to the appropriate Entity authority / Invitation flow.
 
 ---
 
@@ -252,40 +262,37 @@ The action card should omit unavailable actions rather than showing dead or unau
 
 People never grants access merely because someone exists in Roundhouse.
 
-A person appears only where there is a legitimate relationship, participation path, or permission that allows the viewer to see them.
+A person appears only where a legitimate relationship, participation path, or permission allows the viewer to see them.
 
 Likewise:
 
-- A Homeowner does not automatically see every employee of a Trade Business.
-- A Trade Professional does not automatically see every participant associated with a Home.
-- Phone numbers and email addresses appear only when the viewer is authorized to access them.
-- View Entity and View Property actions appear only when the viewer has legitimate access.
-- Message retains the Entity/Property context through which the relationship exists.
-- Viewer remains a view-only Role and does not inherit Home Team contribution or management authority.
+- a Homeowner does not automatically see every employee of a Trade Business;
+- a Trade Professional does not automatically see every participant associated with a Home;
+- phone and email appear only when permitted;
+- View Entity and View Property actions require legitimate access;
+- Message retains Entity context;
+- Viewer remains view-only;
+- a neutral Viewer profile alone does not create a relationship;
+- Business-derived access disappears from active People when its governing Business source ends unless another current authorization remains.
 
-People is therefore a **relationship-aware directory**, not an authority bypass.
+People is a **relationship-aware directory**, not an authority bypass.
 
 ---
 
 # Governing People Rules
 
 1. **People is the second bottom Command Center control from the left, immediately after Resolution.**
-2. The button uses a simple People/group icon with the short label **People**.
-3. People is a contact and relationship directory, not a social network or friend list.
-4. There is no Friends section and no Collaborator Role; the applicable view-only Role is **Viewer**.
-5. A Search field sits at the top and filters by person, Property/Home, address, and Trade Business information.
-6. Search only filters what is displayed; it never deletes or changes relationships.
-7. Homeowner People contains two primary blocks: **Home Team** and **Trade Professionals**.
-8. Home Team combines **Home Team Members and Viewers**.
-9. In a multi-Property Homeowner Command Center, people show the Home / Property through which they are associated.
-10. Homeowner Trade Professionals are grouped by **Trade Business Entity** when multiple associated people come from that Business.
-11. If only one person from a Trade Business is associated, show that person directly with the Business name rather than creating an unnecessary collapsed group.
-12. Inside a specific Property, People shows only Home Team Members, Viewers, and Trade Professionals associated with that Property.
-13. Trade Professional People is organized around **Homes / Properties and the people there the Trade Professional is authorized to communicate with**.
-14. If several authorized people are associated with one Home, show the Property/Home + address + person count and expand to reveal them.
-15. If only one authorized person is associated with the Home, show that person directly with the Home / Property information.
-16. Tapping a person opens a compact Person Action Card.
-17. Available Person actions may include **View Entity, View Home / Property, Call, Email, and Message**.
-18. Contact actions appear only when the underlying information and permission are available.
-19. Message opens Roundhouse Mail with the appropriate Entity / Property context attached.
-20. **People helps the user find the right person, understand the relationship connecting them, communicate, and navigate into the relevant Entity or Property without exposing unrelated people or information.**
+2. People is a relationship directory, not a social network, public search system, or invitation inbox.
+3. Pending invitations remain in the Invitation Center until legitimate participation becomes active.
+4. Viewer is the neutral view-only Role and must be attached to a legitimate Residential Property or Commercial Facility.
+5. There is no Trade Viewer Role.
+6. Search filters only relationships already visible to the current person.
+7. Homeowner People contains **Home Team** and **Trade Professionals**.
+8. Home Team contains Home Team Members and Property / Facility Viewers.
+9. Trade Business grouping reveals only the people legitimately associated with the Homeowner / Property.
+10. Business People and Business Team remain distinct.
+11. Business-derived Property participation retains its source and ends when that governing Business relationship ends unless an independent authorization exists.
+12. Independently authorized Property relationships survive unrelated Business changes.
+13. Delegated Manager approval does not disguise who actually exercised the authority.
+14. Tapping a person opens a permission-aware Person Action Card.
+15. **People helps the user find the right person, understand the Entity relationship connecting them, communicate, and navigate without exposing unrelated people or information.**
