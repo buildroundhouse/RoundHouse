@@ -70,15 +70,21 @@ The Property Entity uses the same four-tab right-edge geometry as the Command Ce
 
 ### 1. Work
 
-Replaces personal Daily Grind inside the Property Entity.
+Work is the top right-edge Property tab and replaces personal Daily Grind inside the Property Entity.
 
-Work answers:
+Its governing question is:
 
-**What work is active, waiting, assigned, requested, or due at this Property?**
+**What needs doing at this place?**
 
-This is the Property-scoped home for work such as work orders, homeowner requests, assigned work, maintenance that has become due, corrective work created from Standards drift, and other legitimate Property work requiring action.
+Work includes legitimate Property work across requested, open, assigned, in-progress, complete, verified, and cancelled lifecycle states according to permission. The user-facing label remains **Work**, not **Pending Work**, because the screen covers more than not-yet-started items.
 
-Business-level Work and Property-level Work can reference the same underlying Record according to scope and permissions rather than creating duplicate work items.
+Property Work can receive or surface homeowner requests, assigned work, due Maintenance occurrences, corrective Work created from Standards drift, and other legitimate Property action. Business-level Work and Property-level Work can reference the same underlying Record according to scope and permissions rather than creating duplicate work items.
+
+**Work organizes the job. CAPTURE documents the real work session.**
+
+The full Property Work screen and execution logic is governed by:
+
+**`23_PROPERTY_WORK.md`**
 
 ### 2. Tasks / Lists
 
@@ -207,12 +213,13 @@ The goal is familiar operation with unmistakable context.
 5. Personal systems such as Daily Grind and personal Points do not become Property systems merely because the person entered a Property.
 6. The Property identity and blue **Switch** control provide Property switching; a separate permanent Properties tab is not required inside the Property Entity.
 7. Mail opened from the Entity is the same Roundhouse Mail system filtered to that Entity context.
-8. Maintenance governs recurring care and Property Standards; due work and drift can feed Work rather than becoming parallel task systems.
-9. Vault is the permanent Property-information destination, with Specs, Assets & Equipment, Documents, and Property History / Records as its primary internal sections.
-10. Property Documents has one clear home: **Property Entity → Vault → Documents**. Other valid pathways reference the same underlying files rather than creating copies.
-11. Property Timeline is the living view; **Vault → Property History / Records** is the durable archival view. Both can present the same underlying Record without duplication.
-12. Handoff assembles current permitted Property truth and does not maintain a duplicate permanent copy of that truth.
-13. The Property Entity should feel visually distinct from the personal Command Center while preserving useful positional familiarity.
+8. Property **Work** is the top right-edge operating view and answers what needs doing at this place. It is not named Pending Work because its scope includes active and completion states as well as pending states.
+9. Maintenance governs recurring care and Property Standards; due work and drift can feed Work rather than becoming parallel task systems.
+10. Vault is the permanent Property-information destination, with Specs, Assets & Equipment, Documents, and Property History / Records as its primary internal sections.
+11. Property Documents has one clear home: **Property Entity → Vault → Documents**. Other valid pathways reference the same underlying files rather than creating copies.
+12. Property Timeline is the living view; **Vault → Property History / Records** is the durable archival view. Both can present the same underlying Record without duplication.
+13. Handoff assembles current permitted Property truth and does not maintain a duplicate permanent copy of that truth.
+14. The Property Entity should feel visually distinct from the personal Command Center while preserving useful positional familiarity.
 
 ---
 
