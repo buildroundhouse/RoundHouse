@@ -43,23 +43,63 @@ Each Property should be recognizable primarily by:
 - Address
 - appropriate owner/client identification where useful
 
-The large recognizable Property image is important. People working across several homes or jobs should be able to identify a place visually without reading a database-style record.
+The recognizable Property image is important. People working across several homes or jobs should be able to identify a place visually without reading a database-style record.
 
 Search provides access to additional Properties the person legitimately has access to without cluttering the active working view.
 
 ## Homeowner Command Center
 
-A Homeowner Command Center can represent work and activity across **all Properties that homeowner owns or manages in that Homeowner context**.
+A Homeowner has **one personal Command Center**. That Command Center can represent activity across all residential Properties the homeowner owns or manages in that Homeowner context.
 
-For example, if a homeowner owns two houses, both Properties can appear in the Properties working function.
+### Homeowner With One Property
 
-Their personal Command Center Timeline can interweave attributable/relevant activity from both Properties because the Command Center answers:
+Most homeowners will have one Property. Roundhouse should not make that common case feel like an account-management system.
+
+When the Homeowner has only one residential Property, the Command Center can visually identify itself with that Property at the top. The Property image/name can remain in the top identity area, and the Timeline, Lists, Daily Grind, and other working functions naturally concern that single Property.
+
+This may visually feel very close to a Property-centered Command Center, but the architectural distinction remains:
+
+**The Command Center is still the Homeowner's working view. The Property Entity remains the permanent Property record.**
+
+If the Homeowner later adds another Property, the same Command Center expands into the multi-Property behavior below rather than creating another personal Command Center.
+
+### Homeowner With Multiple Properties
+
+When the Homeowner owns or manages multiple residential Properties, the Command Center becomes an explicit **multi-Property working view**.
+
+The top identity area should no longer imply that one Property is currently the Homeowner's entire Command Center context. Instead, it should visibly identify the combined state with wording such as:
+
+**Multi-Property Account**
+
+The final customer-facing label can be refined, but the visual meaning must be unmistakable: the Homeowner is currently looking across their Properties rather than inside one Property.
+
+The Homeowner Timeline can interweave relevant activity from multiple Properties in chronological order. For example, an item from Spring Lake may be followed by an item from Dripping Springs because the Command Center answers:
 
 **What is happening in my world?**
 
-The same applies to Lists. From the Command Center, the homeowner can see their personal lists and Property-associated lists across the Properties they manage, subject to permissions.
+The same principle applies to Lists, Daily Grind, Receipts, Calendar, and other appropriate personal working views. They may assemble relevant information across the Homeowner's Properties while clearly identifying which Property each item belongs to.
 
-The homeowner does not have to enter each Property simply to understand their overall day or current activity.
+The Command Center does not merge the Property records. It only assembles the Homeowner's working view across them.
+
+## Switching Into One Property
+
+When a Homeowner deliberately selects one Property, Roundhouse narrows from the personal/multi-Property Command Center to that Property's context.
+
+The visual change should be obvious.
+
+The Property view begins with a **Property splash/hero area at the top** containing the recognizable Property photograph, Property name, and physical address. This immediately tells the person:
+
+**You are now inside this Property.**
+
+Below that splash, the Timeline and other Property-specific views concern only that Property.
+
+For example, after entering **Spring Lake**, activity from Dripping Springs no longer appears in the Timeline or Property-specific Lists.
+
+The path is therefore:
+
+**Homeowner Command Center → Properties → Select Property → Property splash/hero → that Property's record and working context**
+
+For a single-Property homeowner, the Command Center may already display the home's identity in its top area for simplicity. Entering **View Property** still causes the clear Property splash/hero and moves the person into the permanent Property context.
 
 ## Trade Professional Command Center
 
@@ -143,12 +183,14 @@ When the person deliberately leaves the Command Center working sheet and enters 
 1. **Properties is the fourth and lowest right-side Command Center working tab.**
 2. It opens as the same large working-sheet pattern used by Daily Grind, Tasks / Lists, and Receipts.
 3. The right-side rail, bottom controls, and CAPTURE/Concierge remain available while the Properties sheet is open.
-4. The Command Center can assemble a person's relevant activity across multiple Properties.
-5. The Command Center is a working view, **not the permanent Property record**.
-6. Entering a Property narrows the view to that single Property.
-7. A Property Entity maintains its own Timeline, Records, documents, participants, and other Property-specific information.
-8. Homeowners can use one Command Center across the Properties they own/manage within the appropriate context.
-9. Trade Professionals can use one Command Center across the Properties/jobs where they are working.
-10. Different authority contexts, including commercial/facility management, must remain explicit rather than silently inheriting Homeowner authority.
-11. Property context does not automatically make internal Business information homeowner-visible.
-12. **Avatar Timeline = what I am doing across my contexts. Property Timeline = what is happening at this Property.**
+4. A Homeowner has one personal Command Center, not one personal Command Center per Property.
+5. A one-Property Homeowner Command Center may visually identify itself with that single Property because it is the simple/common case.
+6. A multi-Property Homeowner Command Center must visibly identify itself as a combined multi-Property view rather than pretending one Property is selected.
+7. The Homeowner Command Center may assemble relevant Timeline and working information across multiple Properties.
+8. The Command Center is a working view, **not the permanent Property record**.
+9. Entering a Property narrows the view to that single Property and introduces a recognizable Property splash/hero at the top.
+10. A Property Entity maintains its own Timeline, Records, documents, participants, and other Property-specific information.
+11. Trade Professionals can use one Command Center across the Properties/jobs where they are working.
+12. Different authority contexts, including commercial/facility management, must remain explicit rather than silently inheriting Homeowner authority.
+13. Property context does not automatically make internal Business information homeowner-visible.
+14. **Avatar Timeline = what I am doing across my contexts. Property Timeline = what is happening at this Property.**
