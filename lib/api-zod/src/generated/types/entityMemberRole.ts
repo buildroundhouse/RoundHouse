@@ -4,6 +4,10 @@
  * Api
  * Roundhouse API specification
  * OpenAPI spec version: 0.1.0
+ *
+ * NOTE: `viewer` is the current neutral view-only membership role.
+ * The historical storage value retained below is migration-only and must
+ * never be rendered as current product vocabulary.
  */
 
 export type EntityMemberRole =
@@ -15,5 +19,6 @@ export const EntityMemberRole = {
   manager: "manager",
   employee: "employee",
   worker: "worker",
+  viewer: "viewer",
   collaborator: "collaborator",
 } as const;
