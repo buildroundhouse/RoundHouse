@@ -6,11 +6,20 @@ Roundhouse Mail is the single communication system for conversations between peo
 
 There is **no general Notifications section inside Mail**.
 
+Mail and Notifications are separate systems that sit beside one another in the top utility area.
+
+**Mail = what somebody said to me.**  
+**Notifications = what changed around Roundhouse.**
+
+The Notification Center and push behavior are governed by **`32_NOTIFICATIONS.md`**.
+
 ## 1. Mail — Command Center
 
 Tapping the **envelope icon** at the top of the Command Center opens Mail.
 
-At the top:
+A compact **Notifications / bell icon** sits immediately beside the envelope. The bell opens Notification Center; it does not open Mail.
+
+At the top of Mail:
 
 **← Command Center**  
 **Mail**  
@@ -32,7 +41,9 @@ Mail is separated into:
 
 They are not mixed together.
 
-The Mail icon can show the user's **unread-message count**. This count belongs only to Mail; feature-level attention indicators elsewhere in Roundhouse are not Mail notifications.
+The Mail icon can show the user's **unread-message count**. This count belongs only to Mail.
+
+The Notifications bell does not use a competing numeric count. It uses a simple **dot** when there are unseen notification events.
 
 ## 2. Individual Message Preview
 
@@ -103,24 +114,57 @@ There is still only **one Mail system**.
 
 **Outward-Facing Profile → Message** starts or opens communication with that person. The conversation retains the appropriate Entity context and subsequently appears in normal Mail.
 
-## 6. Feature-Level Attention
+## 6. Message Notifications and Phone Push
 
-Roundhouse does not maintain a general notification feed inside Mail.
+A new Mail message can generate three related but distinct states:
 
-Attention belongs to the feature that requires attention:
+1. the Mail conversation becomes unread;
+2. Notification Center receives a chronological notification event;
+3. the person's phone can receive a push notification.
 
-- Messages use their own unread count in Mail.
-- Calendar can show its own attention indicator when something requires acknowledgment.
-- Resolutions use their own attention and escalation mechanics within the Resolution system.
-- Other features may use their own indicators where appropriate.
+This does **not** merge Mail and Notifications.
 
-A user does not need to clear a separate notification about an item that already exists in the feature responsible for it.
+The notification merely tells the person that communication arrived and links directly to the Mail conversation.
+
+Examples:
+
+**Mike sent you a message**  
+110 Spring Lake
+
+or, when lock-screen content previews are disabled:
+
+**New Roundhouse message**
+
+Push behavior follows the person's notification and privacy settings, but meaningful new Mail should be eligible for phone push by default when push permission is available.
+
+Tapping the phone push opens the relevant Mail conversation directly whenever possible.
+
+Viewing the notification event does not have to mark the underlying Mail read. Mail's unread state belongs to Mail and is cleared according to Mail behavior.
+
+## 7. Relationship to Notification Center
+
+Roundhouse maintains a centralized, scrollable Notification Center outside Mail.
+
+Notification Center can contain events such as:
+
+- new Mail;
+- Work changes;
+- Resolution activity;
+- Calendar changes;
+- Estimate / Invoice activity;
+- invitations and relationship events.
+
+The person can scroll backward through notification history rather than treating notifications as a disposable alert tray.
+
+Notifications do not replace the underlying feature.
+
+A notification about a Resolution opens the Resolution. A notification about a Calendar event opens Calendar. A notification about Mail opens Mail.
 
 The **Green → Yellow → Red → 🔥** escalation belongs only to the Resolution system and is not a Mail or general notification mechanic.
 
-## 7. Governing Rule
+## 8. Governing Rule
 
-**Messages are private to their participants and occur within an Entity context.**
+**Messages are private to their participants and occur within an Entity context. Mail and Notifications remain separate: Mail owns conversations and unread-message state; Notification Center provides chronological awareness, and meaningful new messages may also generate phone push notifications that deep-link back to Mail.**
 
 Entity ownership or management does not automatically provide access to private conversations.
 
