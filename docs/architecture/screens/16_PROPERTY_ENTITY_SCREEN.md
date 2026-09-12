@@ -107,20 +107,34 @@ The full Maintenance and Standards experience is governed by:
 
 ### 4. Vault
 
-Vault is the permanent Property-information destination.
+Vault is the permanent Property-information destination and the fourth / bottom right-edge Property tab.
 
-Vault is intended to hold durable information that belongs with the Property rather than with a person's Command Center. Likely categories include:
+It answers:
 
-- Property specifications
-- Assets & equipment
-- Property documents
-- Maintenance / service history
-- Standard evidence and related permanent records
-- Other durable Property records
+**What durable information belongs to this Property, and where can an authorized person reliably find it later?**
 
-The final Vault information architecture will be developed through the legacy integration process.
+Vault's primary internal sections are now:
 
-The visible control should ultimately be icon-first using a custom Roundhouse visual symbol rather than a platform-standard emoji. The word **Vault** is the current governing label.
+- **Specs**
+- **Assets & Equipment**
+- **Documents**
+- **Property History / Records**
+
+**Specs** stores durable facts about the Property itself such as paint, finishes, materials, tile, cabinetry, hardware, measurements, and permission-controlled access information.
+
+**Assets & Equipment** stores serviceable physical equipment that has its own maintenance, work history, documents, and lifecycle. Asset Detail is governed by **`19_PROPERTY_ASSET_DETAIL.md`**.
+
+**Documents** stores durable Property files such as manuals, warranties, permits, inspections, plans, installation records, and related files.
+
+**Property History / Records** provides durable retrieval of completed maintenance, service history, Standard evidence, and other important Property records after they are no longer active work.
+
+Property Handoff does **not** become another Vault folder containing duplicate knowledge. Handoff assembles a permission-aware briefing from existing Specs, Assets, records, Maintenance, Work, and deliberately shared information.
+
+The full Vault and Specs architecture is governed by:
+
+**`20_PROPERTY_VAULT_SPECS.md`**
+
+The visible Vault control should ultimately be icon-first using a custom Roundhouse visual symbol rather than a platform-standard emoji. The word **Vault** is the current governing label.
 
 ---
 
@@ -175,7 +189,7 @@ Primary context signals are:
 - Property-scoped Timeline;
 - **Work** rather than personal Daily Grind;
 - **Maintenance** as the Property care workspace;
-- **Vault** as a Property-only permanent-information destination;
+- **Vault** as the Property memory / permanent-information destination;
 - absence of personal Points / Status in the Entity top area.
 
 The goal is familiar operation with unmistakable context.
@@ -192,8 +206,9 @@ The goal is familiar operation with unmistakable context.
 6. The Property identity and blue **Switch** control provide Property switching; a separate permanent Properties tab is not required inside the Property Entity.
 7. Mail opened from the Entity is the same Roundhouse Mail system filtered to that Entity context.
 8. Maintenance governs recurring care and Property Standards; due work and drift can feed Work rather than becoming parallel task systems.
-9. Vault is the permanent Property-information destination.
-10. The Property Entity should feel visually distinct from the personal Command Center while preserving useful positional familiarity.
+9. Vault is the permanent Property-information destination, with Specs, Assets & Equipment, Documents, and Property History / Records as its primary internal sections.
+10. Handoff assembles current permitted Property truth and does not maintain a duplicate permanent copy of that truth.
+11. The Property Entity should feel visually distinct from the personal Command Center while preserving useful positional familiarity.
 
 ---
 
