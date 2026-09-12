@@ -88,9 +88,25 @@ The full Property Work screen and execution logic is governed by:
 
 ### 2. Tasks / Lists
 
-Uses the familiar Tasks / Lists position but shows only authorized Property-scoped tasks, checklists, shopping lists, and other lists belonging to or deliberately shared into this Property.
+Tasks / Lists is the lightweight Property organization screen.
 
-Private personal lists remain on the person's Command Center unless deliberately shared or otherwise governed by Entity permissions.
+Its governing question is:
+
+**What smaller things are we keeping track of at this Property?**
+
+It uses three simple internal modes:
+
+**Tasks | Checklists | Lists**
+
+Tasks / Lists is intentionally lighter than Work. It handles quick tasks, checklists, shopping / materials lists, punch items, reminders, and similar organization that does not need Work-level execution structure.
+
+A lightweight item can be deliberately **Converted to Work** when it grows into a real job rather than accumulating Work-level complexity inside Tasks / Lists.
+
+Private personal or Business-internal lists may remain associated with the Property without becoming homeowner-visible. Sharing into the Property-visible space must be deliberate and clear.
+
+The full Property Tasks / Lists behavior is governed by:
+
+**`24_PROPERTY_TASKS_LISTS.md`**
 
 ### 3. Maintenance
 
@@ -196,6 +212,7 @@ Primary context signals are:
 - blue **Switch** control when multiple Properties are available;
 - Property-scoped Timeline;
 - **Work** rather than personal Daily Grind;
+- lightweight Property-scoped **Tasks / Lists**;
 - **Maintenance** as the Property care workspace;
 - **Vault** as the Property memory / permanent-information destination;
 - absence of personal Points / Status in the Entity top area.
@@ -214,12 +231,14 @@ The goal is familiar operation with unmistakable context.
 6. The Property identity and blue **Switch** control provide Property switching; a separate permanent Properties tab is not required inside the Property Entity.
 7. Mail opened from the Entity is the same Roundhouse Mail system filtered to that Entity context.
 8. Property **Work** is the top right-edge operating view and answers what needs doing at this place. It is not named Pending Work because its scope includes active and completion states as well as pending states.
-9. Maintenance governs recurring care and Property Standards; due work and drift can feed Work rather than becoming parallel task systems.
-10. Vault is the permanent Property-information destination, with Specs, Assets & Equipment, Documents, and Property History / Records as its primary internal sections.
-11. Property Documents has one clear home: **Property Entity → Vault → Documents**. Other valid pathways reference the same underlying files rather than creating copies.
-12. Property Timeline is the living view; **Vault → Property History / Records** is the durable archival view. Both can present the same underlying Record without duplication.
-13. Handoff assembles current permitted Property truth and does not maintain a duplicate permanent copy of that truth.
-14. The Property Entity should feel visually distinct from the personal Command Center while preserving useful positional familiarity.
+9. Property **Tasks / Lists** keeps lightweight organization lightweight; items that become real jobs move into Work rather than forcing Work-level complexity into the list system.
+10. Property context does not automatically make a personal or Business-internal Task / List homeowner-visible; sharing is deliberate and permission-aware.
+11. Maintenance governs recurring care and Property Standards; due work and drift can feed Work rather than becoming parallel task systems.
+12. Vault is the permanent Property-information destination, with Specs, Assets & Equipment, Documents, and Property History / Records as its primary internal sections.
+13. Property Documents has one clear home: **Property Entity → Vault → Documents**. Other valid pathways reference the same underlying files rather than creating copies.
+14. Property Timeline is the living view; **Vault → Property History / Records** is the durable archival view. Both can present the same underlying Record without duplication.
+15. Handoff assembles current permitted Property truth and does not maintain a duplicate permanent copy of that truth.
+16. The Property Entity should feel visually distinct from the personal Command Center while preserving useful positional familiarity.
 
 ---
 
