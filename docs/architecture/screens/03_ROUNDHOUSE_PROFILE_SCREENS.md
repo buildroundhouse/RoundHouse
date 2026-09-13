@@ -1,14 +1,30 @@
 # Roundhouse — Profile Page
 
-The **Profile Page** is a long, vertically scrollable page with a definite bottom. It is the editable version of the person's Profile for their **current Role and Entity context**. The **Command Center remains the landing page** and primary operating screen.
+The **Profile Page** is a long, vertically scrollable page with a definite bottom. It is the visual and management hub for the currently active Profile. The **Command Center remains the landing page** and primary operating screen.
 
 ## 1. Top Navigation
 
-At the **upper-left corner** is a large, obvious **Back arrow** with **Back to Command Center**.
+At the **upper-left corner** is a large, obvious **Back arrow**.
 
-This always returns directly to the Command Center for the currently active Role / Entity. The Profile is not another operating dashboard.
+This always returns directly to the Command Center for the Profile currently displayed on this page. If the person switches Profiles before tapping Back, the destination is the newly selected Profile's Command Center.
 
-**Profile** appears at the upper-right as the page title.
+A prominent Profile switch control is centered in the top bar when more than one Profile is available. It shows the active Profile name, the words **Switch profile**, and a down chevron. There is no global Edit or Settings control in the top bar.
+
+---
+
+## 1A. Profile Switching
+
+The Profile Page is the **only** place where a person can change the active Profile.
+
+The Command Center contains no profile switcher. Its Profile photo only opens the active Profile Page.
+
+When more than one Profile is available, tapping the centered **Switch profile** control opens a simple selection sheet. The sheet shows the active Profile and **Other profiles** using recognizable names and images, such as **JD Design Studio**, **DMT DESIGN BUILD**, or **Tierney Home**.
+
+The switcher contains no Role labels, account terminology, settings, editing, archive controls, or add/create/claim actions. Those actions remain in their appropriate workflows.
+
+Selecting another Profile updates the active context and immediately redraws the entire Profile Page: splash image, logo, name, View Profile destination, information, permissions, and management doorways. The switcher then closes, leaving the newly selected Profile Page visible. Back returns to that Profile's Command Center.
+
+When only one Profile is available, the switch control is absent. Tapping the Profile photo from the Command Center still opens the Profile Page directly.
 
 ---
 
@@ -16,9 +32,11 @@ This always returns directly to the Command Center for the currently active Role
 
 Directly beneath the navigation is a **large, full-width horizontal banner image**.
 
-The banner belongs to the person's Profile rather than the Entity's branding. The user can choose an image that represents them personally or professionally.
+The banner belongs to the active Profile and is a dramatic visual confirmation of context. It may show a Home, Business, or other appropriate representative image.
 
-The banner is editable.
+Changing Profiles must visibly replace the banner and associated identity so the person cannot mistake which Profile is active.
+
+The banner is edited from its own granular media control, not from a global page-level Edit button.
 
 ---
 
@@ -26,23 +44,17 @@ The banner is editable.
 
 The **large circular Profile Photo** sits toward the lower-left of the banner and overlaps its bottom edge.
 
-Immediately to the right of the Profile Photo is the smaller **Entity Logo**.
+The Profile's logo or identifying image appears with the Profile name beneath the splash. A Business can present its company logo; a Home can present its recognizable Home identity.
 
-To the right of the Entity Logo is:
-
-**Name**  
-**Role / Title**  
-**Entity Name**
-
-The Entity Logo and Entity Name show the context in which this version of the person's Profile is participating.
-
-The **person remains visually dominant**. The Entity logo is intentionally smaller than the Profile Photo.
+The splash and identity area must make the selected Profile visually unmistakable. Internal Entity and Role concepts may govern access, but the switcher and splash use the Profile's real customer-facing name.
 
 ---
 
 ## 4. Profile Actions
 
-The action area depends on whether the person is editing their own Profile or another authorized person is viewing the outward-facing Profile.
+The action area depends on whether the person is managing their own Profile or another authorized person is viewing the outward-facing Profile.
+
+There is no global page-level Edit or Settings control. Editing begins at the granular field, media item, or management section where the information lives.
 
 ### Editable / Private Profile
 
@@ -50,7 +62,7 @@ The Profile owner sees **View Profile** and **Share Roundhouse**.
 
 ### View Profile
 
-**View Profile** opens the person's outward-facing Profile so they can immediately verify what another authorized viewer can see.
+**View Profile** sits directly beneath the splash/identity area and opens the active Profile's outward-facing view so the person can immediately verify what another authorized viewer can see.
 
 ### Share Roundhouse
 
@@ -192,7 +204,9 @@ The full Discover ecosystem remains post-MVP.
 
 # 5. Editable Personal Information
 
-Below Invite / Find / Discover begins the main vertically scrolling personal information.
+Below Invite / Find / Discover begins the main vertically scrolling Profile information.
+
+Each section owns its own edit doorway. The page never enters a single global editing mode.
 
 These are **personal / Role fields**, not Business Entity information.
 
@@ -257,11 +271,11 @@ This contains remaining personal application settings such as notification prefe
 
 Visually, from top to bottom:
 
-**Back to Command Center / Profile title**  
+**Back / centered active Profile + Switch profile**  
 ↓  
-**Full-width Banner**  
+**Full-width Profile splash image**  
 ↓  
-**Profile Photo → Entity Logo → Name / Role / Entity → Profile Action Area**  
+**Profile image / logo → active Profile name → Profile Action Area**  
 ↓  
 **Invite / Share Roundhouse →**  
 ↓  
@@ -281,13 +295,13 @@ Visually, from top to bottom:
 ↓  
 **Definite bottom of Profile**
 
-For the Profile owner, the Profile Action Area contains **View Profile → Share Roundhouse + Points**. Share Roundhouse and the dedicated Invite row both enter the same Invitation Center.
+For the Profile owner, the Profile Action Area directly beneath the splash contains **View Profile → Share Roundhouse + Points**. Share Roundhouse and the dedicated Invite row both enter the same Invitation Center.
 
-The important visual hierarchy remains that **the person dominates the page** while the Entity establishes operating context.
+The important visual hierarchy is that the active Home or Business Profile is unmistakable. Switching Profiles causes a dramatic splash and identity change before Back returns to the selected Profile's Command Center.
 
 ## Governing Rule
 
-**Profile places Invite / Share Roundhouse before Find a Trade Professional. All Share Roundhouse doorways enter the same Invitation Center. Viewer is the neutral view-only Role and only becomes an active participation relationship when attached to a legitimate Residential Property or Commercial Facility.**
+**Profile places Invite / Share Roundhouse before Find a Trade Professional. All Share Roundhouse doorways enter the same Invitation Center. Viewer is the neutral view-only Role and only becomes an active participation relationship when attached to a legitimate Residential Property or Commercial Facility. The Profile Page is the sole owner of profile switching; the Command Center never switches Profiles.**
 
 ## Profile Wireframe
 
