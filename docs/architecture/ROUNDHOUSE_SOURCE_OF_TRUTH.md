@@ -206,9 +206,21 @@ Roundhouse revokes the permission source that ended without erasing another legi
 
 ## 10. Records and Attribution
 
-Operational activity belongs to an Entity and remains attributable to the Person and Acting Identity that created it.
+Operational activity belongs to the Roundhouse Record system, is connected to the legitimate Entity context in which it occurred, and remains attributable to the Person and Acting Identity that created it.
 
 This includes Work, photos, notes, tasks, materials, receipts, approvals, communications, participant decisions, and other Timeline activity.
+
+A Record does **not** become a separate stored copy merely because it appears in a Property Entity, Business Entity, or personal Command Center. Roundhouse stores the canonical Record once and projects that same Record into each authorized context.
+
+For example, one Work Record may simultaneously appear as:
+
+- a Work Card in **Property → Work** because the work concerns that Property;
+- the same Work Card in **Business → Work** because the Business is responsible for or participated in that work;
+- the same Work Card in a person's Command Center / work history because that person is assigned to or historically attributed to it.
+
+Those views point to the same underlying Record ID. Updating the canonical Record updates every authorized projection; no synchronization between copies is required.
+
+Photos and files follow the same principle. They retain author / uploader provenance and legitimate Entity / Work relationships without becoming separate media copies owned by each account that can see them.
 
 A Record does not lose its original authorship or authority context because ownership, employment, Business participation, management, or access later changes.
 
@@ -232,6 +244,18 @@ Current Roles, ownership, leadership, permissions, Business relationships, and m
 
 **Historical attribution remains.**
 
+## 13. Record Portability
+
+Roundhouse must not hold legitimate records hostage to continued use of the service.
+
+A Person or Entity leaving Roundhouse must have a path to export the records they are legitimately entitled to retain. The intended portable form is a standard **ZIP archive** containing original files plus sufficient structured and human-readable metadata for the archive to remain useful outside Roundhouse.
+
+Export preserves existing record and visibility rights; it does not create new permission to publish or expose information that was private inside Roundhouse.
+
+The detailed export workflow may be implemented after the MVP work surfaces, but the core data model must not prevent portable exit or a future service wind-down export.
+
+Detailed Work-card and portability behavior is governed by **`screens/34_WORK_RECORD_CARDS_AND_PORTABILITY.md`**.
+
 ## Governing Rule
 
-**New Roundhouse features must follow Person → Acting Identity → Entity → Record and must not confuse Role, authority, ownership, permission source, access, leadership, and authorship. Viewer is the neutral view-only Role and only participates through a legitimate Residential Property or Commercial Facility. Business-derived Property access ends when its governing Business relationship ends, while history remains and independently authorized relationships survive.**
+**New Roundhouse features must follow Person → Acting Identity → Entity → Record and must not confuse Role, authority, ownership, permission source, access, leadership, authorship, canonical record storage, or view context. A Record is stored once and may appear in multiple authorized Property, Business, and personal views without duplication. Viewer is the neutral view-only Role and only participates through a legitimate Residential Property or Commercial Facility. Business-derived Property access ends when its governing Business relationship ends, while history remains and independently authorized relationships survive.**
