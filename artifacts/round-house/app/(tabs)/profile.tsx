@@ -102,12 +102,12 @@ const logoImage = require("@/assets/images/logo-mark.png");
 
 export default function ProfileScreen() {
   const colors = useColors();
-  const { profile } = useProfile();
+  const { profile, activeMode, activeOutwardAccountId } = useProfile();
   const { data } = useListProperties();
   const { signOut } = useAuth();
   const [settingsOpen, setSettingsOpen] = useState(false);
   return <>
-    <CurrentProfileScreen onSettings={() => setSettingsOpen(true)} />
+    <CurrentProfileScreen key={`${activeOutwardAccountId}:${activeMode?.id}`} onSettings={() => setSettingsOpen(true)} />
     {settingsOpen ? <SettingsModal visible onClose={() => setSettingsOpen(false)} user={profile ?? undefined}
       colors={colors} properties={data?.properties ?? []} onSignOut={() => { setSettingsOpen(false); void signOut(); }} /> : null}
   </>;

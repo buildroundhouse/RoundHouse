@@ -44,3 +44,24 @@ export function personalDetailsFromIntake(md: Record<string, unknown>): Personal
     certifications: { value: [md.licenseType, md.licenseState, md.licenseNumber].map(text).filter(Boolean).join(" · "), public: visibility.license === true },
   };
 }
+
+export type ProfileEntity = {
+  id: number; displayName: string; kind: string; logoUrl?: string | null;
+  myMembership: { role: string; status: string; direction?: string; permissions?: Record<string, unknown> } | null;
+};
+
+/** Titles are descriptive; only approved Entity membership establishes authority. */
+export function profileContext(kind: string | undefined, md: Record<string, unknown>, entities: ProfileEntity[]) {
+  const memberships = entities.filter(e => e.myMembership?.status === "approved");
+  const requestedId = Number(md.entityId);
+  const entity = memberships.find(e => e.id === requestedId) ?? (memberships.length === 1 ? memberships[0] : null);
+  const baseRole = PROFILE_ROLE_LABELS[kind ?? "collab"] ?? "Viewer";
+  const authority = entity?.myMembership?.role;
+  const authorityLabel = ({ owner: "Owner", admin: "Admin", manager: "Manager" } as Record<string, string>)[authority ?? ""];
+  const role = baseRole === "Viewer" ? "Viewer"
+    : kind === "home" && authority === "manager" ? "Home Manager"
+    : authorityLabel && !(kind === "home" && authority === "owner") ? `${baseRole} (${authorityLabel})` : baseRole;
+  const savedName = typeof md.placeName === "string" ? md.placeName : typeof md.companyName === "string" ? md.companyName : "";
+  const entityName = entity?.displayName ?? (memberships.length > 1 ? memberships.map(e => e.displayName).join(" · ") : savedName || "No Entity participation yet");
+  return { role, entity, entityName, memberships };
+}
