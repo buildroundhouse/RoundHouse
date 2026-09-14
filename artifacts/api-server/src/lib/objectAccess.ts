@@ -185,6 +185,7 @@ export async function isPublicProfileMedia(objectPath: string): Promise<boolean>
       .from(userModesTable)
       .where(
         or(
+          sql`${userModesTable.intakeData}->>'profileBannerUrl' = ${objectPath}`,
           sql`${userModesTable.intakeData}->>'headerImageUrl' = ${objectPath}`,
           sql`${userModesTable.intakeData}->>'companyLogoUrl' = ${objectPath}`,
           sql`${userModesTable.intakeData}->>'bannerUrl' = ${objectPath}`,
