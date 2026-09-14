@@ -359,7 +359,7 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
             delayLongPress={350}
             accessibilityRole="button"
             accessibilityLabel="Capture"
-            accessibilityHint="Tap to open the camera. Press and hold to open Concierge."
+            accessibilityHint="Tap to open the camera. Press and hold to open the assistant."
             style={({ pressed }) => [
               styles.fab,
               {
@@ -371,6 +371,7 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
           >
             <Feather name="camera" size={20} color={colors.primaryForeground ?? "#fff"} />
           </Pressable>
+          <Text pointerEvents="none" style={styles.assistantHint}>press & hold assistant</Text>
         </View>
       )}
 
@@ -779,6 +780,7 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: "center",
   },
+  assistantHint: { position: "absolute", top: 68, width: 120, textAlign: "center", color: "#1677FF", fontSize: 10, lineHeight: 13, fontFamily: "Inter_500Medium" },
   fab: {
     width: 64,
     height: 64,
