@@ -357,6 +357,9 @@ export function PublicProfileModal({
           <View style={{ width: 38 }} />
         </View>
 
+        {counterpartOutwardAccountId ? <Pressable accessibilityRole="button" accessibilityLabel="View Client Portfolio" onPress={() => {
+          onClose(); router.push({ pathname: "/(tabs)/invoices", params: { clientAccountId: String(counterpartOutwardAccountId) } } as never);
+        }} style={{ minHeight: 48, paddingHorizontal: 20, justifyContent: "center" }}><Text style={{ color: colors.primary, fontWeight: "600" }}>View Client Portfolio</Text></Pressable> : null}
         {isFetching && !profile ? (
           <View style={styles.loading}>
             <ActivityIndicator color={colors.foreground} />
