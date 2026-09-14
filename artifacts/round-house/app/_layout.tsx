@@ -195,9 +195,12 @@ function ActiveOutwardAccountBridge() {
 }
 
 export function navigateToPushTarget(link: PushDeepLink) {
+  if (link.type === "question") {
+    router.push({ pathname: "/(tabs)/resolutions", params: link.questionId ? { resolutionId: String(link.questionId) } : {} } as never);
+    return;
+  }
   if (
     link.type === "reminder" ||
-    link.type === "question" ||
     link.type === "company_notice"
   ) {
     router.push("/reminders");

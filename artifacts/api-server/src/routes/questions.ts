@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { and, desc, eq, or } from "drizzle-orm";
+import { and, desc, eq, or, isNull } from "drizzle-orm";
 import { db, questionsTable, usersTable } from "@workspace/db";
 import { requireAuth, type AuthRequest } from "../middlewares/requireAuth";
 import { recordPoints } from "../lib/rewards";
@@ -204,6 +204,18 @@ router.patch("/questions/:questionId", requireAuth, async (req, res): Promise<vo
   }
 
   const { responseText, confirm, nextStep, complete } = req.body ?? {};
+  if (existing.status === STATUS_COMPLETED && (typeof responseText === "string" || confirm === true || complete === true)) {
+    res.status(409).json({ error: "Resolved history cannot be changed" });
+    return;
+  }
+  if (existing.resolutionState) {
+    res.status(409).json({ error: "Open this item in the Resolution Center to preserve its discussion and closeout history" });
+    return;
+  }
+  if ((confirm === true || complete === true) && existing.userClerkId !== userId) {
+    res.status(403).json({ error: "Only the creator can resolve this item" });
+    return;
+  }
   const updates: Partial<typeof questionsTable.$inferInsert> = {};
 
   // Provider answers an Ask-a-Pro question.
@@ -260,8 +272,12 @@ router.patch("/questions/:questionId", requireAuth, async (req, res): Promise<vo
   const [row] = await db
     .update(questionsTable)
     .set(updates)
-    .where(eq(questionsTable.id, id))
+    .where(and(eq(questionsTable.id, id), isNull(questionsTable.resolutionState)))
     .returning();
+  if (!row) {
+    res.status(409).json({ error: "This resolution changed. Open it in the Resolution Center." });
+    return;
+  }
 
   // Award points only for Ask-a-Pro flow, only to the responder
   // (provider). The provider is the counterparty when a client owns the
@@ -309,24 +325,8 @@ router.patch("/questions/:questionId", requireAuth, async (req, res): Promise<vo
   res.json(serialize(row));
 });
 
-router.delete("/questions/:questionId", requireAuth, async (req, res): Promise<void> => {
-  const { userId } = req as AuthRequest;
-  const id = parseId(req.params.questionId);
-  if (!Number.isFinite(id)) {
-    res.status(404).json({ error: "Not found" });
-    return;
-  }
-  const [row] = await db
-    .delete(questionsTable)
-    .where(
-      and(eq(questionsTable.id, id), eq(questionsTable.userClerkId, userId)),
-    )
-    .returning({ id: questionsTable.id });
-  if (!row) {
-    res.status(404).json({ error: "Not found" });
-    return;
-  }
-  res.sendStatus(204);
+router.delete("/questions/:questionId", requireAuth, async (_req, res): Promise<void> => {
+  res.status(409).json({ error: "Questions and requests are permanent Resolution history. Resolve them instead of deleting them." });
 });
 
 export default router;

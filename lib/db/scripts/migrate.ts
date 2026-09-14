@@ -45,6 +45,10 @@ import { backfillCommentAuthorOutwardAccount } from "./backfillCommentAuthorOutw
 type Step = { name: string; sql: string };
 
 export const SCHEMA_STEPS: Step[] = [
+  {
+    name: "reminder_questions.resolution_state",
+    sql: `ALTER TABLE reminder_questions ADD COLUMN IF NOT EXISTS resolution_state jsonb;`,
+  },
   // --- users -------------------------------------------------------------
   {
     name: "users.active_outward_account_id",

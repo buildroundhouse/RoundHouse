@@ -1,4 +1,4 @@
-import { pgTable, text, serial, timestamp, index } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, index, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -38,6 +38,13 @@ export const questionsTable = pgTable(
     requestedAction: text("requested_action"), // for "request": "reply" | "approve" | "upload" | "confirm"
     responseText: text("response_text"),
     nextStep: text("next_step"), // for "ask_pro" after confirmed: "appointment" | "list" | "curious"
+    resolutionState: jsonb("resolution_state").$type<{
+      context?: { id: number; name: string };
+      responsibleId: string | null;
+      followUps: number;
+      readBy: string[];
+      events: { actorId: string; text: string; kind: "reply" | "follow_up" | "resolved"; at: string }[];
+    }>(),
     confirmedAt: timestamp("confirmed_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true })

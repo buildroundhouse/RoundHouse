@@ -75,6 +75,10 @@ function formatRelative(iso: string): string {
 }
 
 function deepLinkFromNotification(n: NotificationItem): PushDeepLink | null {
+  if (["question_asked", "question_answered", "request_received"].includes(n.type)) {
+    const id = Number(n.relatedId);
+    return { type: "question", ...(Number.isSafeInteger(id) && id > 0 ? { questionId: id } : {}) };
+  }
   const dl = n.deepLink;
   if (!dl) return null;
   if (!dl.workOrderId && !dl.propertyId && !dl.logId) return null;
