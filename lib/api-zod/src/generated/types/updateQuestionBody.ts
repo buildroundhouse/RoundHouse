@@ -14,4 +14,6 @@ export interface UpdateQuestionBody {
   nextStep?: UpdateQuestionBodyNextStep;
   /** Client marking a What-I-Need-From-You request done. */
   complete?: boolean;
+  /** Creator sends another prompt on the same unanswered Resolution. */
+  followUp?: boolean;
 }
