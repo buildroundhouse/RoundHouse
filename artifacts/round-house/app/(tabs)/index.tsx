@@ -46,7 +46,7 @@ import {
   type HomeSidePanelKey,
 } from "@/components/HomeSidePanelOverlay";
 import LogsScreen from "@/app/(tabs)/logs";
-import InvoicesScreen from "@/app/(tabs)/invoices";
+import { ReceiptsPanel } from "@/components/ReceiptsPanel";
 import PropertiesScreen from "@/app/(tabs)/properties";
 import MyJobsScreen from "@/app/my-jobs";
 import RemindersScreen from "@/app/reminders";
@@ -673,7 +673,7 @@ export default function TimelineScreen() {
       >
         {activeSidePanel === "logs" ? <LogsScreen embedded /> : null}
         {activeSidePanel === "jobs" ? <MyJobsScreen embedded /> : null}
-        {activeSidePanel === "receipts" ? <InvoicesScreen embedded /> : null}
+        {activeSidePanel === "receipts" ? <ReceiptsPanel /> : null}
         {activeSidePanel === "reminders" ? (
           <RemindersScreen embedded onRequestAdd={setRemindersAdd} />
         ) : null}

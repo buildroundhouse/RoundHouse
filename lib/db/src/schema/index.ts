@@ -39,3 +39,4 @@ export * from "./point_settings";
 export * from "./prize_winners";
 export * from "./preset_chips";
 export * from "./concierge";
+export * from "./financial_documents";

@@ -1,0 +1,28 @@
+import { pgTable, serial, integer, text, timestamp, jsonb, uniqueIndex } from "drizzle-orm/pg-core";
+export type FinancialEvent = { action: "created" | "edited" | "approved" | "converted" | "check_collected"; actorId: string; at: string };
+export const financialDocumentsTable = pgTable("financial_documents", {
+  id: serial("id").primaryKey(),
+  kind: text("kind").notNull().$type<"estimate" | "invoice">(),
+  number: integer("number").notNull(),
+  issuerEntityId: integer("issuer_entity_id").notNull(),
+  issuerAccountId: integer("issuer_account_id").notNull(),
+  issuerName: text("issuer_name").notNull(),
+  propertyEntityId: integer("property_entity_id").notNull(),
+  propertyName: text("property_name").notNull(),
+  clientClerkId: text("client_clerk_id").notNull(),
+  clientAccountId: integer("client_account_id").notNull(),
+  clientName: text("client_name").notNull(),
+  requestKey: text("request_key"),
+  createdBy: text("created_by").notNull(),
+  description: text("description").notNull(),
+  amountCents: integer("amount_cents").notNull(),
+  status: text("status").notNull().$type<"pending" | "approved" | "paid">().default("pending"),
+  sourceEstimateId: integer("source_estimate_id"),
+  convertedInvoiceId: integer("converted_invoice_id"),
+  approvedAt: timestamp("approved_at", { withTimezone: true }),
+  paidAt: timestamp("paid_at", { withTimezone: true }),
+  paymentMethod: text("payment_method"),
+  events: jsonb("events").notNull().$type<FinancialEvent[]>().default([]),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, t => [uniqueIndex("financial_documents_request_unique").on(t.issuerAccountId, t.requestKey), uniqueIndex("financial_documents_number_unique").on(t.issuerEntityId, t.kind, t.number), uniqueIndex("financial_documents_source_unique").on(t.sourceEstimateId)]);
