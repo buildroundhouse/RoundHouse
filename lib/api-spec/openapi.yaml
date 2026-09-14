@@ -10237,6 +10237,10 @@ components:
           type: string
           nullable: true
           description: For "ask_pro" after the client confirms. One of appointment, list, curious.
+        unansweredPromptCount:
+          type: integer
+          minimum: 1
+          description: Number of unanswered prompts in this specific Resolution thread.
         confirmedAt:
           type: string
           format: date-time
@@ -10253,6 +10257,7 @@ components:
         - kind
         - status
         - questionText
+        - unansweredPromptCount
         - createdAt
         - updatedAt
 
@@ -10301,6 +10306,9 @@ components:
         complete:
           type: boolean
           description: Client marking a What-I-Need-From-You request done.
+        followUp:
+          type: boolean
+          description: Creator sends another prompt on the same unanswered Resolution.
 
     ListNotificationsResponse:
       type: object
