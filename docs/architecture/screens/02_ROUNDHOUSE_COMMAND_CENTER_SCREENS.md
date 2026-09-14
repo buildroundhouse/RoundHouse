@@ -2,11 +2,11 @@
 
 ## Purpose
 
-The Command Center is the personal working screen for a Roundhouse Avatar.
+The Command Center is the personal working screen for the currently active Roundhouse Profile.
 
 It is not the Property or Business Entity page. The Command Center is where the person works. Entity pages are where the shared history of a Property or Business is viewed and, according to Role and permission, worked within.
 
-**Avatar Timeline = what I am doing.**  
+**Profile Timeline = what I am doing.**  
 **Entity Timeline = what is happening here.**
 
 The Timeline is the architectural and visual center of the Command Center.
@@ -23,15 +23,15 @@ The main Timeline shows the Trade Professional's own attributed activity: work, 
 
 The top bar is shallow and contains four controls/areas from left to right.
 
-### 1. Avatar Photo — far left
+### 1. Profile Photo — far left
 
-Tap the Avatar photo to open the Avatar/Role menu.
+Tap the Profile photo to leave the Command Center and open the currently active Profile Page.
 
-From here the person can switch between Businesses, Properties, or other Entity Roles they operate through and access appropriate Role/profile information and settings.
+The Profile photo is **not a switcher**. The Command Center must not contain profile-switching, Role-switching, account-switching, or add/create controls.
 
-A person operating through more than one Business can switch the active Business here.
+If the person has access to multiple Profiles, switching happens only from the prominent Profile switcher on the Profile Page. This makes changing the active working context deliberate rather than allowing casual movement between Command Centers.
 
-### 2. Current Business Logo + Name — beside Avatar
+### 2. Current Business Logo + Name — beside Profile Photo
 
 The current Business logo and Business name form one tappable area.
 
@@ -87,7 +87,7 @@ A Trade Professional searching their personal Timeline searches their own attrib
 
 Clear or close Search to restore the full Timeline.
 
-**Search filters the current Timeline. Avatar Timeline search filters that Avatar's history. Entity Timeline search filters the Entity's history according to viewer permissions.**
+**Search filters the current Timeline. Profile Timeline search filters that Profile's history. Entity Timeline search filters the Entity's history according to viewer permissions.**
 
 ---
 
@@ -205,9 +205,9 @@ When the Homeowner owns or manages multiple residential Properties, the top of t
 
 The Entity identity area should instead identify the combined state with wording such as:
 
-**Multi-Property Account**
+**My Properties**
 
-The final customer-facing wording can be refined, but the meaning must be clear: the Homeowner is looking across multiple Properties.
+The wording must make clear that the Homeowner is looking across multiple Properties without presenting those Properties as separate login accounts.
 
 The Homeowner Timeline may interweave activity from those Properties chronologically, with each item clearly identifying which Property it belongs to. Lists, Daily Grind, Receipts, Calendar, and other appropriate Command Center working views can likewise assemble relevant information across the Homeowner's Properties.
 
@@ -215,21 +215,21 @@ The Command Center does not merge those Property records. It is simply the Homeo
 
 ## Top Bar — Four Areas
 
-### 1. Avatar Photo — far left
+### 1. Profile Photo — far left
 
-Tap to open the Avatar/Role menu and access appropriate Role/profile information and settings.
+Tap to open the currently active Profile Page. It never opens a switcher on the Command Center.
 
-### 2. Property / Multi-Property Identity — beside Avatar
+### 2. Property / Multi-Property Identity — beside Profile Photo
 
 For a Homeowner with one Property, this area shows the **Property image + Property name**.
 
-For a Homeowner with multiple Properties, this area shows the **combined multi-Property identity** rather than pretending that one Property is selected. A temporary governing label is **Multi-Property Account**.
+For a Homeowner with multiple Properties, this area shows the **combined multi-Property identity** rather than pretending that one Property is selected. A temporary governing label is **My Properties**.
 
 From the multi-Property state, the Properties working tab provides the direct path to select a specific Property.
 
 ### 3. Badge + Points — toward the right
 
-Shows the Homeowner Avatar's status and points. Tap to open Rewards.
+Shows the Homeowner Profile's status and points. Tap to open Rewards.
 
 ### 4. Inbox — far right
 
@@ -369,9 +369,9 @@ The Business Entity receives only information and controls that genuinely belong
 
 # Governing Command Center Rules
 
-1. **Personal Command Centers belong to Avatars.**
+1. **Personal Command Centers belong to the currently active Profile.**
 2. **The Timeline is the visual and architectural centerpiece of the Command Center.**
-3. **Avatar Timeline = what I am doing.**
+3. **Profile Timeline = what I am doing.**
 4. **Entity Timeline = what is happening here.**
 5. A Homeowner has one personal Command Center, not one personal Command Center per Property.
 6. A single-Property Homeowner Command Center may visually identify itself with that Property because this is the common/simple case.
@@ -385,5 +385,8 @@ The Business Entity receives only information and controls that genuinely belong
 14. Working tools belong primarily in the Command Center. Durable Property information belongs primarily with the Property Entity.
 15. Property Documents belongs on the Property Entity, not as another permanent Command Center button.
 16. Notes, photographs, documents, and other records should not receive duplicate navigation merely because they can appear in Timeline history; add dedicated access only where there is a genuine retrieval or workflow need.
-17. The same underlying Record may appear in appropriate Avatar and Entity Timeline views without creating duplicate records.
-18. **Entities are where interaction happens. Entity Timelines record shared history. Avatar Timelines assemble each person's individual history from their attributed participation across those Entities.**
+17. The same underlying Record may appear in appropriate Profile and Entity Timeline views without creating duplicate records.
+18. **Entities are where interaction happens. Entity Timelines record shared history. Profile Timelines assemble each person's individual history from their attributed participation across those Entities.**
+19. **The Command Center never owns profile switching. Its Profile photo opens the active Profile Page.**
+20. **The Profile Page is the sole switching location. After a switch, Back returns to the selected Profile's Command Center.**
+21. **The switcher never creates, claims, adds, archives, edits, or configures a Profile. Those actions remain in their proper workflows.**
