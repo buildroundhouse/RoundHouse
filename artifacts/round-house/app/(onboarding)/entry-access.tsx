@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -18,6 +19,7 @@ export default function EntryAccessScreen() {
   const colors = useColors(),
     router = useRouter(),
     profile = useProfile();
+  const queryClient = useQueryClient();
   const invites = useListMyEntityInvites(),
     respond = useRespondToEntityMembership();
   const [error, setError] = useState("");
@@ -90,7 +92,8 @@ export default function EntryAccessScreen() {
                   profile.refetchProfile(),
                   profile.refetchOutwardAccounts(),
                 ]);
-                router.replace("/(tabs)");
+                await queryClient.invalidateQueries({ queryKey: ["/api/entities/mine"] });
+                router.replace("/");
               } catch (e) {
                 setError(
                   e instanceof Error
@@ -127,11 +130,11 @@ export default function EntryAccessScreen() {
       </Pressable>
       <Pressable
         accessibilityRole="button"
-        onPress={() => router.replace("/(tabs)")}
+        onPress={() => router.replace("/(onboarding)/entry")}
         style={{ minHeight: 48, justifyContent: "center" }}
       >
         <Text style={{ color: colors.primary }}>
-          Continue without joining a space
+          Choose a different space or relationship
         </Text>
       </Pressable>
     </EntryStep>

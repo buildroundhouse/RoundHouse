@@ -11,7 +11,7 @@ Do not offer Collaborator in intake. The old mode-picker route redirects to the 
 
 Residential and commercial owner paths use the existing home and facilities runtime respectively. The selected entity type, property/business type, and relationship are retained as `entrySelection` in the completed intake. The address card stays a separate step and retains ZIP lookup/manual-entry behavior. Business Continue now creates the pending business profile and opens the existing validated details form with the entered data restored.
 
-Joining a space is different from creating an owner's workspace. Manager, Team Member, and Viewer selections show the existing invitation flow. Selecting one never creates an owner account or grants permissions. Invitations retain the server-authorized access; this change does not migrate historical membership roles or redefine authorization. Without an invitation, the user can refresh or continue without joining a space.
+Joining a space is different from creating an owner's workspace. Manager, Team Member, and Viewer selections show the existing invitation flow. Selecting one never creates an owner account or grants permissions. Invitations retain the server-authorized access; this change does not migrate historical membership roles or redefine authorization. Without an invitation, the user can refresh or choose a different space/relationship; they cannot enter the Command Center as an unconnected Viewer.
 
 ## Why the old flow survived
 
@@ -45,3 +45,29 @@ Personal identity (photo, name, optional phone) is saved to the signed-in user's
 `identityCompletedAt` is the durable completion checkpoint. Missing or changed display media must not send a completed person back into identity setup. Old identity links redirect to the active unfinished intake, or the Property/Business start if no unfinished space is available. It is acceptable to restart space selection when no progress can be recovered; it is not acceptable to restart completed identity. Personal corrections remain available through the personal profile editor.
 
 The identity form restores personal fields from `/users/me/personal`, not the business/property display overlay. Profile queries are scoped to the authenticated UID to prevent a previous account's cached state from influencing setup. A genuinely expired or signed-out session may still require sign-in; signing in to the same account must restore its saved identity rather than create it again.
+
+
+## Prevent legacy Viewer baseline from bypassing intake
+
+The server still creates a personal `collab` baseline and automatically stamps its
+`intakeCompletedAt` (legacy compatibility in `lib/outwardAccounts.ts`). The previous
+ProfileProvider treated this as completed space setup. Since that kind now displays
+as Viewer, a signed-in person could land in the Command Center as Viewer without
+joining a property or business. This was a routing bug, not proof of an authorized
+Viewer membership or a successful owner intake submission.
+
+ProfileProvider now verifies approved, non-archived Entity participation in the
+active outward account before allowing Viewer/Team profiles through. The query is
+scoped by signed-in UID and outward account and explicitly sends that account ID.
+Pending checks hold the Command Center; failed checks offer Retry. Owner intake
+still resumes from its saved completion state and personal identity remains saved.
+Admin access is preserved. The baseline and all existing records remain intact.
+
+Invitation acceptance refreshes participation and goes through the entry gate.
+The invitation screen no longer offers a direct Command Center bypass. The legacy
+ModeSwitcher Add action now starts Property/Business selection instead of creating
+a raw role-first mode. This change does not grant or migrate membership permissions.
+
+The entry screen also offers saved owner spaces: Resume setup for unfinished
+intake, Open for completed spaces. Choosing one switches to that existing mode
+and rechecks entry, so recovery from the baseline does not create duplicate spaces.

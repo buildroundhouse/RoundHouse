@@ -10,7 +10,7 @@ export default defineConfig({
     },
   },
   test: {
-    include: ["../round-house/lib/entry-navigation.test.ts", "../round-house/lib/identity-progress.test.ts"],
+    include: ["../round-house/lib/entry-navigation.test.ts", "../round-house/lib/identity-progress.test.ts", "../round-house/lib/profile-gate.test.ts", "../round-house/lib/entry-access.test.ts"],
     environment: "node",
   },
 });

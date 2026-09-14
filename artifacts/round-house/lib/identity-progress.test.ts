@@ -6,6 +6,7 @@ const state = vi.hoisted(() => ({
 }));
 vi.mock("expo-router", () => ({ Redirect: () => null, Stack: Object.assign(() => null, { Screen: () => null }), useSegments: () => ["(onboarding)", state.segment] }));
 vi.mock("react-native", () => ({ View: () => null, ActivityIndicator: () => null }));
+vi.mock("@/components/SetupRetry", () => ({ SetupRetry: () => null }));
 vi.mock("@/lib/auth", () => ({ useAuth: () => ({ isSignedIn: true, isLoaded: true }) }));
 vi.mock("@/lib/profile", () => ({ useProfile: () => ({ status: { kind: "needs-intake" }, profile: state.profile, activeMode: state.mode }) }));
 import OnboardingLayout from "../app/(onboarding)/_layout";

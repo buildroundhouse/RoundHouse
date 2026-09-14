@@ -6,6 +6,7 @@ import React, { useMemo } from "react";
 import { Platform, StyleSheet, View, useColorScheme } from "react-native";
 import { useAuth } from "@/lib/auth";
 import { useProfile } from "@/lib/profile";
+import { SetupRetry } from "@/components/SetupRetry";
 import { CaptureFAB } from "@/components/CaptureFAB";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { AdminQuickExit } from "@/components/admin/AdminQuickExit";
@@ -203,12 +204,11 @@ export default function TabLayout() {
   const { status, activeOutwardAccountId } = useProfile();
   if (!isLoaded) return <LoadingScreen />;
   if (!isSignedIn) return <Redirect href="/(auth)/sign-in" />;
-  if (status.kind === "needs-identity")
-    return <Redirect href="/(onboarding)/identity" />;
-  if (status.kind === "needs-mode-picker")
-    return <Redirect href="/(onboarding)/mode-picker" />;
-  if (status.kind === "needs-intake")
-    return <Redirect href="/(onboarding)/intake" />;
+  if (status.kind === "loading") return <LoadingScreen />;
+  if (status.kind === "error") return <SetupRetry onRetry={status.retry} />;
+  if (status.kind === "needs-identity") return <Redirect href="/(onboarding)/identity" />;
+  if (status.kind === "needs-mode-picker") return <Redirect href="/(onboarding)/mode-picker" />;
+  if (status.kind === "needs-intake") return <Redirect href="/(onboarding)/intake" />;
   if (status.kind === "admin-empty") return <Redirect href="/account/admin" />;
 
   return (
