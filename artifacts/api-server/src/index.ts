@@ -90,6 +90,13 @@ function runStartupMigrationsAndJobs() {
 }
 
 function startScheduledJobs() {
+  // Validation branches contain copies of real records and push tokens. Never
+  // send their reminders, create recurring work, or run cleanup during checks.
+  if (process.env.ROUNDHOUSE_DISABLE_BACKGROUND_JOBS === "true") {
+    logger.info("Background jobs disabled for deployment validation");
+    return;
+  }
+
   initStripeIntegration().catch((e) =>
     logger.error({ err: e }, "Stripe integration init failed"),
   );
@@ -222,6 +229,13 @@ function startScheduledJobs() {
       })
       .catch((e) => logger.error({ err: e }, "Expired mutes sweep error"));
   }, expiredMutesSweepIntervalMs);
+
+  // Keep the original accounts and connections recoverable during the hosting
+  // cutover. Other scheduled features continue to run normally.
+  if (process.env.ROUNDHOUSE_DISABLE_ACCOUNT_PURGE === "true") {
+    logger.info("Automatic outward-account purge disabled for data preservation");
+    return;
+  }
 
   // #344: hard-delete soft-deleted outward accounts (and their archived
   // connections) once they fall out of the recovery window. Same shape

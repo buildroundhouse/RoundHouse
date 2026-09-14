@@ -662,18 +662,21 @@ export const SCHEMA_STEPS: Step[] = [
     `,
   },
   {
-    // Tighten the (user, outward account) pair to be unique. Older
-    // dev DBs may already have created duplicate threads via the
-    // pre-unique index, so we collapse them to the lowest id first
-    // (the SELECT inside the DELETE finds dupes; the trick is safe to
-    // re-run because the second pass simply finds none).
+    // Tighten the (user, outward account) pair to be unique. Do not delete
+    // duplicate threads automatically: their messages may still refer to
+    // those IDs. Keep the records and fail readiness for a reviewed repair.
     name: "concierge_conversations_user_acct_unique",
     sql: `
-      DELETE FROM concierge_conversations a
-      USING concierge_conversations b
-      WHERE a.id > b.id
-        AND a.user_clerk_id = b.user_clerk_id
-        AND a.outward_account_id = b.outward_account_id;
+      DO $$
+      BEGIN
+        IF EXISTS (
+          SELECT 1 FROM concierge_conversations
+          GROUP BY user_clerk_id, outward_account_id
+          HAVING count(*) > 1
+        ) THEN
+          RAISE EXCEPTION 'Duplicate concierge conversations require a data-preserving repair before deployment';
+        END IF;
+      END $$;
       CREATE UNIQUE INDEX IF NOT EXISTS concierge_conversations_user_acct_unique
         ON concierge_conversations (user_clerk_id, outward_account_id);
     `,
