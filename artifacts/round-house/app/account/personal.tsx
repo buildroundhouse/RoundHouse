@@ -24,27 +24,11 @@ import {
 import { useColors } from "@/hooks/useColors";
 import { useProfile } from "@/lib/profile";
 import { resolveStorageUrl } from "@/lib/uploads";
-import { MODE_LABELS } from "@/lib/intake-schemas";
-import { EditProfileModal } from "@/components/EditProfileModal";
+import { ProfileNavigation } from "@/components/ProfileNavigation";
+import { ProfilePreview } from "@/components/ProfilePreview";
+import { PROFILE_ROLE_LABELS } from "@/lib/personal-profile";
 
-/**
- * Personal Profile screen.
- *
- * The "private side" of identity: things that belong to the person, not to
- * any one outward-facing account. These fields live on the users-table row
- * directly and are read/written via /users/me/personal — which is the
- * non-hydrated endpoint, so per-account fields (per-account phone, per-account
- * avatar, etc.) cannot bleed into or stomp the personal copy.
- *
- * Legal name is intentionally NOT surfaced here. The screen shows the
- * personal fields that aren't legal name (username, avatar, email, phone,
- * notification toggles) plus an "Intake information" section that lets the
- * user reopen the same intake editor used on the Profile tab for any of
- * their modes/accounts.
- *
- * Outward branding (avatar, bio, company name, business phone, …) is edited
- * from /account/edit/[id] — see OutwardAccountForm.
- */
+/** Private login/contact settings; role-profile links open the current Profile screen. */
 export default function PersonalProfileScreen() {
   const colors = useColors();
   const router = useRouter();
@@ -68,11 +52,8 @@ export default function PersonalProfileScreen() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
 
-  // Intake editor: we reuse the same EditProfileModal the Profile tab uses,
-  // but it implicitly scopes to the active mode. So before opening it for a
-  // non-active mode, we switch the active mode first and wait for the
-  // profile/modes refresh so the modal reads the right intakeData.
-  const [intakeEditorOpen, setIntakeEditorOpen] = useState(false);
+  // Selecting a saved role opens the current Profile; never the legacy intake editor.
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [switchingModeId, setSwitchingModeId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -111,7 +92,7 @@ export default function PersonalProfileScreen() {
     });
   }, [modes]);
 
-  const onEditIntake = async (mode: UserModeProfile) => {
+  const onOpenRoleProfile = async (mode: UserModeProfile) => {
     try {
       if (mode.id !== activeMode?.id) {
         setSwitchingModeId(mode.id);
@@ -119,7 +100,7 @@ export default function PersonalProfileScreen() {
         await Promise.all([refetchProfile(), refetchModes()]);
         await queryClient.invalidateQueries();
       }
-      setIntakeEditorOpen(true);
+      router.push("/(tabs)/profile");
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Couldn't open the editor.";
@@ -129,18 +110,12 @@ export default function PersonalProfileScreen() {
     }
   };
 
-  // The header-right "Admin Hub" / "Done" link that used to live up
-  // here was removed when the white route header was hidden in
-  // app/account/_layout.tsx. The in-page primary "Done — back to
-  // home" button below now owns the only exit affordance and has
-  // its own dirty-edit confirm + router logic.
-
-  const onIntakeEditorClose = async () => {
-    setIntakeEditorOpen(false);
-    // Make sure the Profile tab and anywhere else that reads modes/profile
-    // sees the freshly-saved intake data immediately.
-    await Promise.all([refetchProfile(), refetchModes()]);
-    await queryClient.invalidateQueries();
+  const exitToCommandCenter = async () => {
+    if (editing && (email.trim() !== (personal?.email ?? "") || phone.trim() !== (personal?.phone ?? ""))) {
+      const discard = await confirm({ title: "Discard unsaved changes?", message: "You have unsaved edits to your personal info.", confirmLabel: "Discard", cancelLabel: "Keep editing", destructive: true });
+      if (!discard) return;
+    }
+    router.replace("/(tabs)");
   };
 
   const intakeModeTitle = (mode: UserModeProfile): string => {
@@ -167,23 +142,17 @@ export default function PersonalProfileScreen() {
     for (const c of candidates) {
       if (typeof c === "string" && c.trim().length > 0) return c.trim();
     }
-    return MODE_LABELS[mode.kind];
+    return PROFILE_ROLE_LABELS[mode.kind] ?? "Viewer";
   };
 
   return (
-    <ScrollView
-      style={{ backgroundColor: colors.background }}
-      contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 48 }}
-    >
-      {/*
-        Header bar is hidden by app/account/_layout.tsx (headerShown:
-        false on the personal route). The dead <Stack.Screen
-        headerRight={...}> override that used to live here was
-        removed because (a) it never won against the layout's options
-        when nested inside ScrollView, and (b) the in-page primary
-        "Done — back to home" button below now owns the only exit
-        affordance.
-      */}
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <ProfileNavigation title="Account" onExit={() => void exitToCommandCenter()}/>
+      <ScrollView
+        style={{ backgroundColor: colors.background }}
+        contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 48 }}
+      >
+      <LinkRow icon="eye" label="View Profile" onPress={() => setPreviewOpen(true)} colors={colors}/>
       <Text
         style={[
           styles.banner,
@@ -339,12 +308,11 @@ export default function PersonalProfileScreen() {
       <Text
         style={[styles.h2, { color: colors.foreground, marginTop: 16 }]}
       >
-        Intake information
+        Your role profiles
       </Text>
       <Text style={[styles.help, { color: colors.mutedForeground }]}>
-        Revisit the answers you gave when you set up each account — business
-        details, property info, focus areas, and so on. Edits save back to
-        the same place your Profile tab shows them.
+        Open a role profile to edit your personal information and choose what
+        appears publicly. Property and Business details belong to their Entity.
       </Text>
       {intakeModes.length === 0 ? (
         <View
@@ -354,12 +322,12 @@ export default function PersonalProfileScreen() {
           ]}
         >
           <Text style={{ color: colors.mutedForeground, fontSize: 13 }}>
-            No intake answers yet. Add an account to fill some in.
+            No saved role profiles yet.
           </Text>
         </View>
       ) : intakeModes.length === 1 ? (
         <Pressable
-          onPress={() => onEditIntake(intakeModes[0])}
+          onPress={() => onOpenRoleProfile(intakeModes[0])}
           disabled={switchingModeId != null}
           style={({ pressed }) => [
             styles.editBtn,
@@ -375,7 +343,7 @@ export default function PersonalProfileScreen() {
             <Feather name="edit-2" size={14} color={colors.foreground} />
           )}
           <Text style={[styles.editTxt, { color: colors.foreground }]}>
-            Edit intake information
+            Open Profile
           </Text>
         </Pressable>
       ) : (
@@ -407,14 +375,14 @@ export default function PersonalProfileScreen() {
                     ]}
                     numberOfLines={1}
                   >
-                    {MODE_LABELS[mode.kind]}
+                    {PROFILE_ROLE_LABELS[mode.kind] ?? "Viewer"}
                     {mode.intakeCompletedAt ? "" : " · setup in progress"}
                   </Text>
                 </View>
                 <Pressable
-                  onPress={() => onEditIntake(mode)}
+                  onPress={() => onOpenRoleProfile(mode)}
                   disabled={switchingModeId != null}
-                  accessibilityLabel={`Edit intake information for ${intakeModeTitle(mode)}`}
+                  accessibilityLabel={`Open Profile for ${intakeModeTitle(mode)}`}
                   style={({ pressed }) => [
                     styles.intakeBtn,
                     {
@@ -466,55 +434,12 @@ export default function PersonalProfileScreen() {
         colors={colors}
       />
 
-      {/*
-        The user reported this screen was "a trap" — there's a small
-        "Admin Hub"/"Done" link in the header but it's easy to miss
-        once you've scrolled past the fold. A full-width primary
-        button at the end of the form gives an unmissable exit
-        straight to the home screen, with the same dirty-edit
-        confirmation as the header link via onExitToHome.
-      */}
-      <Pressable
-        onPress={async () => {
-          if (editing) {
-            const dirty =
-              email.trim() !== (personal?.email ?? "") ||
-              phone.trim() !== (personal?.phone ?? "");
-            if (dirty) {
-              const ok = await confirm({
-                title: "Discard unsaved changes?",
-                message: "You have unsaved edits to your personal info.",
-                confirmLabel: "Discard",
-                cancelLabel: "Keep editing",
-                destructive: true,
-              });
-              if (!ok) return;
-            }
-          }
-          router.replace("/(tabs)" as never);
-        }}
-        accessibilityRole="link"
-        accessibilityLabel="Done — go to home screen"
-        style={({ pressed }) => [
-          styles.btn,
-          {
-            backgroundColor: colors.primary,
-            borderColor: colors.primary,
-            marginTop: 16,
-            opacity: pressed ? 0.85 : 1,
-          },
-        ]}
-      >
-        <Text style={[styles.btnTxt, { color: colors.primaryForeground }]}>
-          Done — back to home
-        </Text>
+      <Pressable onPress={() => void exitToCommandCenter()} style={[styles.btn, { backgroundColor: colors.primary }]} accessibilityRole="button" accessibilityLabel="Back to Command Center">
+        <Text style={[styles.btnTxt, { color: "#fff" }]}>Back to Command Center</Text>
       </Pressable>
-
-      <EditProfileModal
-        visible={intakeEditorOpen}
-        onClose={onIntakeEditorClose}
-      />
     </ScrollView>
+    {previewOpen ? <ProfilePreview visible onClose={() => setPreviewOpen(false)} onExit={() => void exitToCommandCenter()}/> : null}
+    </View>
   );
 }
 

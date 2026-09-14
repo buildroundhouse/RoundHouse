@@ -1672,7 +1672,10 @@ router.get("/users/:userId", requireAuth, async (req, res): Promise<void> => {
     intakeSnapshot: personal.intake,
     connection,
     myReverseConnection,
-    counterpartOutwardAccount,
+    // Keep the legacy biography copy consistent with personal visibility.
+    counterpartOutwardAccount: !isSelf && intakeSnapshot.personalProfile && counterpartOutwardAccount
+      ? { ...counterpartOutwardAccount, bio: sanitized.bio }
+      : counterpartOutwardAccount,
     isSelf,
     serviceStoryCounts,
   });

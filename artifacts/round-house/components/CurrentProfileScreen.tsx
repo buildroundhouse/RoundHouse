@@ -9,13 +9,11 @@ import { customFetch, useCompleteModeIntake, useUpdateMe } from "@workspace/api-
 import { useProfile } from "@/lib/profile";
 import { useColors } from "@/hooks/useColors";
 import { resolveStorageUrl, uploadAsset } from "@/lib/uploads";
-import { formatOwnerNameForSkin } from "@/lib/ownerNameDisplay";
-import { PERSONAL_FIELDS, PROFILE_ROLE_LABELS, personalDetailsFromIntake, type PersonalDetails } from "@/lib/personal-profile";
+import { ProfileNavigation } from "./ProfileNavigation";
+import { ProfilePreview } from "./ProfilePreview";
+import { PERSONAL_FIELDS, personalDetailsFromIntake, profileContext, modeForAccount, type ProfileEntity, type PersonalDetails } from "@/lib/personal-profile";
 
-export type ProfileEntity = {
-  id: number; displayName: string; kind: string; logoUrl?: string | null;
-  myMembership: { role: string; status: string; direction?: string; permissions?: Record<string, unknown> } | null;
-};
+export type { ProfileEntity } from "@/lib/personal-profile";
 
 export function ProfileRow({ title, subtitle, onPress, icon = "chevron-right" }: { title: string; subtitle?: string; onPress: () => void; icon?: keyof typeof Feather.glyphMap }) {
   const c = useColors();
@@ -43,8 +41,9 @@ export function ProfileSubpage({ title, onClose, children }: { title: string; on
 
 export function CurrentProfileScreen({ onSettings }: { onSettings: () => void }) {
   const c = useColors(); const insets = useSafeAreaInsets(); const router = useRouter();
-  const { profile, activeMode, activeOutwardAccount, refetchProfile, refetchModes } = useProfile();
+  const { profile, activeMode: selectedMode, modes, activeOutwardAccount, refetchProfile, refetchModes } = useProfile();
   const queryClient = useQueryClient();
+  const activeMode = modeForAccount(activeOutwardAccount, modes, selectedMode);
   const accountId = activeOutwardAccount?.id;
   const entities = useQuery({ queryKey: ["/api/entities/mine", accountId], enabled: !!accountId,
     queryFn: () => customFetch<{ entities: ProfileEntity[] }>("/api/entities/mine") });
@@ -55,13 +54,8 @@ export function CurrentProfileScreen({ onSettings }: { onSettings: () => void })
   const updateMode = useCompleteModeIntake(); const updateMe = useUpdateMe();
   const md = (activeMode?.intakeData ?? {}) as Record<string, unknown>;
   const details = personalDetailsFromIntake(md);
-  const role = PROFILE_ROLE_LABELS[activeMode?.kind ?? "collab"] ?? "Viewer";
-  const namedRole = typeof md.roleTitle === "string" && md.roleTitle.trim() ? md.roleTitle : role;
-  const matching = entities.data?.entities ?? [];
-  const requestedId = Number(md.entityId);
-  const entity = matching.find(e => e.id === requestedId) ?? (matching.length === 1 ? matching[0] : null);
-  const savedEntityName = typeof md.placeName === "string" ? md.placeName : typeof md.companyName === "string" ? md.companyName : null;
-  const entityName = entity?.displayName ?? (matching.length > 1 ? matching.map(e => e.displayName).join(" · ") : savedEntityName || "No Entity participation yet");
+  const { role, entity, entityName, memberships: matching } = profileContext(activeOutwardAccount?.kind ?? activeMode?.kind, md, entities.data?.entities ?? []);
+  const title = typeof md.roleTitle === "string" ? md.roleTitle.trim() : "";
   const avatar = resolveStorageUrl(profile?.avatarUrl);
   const banner = resolveStorageUrl(typeof md.profileBannerUrl === "string" ? md.profileBannerUrl : null);
   const logo = resolveStorageUrl(entity?.logoUrl);
@@ -86,13 +80,7 @@ export function CurrentProfileScreen({ onSettings }: { onSettings: () => void })
     finally { setPhotoBusy(false); }
   }
   return <View style={{ flex: 1, backgroundColor: c.background }}>
-    <View style={[s.navigation, { paddingTop: insets.top + 10, borderColor: c.border }]}>
-      <Pressable testID="profile-back-command-center" accessibilityRole="button" accessibilityLabel="Back to Command Center"
-        onPress={() => router.replace("/(tabs)")} style={s.back}>
-        <Feather name="arrow-left" size={26} color={c.foreground} />
-        <Text style={[s.backText, { color: c.foreground }]}>Back to Command Center</Text>
-      </Pressable><Text style={[s.label, { color: c.foreground }]}>Profile</Text>
-    </View>
+    <ProfileNavigation/>
     <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 130 }}>
       <Pressable disabled={photoBusy} onPress={() => void choosePhoto("banner")} accessibilityRole="button" accessibilityLabel="Edit personal profile banner"
         style={[s.banner, { backgroundColor: c.muted }]}>
@@ -106,7 +94,7 @@ export function CurrentProfileScreen({ onSettings }: { onSettings: () => void })
         </Pressable>
         <View style={[s.logo, { backgroundColor: c.muted }]}>{logo ? <Image source={{ uri: logo }} style={{ width: 32, height: 32 }} resizeMode="contain"/> : <Feather name={entity?.kind === "business" ? "briefcase" : "home"} size={22} color={c.mutedForeground}/>}</View>
         <View style={{ flex: 1, gap: 4, paddingTop: 28 }}><Text style={[s.name, { color: c.foreground }]}>{profile?.name || "Your profile"}</Text>
-          <Text style={{ color: c.foreground }}>{namedRole}</Text><Text style={[s.secondary, { color: c.mutedForeground }]}>{entities.isLoading ? "Loading Entity…" : entityName}</Text>
+          <Text style={{ color: c.foreground }}>{role}</Text>{title && title !== role ? <Text style={{ color: c.mutedForeground }}>{title}</Text> : null}<Text style={[s.secondary, { color: c.mutedForeground }]}>{entities.isLoading ? "Loading Entity…" : entityName}</Text>
         </View>
       </View>
       <View style={s.body}>
@@ -142,15 +130,8 @@ export function CurrentProfileScreen({ onSettings }: { onSettings: () => void })
       if (name !== profile?.name) await updateMe.mutateAsync({ data: { name } });
       await refresh(); setEditing(false);
     }}/> : null}
-    {page ? <ProfileSubpage title={page === "preview" ? "View Profile" : page === "permissions" ? "Authority & Permissions" : page === "account" ? "Subscription & Account" : "Discover"} onClose={() => setPage(null)}>
-      {page === "preview" ? <>
-        {banner ? <Image source={{ uri: banner }} style={{ width: "100%", height: 150, borderRadius: 12 }}/> : null}
-        {avatar ? <Image source={{ uri: avatar }} style={{ width: 90, height: 90, borderRadius: 45 }}/> : null}
-        <Text style={[s.name, { color: c.foreground }]}>{formatOwnerNameForSkin(profile?.name, activeOutwardAccount?.lastInitialOnly)}</Text>
-        <Text style={{ color: c.foreground }}>{namedRole} · {entityName}</Text>
-        {PERSONAL_FIELDS.filter(({ key }) => details[key]?.public && details[key]?.value).map(({ key, label }) => <View key={key} style={{ gap: 7 }}><Text style={[s.label, { color: c.foreground }]}>{label}</Text><Text style={{ color: c.foreground }}>{details[key]?.value}</Text></View>)}
-        {!PERSONAL_FIELDS.some(({ key }) => details[key]?.public && details[key]?.value) ? <Text style={{ color: c.mutedForeground }}>No personal information has been made public.</Text> : null}
-      </> : null}
+    {page === "preview" ? <ProfilePreview visible onClose={() => setPage(null)}/> : null}
+    {page && page !== "preview" ? <ProfileSubpage title={page === "permissions" ? "Authority & Permissions" : page === "account" ? "Subscription & Account" : "Discover"} onClose={() => setPage(null)}>
       {page === "permissions" ? <>
         <Text style={{ color: c.mutedForeground }}>Your role describes your participation. Authority and permissions come from your approved membership in each Entity.</Text>
         {entities.isLoading ? <ActivityIndicator/> : entities.isError ? <ProfileRow title="Could not load permissions. Retry" onPress={() => void entities.refetch()}/> : matching.length === 0 ? <Text style={{ color: c.foreground }}>No approved Entity membership in this context.</Text> : matching.map(e => <View key={e.id} style={[s.row, { borderColor: c.border, flexDirection: "column", alignItems: "stretch" }]}>
