@@ -49,3 +49,5 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+# Vercel generated build output and local project link
+.vercel/

@@ -21,15 +21,11 @@
       "package": "app.replit.roundhouse"
     },
     "web": {
+      "output": "single",
       "favicon": "./assets/images/icon.png"
     },
     "plugins": [
-      [
-        "expo-router",
-        {
-          "origin": "https://replit.com/"
-        }
-      ],
+      "expo-router",
       "expo-font",
       "expo-web-browser",
       "expo-image-picker",

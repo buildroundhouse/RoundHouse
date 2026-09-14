@@ -37,8 +37,7 @@ export async function initStripeIntegration(): Promise<void> {
     return;
   }
 
-  const baseDomain = process.env["BILLING_WEBHOOK_BASE_URL"]
-    ?? `https://${process.env["REPLIT_DOMAINS"]?.split(",")[0] ?? ""}`;
+  const baseDomain = process.env["BILLING_WEBHOOK_BASE_URL"]?.replace(/\/+$/, "");
   if (baseDomain && baseDomain !== "https://") {
     try {
       const result = await stripeSync.findOrCreateManagedWebhook(
@@ -52,7 +51,7 @@ export async function initStripeIntegration(): Promise<void> {
       logger.warn({ err }, "Stripe managed webhook setup failed");
     }
   } else {
-    logger.warn("BILLING_WEBHOOK_BASE_URL/REPLIT_DOMAINS missing; skipping managed webhook setup");
+    logger.warn("BILLING_WEBHOOK_BASE_URL missing; skipping managed webhook setup");
   }
 
   // Run the initial backfill in the background so server startup isn't
