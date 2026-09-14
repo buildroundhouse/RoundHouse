@@ -11,6 +11,13 @@ export function attachHostedWeb(app: Express, webDirectory?: string): void {
     throw new Error("ROUNDHOUSE_WEB_DIR must contain the built web app's index.html.");
   }
 
+  // Expo exports pnpm dependency fonts beneath this literal hidden directory.
+  // Serve only that exported subtree; hidden files within it remain denied.
+  app.use("/assets/__node_modules/.pnpm", express.static(
+    path.join(directory, "assets/__node_modules/.pnpm"),
+    { index: false, dotfiles: "deny", maxAge: 0 },
+  ));
+
   // API handlers were mounted first. Unknown API endpoints must never return
   // the frontend's HTML, including when the client sends a POST request.
   app.use((req, res, next) => {

@@ -11,6 +11,10 @@ mkdirSync(path.join(directory, "_expo"));
 writeFileSync(path.join(directory, "index.html"), "<!doctype html><title>RoundHouse</title>");
 writeFileSync(path.join(directory, "_expo", "app.js"), "window.roundhouse = true;");
 writeFileSync(path.join(directory, ".env"), "PRIVATE=never-serve");
+const fontDirectory = path.join(directory, "assets/__node_modules/.pnpm/font-package/fonts");
+mkdirSync(fontDirectory, { recursive: true });
+writeFileSync(path.join(fontDirectory, "font.ttf"), "exported-font");
+writeFileSync(path.join(fontDirectory, ".env"), "PRIVATE=never-serve");
 afterAll(() => rmSync(directory, { recursive: true, force: true }));
 
 function createApp() {
@@ -21,6 +25,10 @@ function createApp() {
 }
 
 describe("hosted web app", () => {
+  it("serves Expo's pnpm fonts while denying hidden files inside the export", async () => {
+    await request(createApp()).get("/assets/__node_modules/.pnpm/font-package/fonts/font.ttf").expect(200);
+    await request(createApp()).get("/assets/__node_modules/.pnpm/font-package/fonts/.env").expect(404);
+  });
   it.each(["/", "/property/123", "/account/profile"])("opens %s directly", async (url) => {
     const response = await request(createApp()).get(url).expect(200);
     expect(response.text).toContain("<title>RoundHouse</title>");
