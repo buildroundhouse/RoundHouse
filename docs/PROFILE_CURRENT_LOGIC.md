@@ -20,3 +20,22 @@ The Invitation Center reuses existing received/request/sent flows and adds the s
 ## Validation
 
 Web export and API bundle passed. Four focused privacy/validation tests cover private-field redaction, removal of duplicate legacy personal values, contact restrictions, self/legacy behavior, and malformed visibility values. Whole-project typechecking retains unrelated existing errors. Signed-in handset behavior still requires checking in the test app.
+
+## Avatar navigation follow-through
+
+Every role uses the shared ProfileNavigation and ProfilePreview, including Homeowner,
+Home Manager, Home Team Member, Trade Professional, Trade Team Member, and Viewer
+(including historical Viewer aliases). The private account page also has a persistent
+Back to Command Center header and View Profile entry. Preview offers both Back to
+Profile and direct Back to Command Center. Navigation preserves the active avatar.
+
+The old FullProfileModal now forwards to the current preview. Private account role
+links open the current Profile instead of reopening the retired intake editor.
+Approved Entity membership supplies Owner / Admin / Manager designations; a typed
+job title or pending invitation cannot grant authority. Switching active context
+resets the profile's open panels and editor state.
+
+Validation: 22 focused rendering/navigation/privacy tests across the avatar roles;
+Expo web production export passes. Changed application files have no TypeScript
+errors; unrelated existing account/switcher errors still block the full typecheck.
+These tests use mocked account data; signed-in handset validation is separate.
