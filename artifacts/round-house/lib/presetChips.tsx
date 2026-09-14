@@ -273,11 +273,9 @@ const INTAKE_FIELD_TO_SET: Record<string, PresetSetKey> = {
 interface IntakeFieldLike {
   key: string;
   options?: { value: string; label: string; sublabel?: string }[];
-  [k: string]: unknown;
 }
 interface IntakeLike {
   fields: IntakeFieldLike[];
-  [k: string]: unknown;
 }
 
 /**

@@ -10,7 +10,18 @@ export default function OnboardingLayout() {
   // Existing users can add a space, and identity saves must finish navigation
   // without the layout bouncing them out when the server becomes ready.
   const setupScreen = segments[segments.length - 1];
-  const onSetupScreen = ["mode-picker", "identity", "entry", "entry-entity", "entry-business", "intake"].includes(setupScreen ?? "");
+  const onSetupScreen = [
+    "mode-picker",
+    "identity",
+    "entry",
+    "entry-entity",
+    "entry-business",
+    "entry-property-type",
+    "entry-business-type",
+    "entry-role",
+    "entry-access",
+    "intake",
+  ].includes(setupScreen ?? "");
 
   if (isLoaded && !isSignedIn) {
     return <Redirect href="/(auth)/sign-in" />;
@@ -30,6 +41,10 @@ export default function OnboardingLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="identity" />
       <Stack.Screen name="entry" />
+      <Stack.Screen name="entry-property-type" />
+      <Stack.Screen name="entry-business-type" />
+      <Stack.Screen name="entry-role" />
+      <Stack.Screen name="entry-access" />
       <Stack.Screen name="entry-entity" />
       <Stack.Screen name="entry-business" />
       <Stack.Screen name="mode-picker" />
