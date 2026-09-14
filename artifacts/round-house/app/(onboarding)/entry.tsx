@@ -2,6 +2,7 @@ import React from "react";
 import { useRouter } from "expo-router";
 import { EntryStep } from "@/components/EntryStep";
 import { ENTRY_CHOICES } from "@/lib/entry-intake";
+import { SavedSpaces } from "@/components/SavedSpaces";
 export default function EntryScreen() {
   const router = useRouter();
   return (
@@ -17,6 +18,8 @@ export default function EntryScreen() {
             : "/(onboarding)/entry-business-type",
         )
       }
-    />
+    >
+      <SavedSpaces />
+    </EntryStep>
   );
 }

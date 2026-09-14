@@ -11,9 +11,12 @@ import {
 } from "@workspace/api-client-react";
 import { useAuth } from "./auth";
 import { hasSavedIdentity } from "./identity-progress";
+import { useQuery } from "@tanstack/react-query";
+import { needsEntityMembership, hasApprovedEntity, type IntakeEntity } from "./space-progress";
 
 export type OnboardingStatus =
   | { kind: "loading" }
+  | { kind: "error"; retry: () => void }
   | { kind: "needs-identity" }
   | { kind: "needs-mode-picker" }
   | { kind: "needs-intake"; mode: UserModeProfile }
@@ -48,6 +51,17 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   const modesQuery = useListMyModes({ query: { enabled, queryKey: ["/api/users/me/modes", userId] } });
   const outwardQuery = useListMyOutwardAccounts({
     query: { enabled, queryKey: ["/api/outward-accounts", userId] },
+  });
+
+  const selectedMode = modesQuery.data?.modes.find((m) => m.id === modesQuery.data?.activeModeId) ?? modesQuery.data?.modes[0];
+  const accountId = outwardQuery.data?.activeOutwardAccountId;
+  const verifyMembership = enabled && needsEntityMembership(selectedMode?.kind) && !meQuery.data?.isAdmin;
+  const membershipQuery = useQuery({
+    queryKey: ["/api/entities/mine", userId, accountId],
+    enabled: verifyMembership && !!accountId,
+    queryFn: () => customFetch<{ entities: IntakeEntity[] }>("/api/entities/mine", {
+      headers: { "x-active-outward-account-id": String(accountId) },
+    }),
   });
 
   const value = useMemo<ProfileContextValue>(() => {
@@ -92,6 +106,13 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       status = { kind: "needs-mode-picker" };
     } else if (!activeMode) {
       status = { kind: "needs-mode-picker" };
+    } else if (verifyMembership && (outwardQuery.isError || membershipQuery.isError)) {
+      status = { kind: "error", retry: () => { void outwardQuery.refetch(); if (accountId) void membershipQuery.refetch(); } };
+    } else if (verifyMembership && (outwardQuery.isPending || (!!accountId && membershipQuery.isPending))) {
+      status = { kind: "loading" };
+    } else if (verifyMembership && (!accountId || !hasApprovedEntity(membershipQuery.data?.entities))) {
+      // A legacy auto-completed personal baseline is not space intake.
+      status = { kind: "needs-mode-picker" };
     } else if (!activeMode.intakeCompletedAt) {
       status = { kind: "needs-intake", mode: activeMode };
     } else {
@@ -126,6 +147,13 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     modesQuery.fetchStatus,
     modesQuery.isError,
     outwardQuery.data,
+    outwardQuery.isPending,
+    outwardQuery.isError,
+    membershipQuery.data,
+    membershipQuery.isPending,
+    membershipQuery.isError,
+    verifyMembership,
+    accountId,
     isLoaded,
     isSignedIn,
     meQuery.refetch,

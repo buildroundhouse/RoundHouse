@@ -13,15 +13,12 @@ import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import {
-  useActivateMode,
   useSwitchActiveMode,
-  type UserModeKind,
   type UserModeProfile,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useProfile } from "@/lib/profile";
 import { MODE_LABELS } from "@/lib/intake-schemas";
-import { compareUserModeKind } from "@workspace/api-zod";
 import { resolveStorageUrl } from "@/lib/uploads";
 
 function profileTitle(mode: UserModeProfile, fallback: string): string {
@@ -51,45 +48,14 @@ function profileTitle(mode: UserModeProfile, fallback: string): string {
   return fallback;
 }
 
-type AddType = {
-  key: string;
-  label: string;
-  kind: UserModeKind;
-};
-
-// Order is derived from the shared USER_MODE_KIND_ORDER (see
-// @workspace/api-zod) so the "Add account" picker can never drift
-// from the order the server returns to the switcher.
-const ADD_TYPES: AddType[] = (
-  [
-    { key: "home", label: "Home", kind: "home" },
-    { key: "home_teammate", label: "Home Teammate", kind: "home_teammate" },
-    { key: "trade_pro", label: "Trade Pro", kind: "trade_pro" },
-    { key: "trade_pro_teammate", label: "Trade Teammate", kind: "trade_pro_teammate" },
-    { key: "facilities", label: "Facility Management", kind: "facilities" },
-    { key: "facilities_teammate", label: "Facility Teammate", kind: "facilities_teammate" },
-    { key: "collab", label: "Collaborator", kind: "trade_pro_collab" },
-  ] as AddType[]
-).slice().sort((a, b) => compareUserModeKind(a.kind, b.kind));
-
-// #614 — Teammate kinds are scoped to a parent account family. Only
-// offer them when the user already holds the matching parent mode.
-const TEAMMATE_PARENT_KIND: Partial<Record<UserModeKind, UserModeKind>> = {
-  home_teammate: "home",
-  trade_pro_teammate: "trade_pro",
-  facilities_teammate: "facilities",
-};
-
 export function ModeSwitcher() {
   const colors = useColors();
   const router = useRouter();
   const { modes, activeMode, refetchProfile, refetchModes } = useProfile();
   const switchMutation = useSwitchActiveMode();
-  const activate = useActivateMode();
   const queryClient = useQueryClient();
   const [overlayOpen, setOverlayOpen] = useState(false);
   const [busyId, setBusyId] = useState<number | null>(null);
-  const [addingKind, setAddingKind] = useState<UserModeKind | null>(null);
   const [error, setError] = useState("");
 
   // Per-account isolation: each mode shows ONLY its own banner.  We never
@@ -128,22 +94,9 @@ export function ModeSwitcher() {
     }
   };
 
-  const handleAdd = async (kind: UserModeKind) => {
-    setError("");
-    setAddingKind(kind);
-    try {
-      const created = await activate.mutateAsync({ data: { kind } });
-      await refetchModes();
-      setOverlayOpen(false);
-      router.push({
-        pathname: "/(onboarding)/intake",
-        params: { modeId: String(created.id), kind },
-      });
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't add that account.");
-    } finally {
-      setAddingKind(null);
-    }
+  const handleAdd = () => {
+    setOverlayOpen(false);
+    router.push("/(onboarding)/entry");
   };
 
   return (
@@ -283,42 +236,10 @@ export function ModeSwitcher() {
                   { backgroundColor: colors.card, borderColor: colors.border },
                 ]}
               >
-                {ADD_TYPES.map((t, idx) => {
-                  const busy = addingKind === t.kind;
-                  return (
-                    <Pressable
-                      key={t.key}
-                      onPress={() => handleAdd(t.kind)}
-                      disabled={busy || addingKind !== null}
-                      style={[
-                        styles.row,
-                        idx > 0 && {
-                          borderTopWidth: StyleSheet.hairlineWidth,
-                          borderTopColor: colors.border,
-                        },
-                      ]}
-                    >
-                      <View style={[styles.banner, { backgroundColor: colors.muted }]}>
-                        <Feather name="plus" size={18} color={colors.mutedForeground} />
-                      </View>
-                      <Text
-                        style={[styles.rowTitle, { color: colors.foreground, flex: 1 }]}
-                        numberOfLines={1}
-                      >
-                        {t.label}
-                      </Text>
-                      {busy ? (
-                        <ActivityIndicator size="small" color={colors.mutedForeground} />
-                      ) : (
-                        <Feather
-                          name="chevron-right"
-                          size={20}
-                          color={colors.mutedForeground}
-                        />
-                      )}
-                    </Pressable>
-                  );
-                })}
+                <Pressable accessibilityRole="button" onPress={handleAdd} style={styles.row}>
+                  <Feather name="plus" size={18} color={colors.primary} />
+                  <Text style={[styles.rowTitle, { color: colors.foreground }]}>Add Property or Business</Text>
+                </Pressable>
               </View>
 
               {error ? (

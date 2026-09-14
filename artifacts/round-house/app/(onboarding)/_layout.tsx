@@ -3,6 +3,7 @@ import { Redirect, Stack, useSegments } from "expo-router";
 import { View, ActivityIndicator } from "react-native";
 import { useAuth } from "@/lib/auth";
 import { useProfile } from "@/lib/profile";
+import { SetupRetry } from "@/components/SetupRetry";
 import { afterIdentityRoute, hasSavedIdentity } from "@/lib/identity-progress";
 
 export default function OnboardingLayout() {
@@ -28,6 +29,7 @@ export default function OnboardingLayout() {
   if (isLoaded && !isSignedIn) {
     return <Redirect href="/(auth)/sign-in" />;
   }
+  if (status.kind === "error") return <SetupRetry onRetry={status.retry} />;
   if (status.kind === "loading") {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>

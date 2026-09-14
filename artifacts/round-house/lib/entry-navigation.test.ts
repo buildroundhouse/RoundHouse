@@ -10,6 +10,7 @@ vi.mock("expo-router", () => ({
   Redirect: () => null,
 }));
 vi.mock("@/components/EntryStep", () => ({ EntryStep: () => null }));
+vi.mock("@/components/SavedSpaces", () => ({ SavedSpaces: () => null }));
 vi.mock("@react-native-async-storage/async-storage", () => ({
   default: {
     setItem: async (key: string, value: string) => {
