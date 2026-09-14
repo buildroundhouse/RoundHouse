@@ -15,8 +15,7 @@ import {
 } from "@workspace/db";
 
 /**
- * Server-side AI concierge. Wraps the OpenAI SDK against the Replit AI
- * Integrations proxy so we never need a customer-supplied API key.
+ * Server-side AI concierge using the OpenAI SDK with hosting credentials.
  *
  * The concierge only ever proposes structured actions — it never writes
  * data on the user's behalf. The mobile client renders each action as a
@@ -26,24 +25,24 @@ import {
  * checks the rest of the API already enforces.
  */
 
-const OPENAI_BASE_URL = process.env["AI_INTEGRATIONS_OPENAI_BASE_URL"];
-const OPENAI_API_KEY = process.env["AI_INTEGRATIONS_OPENAI_API_KEY"];
+const OPENAI_BASE_URL = process.env["OPENAI_BASE_URL"];
+const OPENAI_API_KEY = process.env["OPENAI_API_KEY"];
 
 let cached: OpenAI | null = null;
 function client(): OpenAI {
-  if (!OPENAI_BASE_URL || !OPENAI_API_KEY) {
+  if (!OPENAI_API_KEY) {
     throw new Error(
-      "OpenAI integration is not configured. Set AI_INTEGRATIONS_OPENAI_BASE_URL and AI_INTEGRATIONS_OPENAI_API_KEY.",
+      "OpenAI is not configured. Set OPENAI_API_KEY on the server; OPENAI_BASE_URL is optional.",
     );
   }
   if (!cached) {
-    cached = new OpenAI({ baseURL: OPENAI_BASE_URL, apiKey: OPENAI_API_KEY });
+    cached = new OpenAI({ apiKey: OPENAI_API_KEY, ...(OPENAI_BASE_URL ? { baseURL: OPENAI_BASE_URL } : {}) });
   }
   return cached;
 }
 
 export function conciergeEnabled(): boolean {
-  return Boolean(OPENAI_BASE_URL && OPENAI_API_KEY);
+  return Boolean(OPENAI_API_KEY);
 }
 
 export interface ConciergeContext {

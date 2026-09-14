@@ -124,9 +124,11 @@ router.post(
       res.json({ ok: true, payerClerkId: userId, checkoutUrl: null });
       return;
     }
-    const returnUrl =
-      process.env["BILLING_RETURN_URL"] ??
-      `https://${process.env["REPLIT_DOMAINS"]?.split(",")[0] ?? "example.com"}/billing/return`;
+    const returnUrl = process.env["BILLING_RETURN_URL"];
+    if (!returnUrl) {
+      res.status(503).json({ error: "Payment setup is not configured on this server." });
+      return;
+    }
     try {
       const session = await createPaymentMethodSetupSession(userId, returnUrl);
       res.json({

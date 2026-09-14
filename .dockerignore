@@ -1,0 +1,12 @@
+.git
+**/node_modules
+**/dist
+**/.expo
+.vercel
+**/.env
+**/.env.*
+**/*serviceAccount*.json
+**/*service-account*.json
+attached_assets
+myApp
+tests
