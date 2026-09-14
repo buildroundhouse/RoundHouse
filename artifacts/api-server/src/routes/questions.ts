@@ -22,7 +22,10 @@ async function getSenderName(clerkId: string): Promise<string | null> {
     const name = row?.name?.trim();
     return name && name.length > 0 ? name : null;
   } catch (err) {
-    logger.warn({ err, clerkId }, "Failed to load sender name for question notification");
+    logger.warn(
+      { err, clerkId },
+      "Failed to load sender name for question notification",
+    );
     return null;
   }
 }
@@ -45,7 +48,10 @@ async function notifyQuestionRecipient(params: {
       relatedId: String(questionId),
     });
   } catch (err) {
-    logger.error({ err, recipientClerkId, prefType, questionId }, "Failed to insert question notification");
+    logger.error(
+      { err, recipientClerkId, prefType, questionId },
+      "Failed to insert question notification",
+    );
   }
   void sendPushToUser(recipientClerkId, {
     title,
@@ -82,6 +88,7 @@ function serialize(q: QuestionRow) {
     requestedAction: q.requestedAction,
     responseText: q.responseText,
     nextStep: q.nextStep,
+    unansweredPromptCount: q.unansweredPromptCount,
     confirmedAt: q.confirmedAt ? q.confirmedAt.toISOString() : null,
     createdAt: q.createdAt.toISOString(),
     updatedAt: q.updatedAt.toISOString(),
@@ -161,7 +168,9 @@ router.post("/questions", requireAuth, async (req, res): Promise<void> => {
       await notifyQuestionRecipient({
         recipientClerkId: row.counterpartyClerkId,
         prefType: "question_asked",
-        title: senderName ? `New question from ${senderName}` : "New question for you",
+        title: senderName
+          ? `New question from ${senderName}`
+          : "New question for you",
         body: truncate(row.questionText),
         questionId: row.id,
       });
@@ -170,7 +179,9 @@ router.post("/questions", requireAuth, async (req, res): Promise<void> => {
       await notifyQuestionRecipient({
         recipientClerkId: row.counterpartyClerkId,
         prefType: "request_received",
-        title: senderName ? `${senderName} needs something from you` : "New request for you",
+        title: senderName
+          ? `${senderName} needs something from you`
+          : "New request for you",
         body: truncate(detail),
         questionId: row.id,
       });
@@ -180,153 +191,201 @@ router.post("/questions", requireAuth, async (req, res): Promise<void> => {
   res.status(201).json(serialize(row));
 });
 
-router.patch("/questions/:questionId", requireAuth, async (req, res): Promise<void> => {
-  const { userId } = req as AuthRequest;
-  const id = parseId(req.params.questionId);
-  if (!Number.isFinite(id)) {
-    res.status(404).json({ error: "Not found" });
-    return;
-  }
-  const [existing] = await db
-    .select()
-    .from(questionsTable)
-    .where(eq(questionsTable.id, id));
-  if (!existing) {
-    res.status(404).json({ error: "Not found" });
-    return;
-  }
-  if (
-    existing.userClerkId !== userId &&
-    existing.counterpartyClerkId !== userId
-  ) {
-    res.status(404).json({ error: "Not found" });
-    return;
-  }
-
-  const { responseText, confirm, nextStep, complete } = req.body ?? {};
-  const updates: Partial<typeof questionsTable.$inferInsert> = {};
-
-  // Provider answers an Ask-a-Pro question.
-  let awardedAnswer = false;
-  if (typeof responseText === "string") {
-    const trimmed = responseText.trim();
-    if (!trimmed) {
-      res.status(400).json({ error: "responseText must be non-empty" });
+router.patch(
+  "/questions/:questionId",
+  requireAuth,
+  async (req, res): Promise<void> => {
+    const { userId } = req as AuthRequest;
+    const id = parseId(req.params.questionId);
+    if (!Number.isFinite(id)) {
+      res.status(404).json({ error: "Not found" });
       return;
     }
-    updates.responseText = trimmed;
-    if (existing.kind === ASK_PRO && existing.status === STATUS_OPEN) {
-      updates.status = STATUS_ANSWERED;
-      awardedAnswer = true;
-    }
-  }
-
-  // Client confirms the answer was helpful — completes Ask-a-Pro and
-  // unlocks the next-step picker on the client side.
-  let awardedConfirm = false;
-  if (confirm === true && existing.kind === ASK_PRO) {
-    if (existing.userClerkId !== userId) {
-      res
-        .status(403)
-        .json({ error: "Only the asker can confirm an Ask-a-Pro question" });
+    const [existing] = await db
+      .select()
+      .from(questionsTable)
+      .where(eq(questionsTable.id, id));
+    if (!existing) {
+      res.status(404).json({ error: "Not found" });
       return;
     }
-    updates.status = STATUS_COMPLETED;
-    updates.confirmedAt = new Date();
-    awardedConfirm = true;
-  }
-
-  if (typeof nextStep === "string" && nextStep.trim()) {
-    const allowed = new Set(["appointment", "list", "curious"]);
-    if (!allowed.has(nextStep.trim())) {
-      res
-        .status(400)
-        .json({ error: "nextStep must be appointment | list | curious" });
+    if (
+      existing.userClerkId !== userId &&
+      existing.counterpartyClerkId !== userId
+    ) {
+      res.status(404).json({ error: "Not found" });
       return;
     }
-    updates.nextStep = nextStep.trim();
-  }
 
-  // Provider→client request marked complete by the client.
-  if (complete === true && existing.kind === REQUEST) {
-    updates.status = STATUS_COMPLETED;
-  }
+    const { responseText, confirm, nextStep, complete, followUp } =
+      req.body ?? {};
+    const updates: Partial<typeof questionsTable.$inferInsert> = {};
 
-  if (Object.keys(updates).length === 0) {
-    res.status(400).json({ error: "No supported fields to update" });
-    return;
-  }
-
-  const [row] = await db
-    .update(questionsTable)
-    .set(updates)
-    .where(eq(questionsTable.id, id))
-    .returning();
-
-  // Award points only for Ask-a-Pro flow, only to the responder
-  // (provider). The provider is the counterparty when a client owns the
-  // question (the common case). If the question was created without a
-  // bound counterparty there is nobody to credit.
-  if (row && row.kind === ASK_PRO) {
-    const responderId = row.counterpartyClerkId;
-    if (responderId) {
-      if (awardedAnswer) {
-        await recordPoints({
-          userClerkId: responderId,
-          eventType: "question_answered",
-          sourceRef: `question:${row.id}`,
-        });
+    if (followUp === true) {
+      const canFollowUp =
+        existing.userClerkId === userId &&
+        ((existing.kind === ASK_PRO && existing.status === STATUS_OPEN) ||
+          (existing.kind === REQUEST && existing.status === STATUS_WAITING));
+      if (!canFollowUp) {
+        res
+          .status(403)
+          .json({
+            error: "Only the creator can follow up on an unanswered Resolution",
+          });
+        return;
       }
-      if (awardedConfirm) {
-        await recordPoints({
-          userClerkId: responderId,
-          eventType: "question_confirmed_helpful",
-          sourceRef: `question:${row.id}`,
-        });
+      updates.unansweredPromptCount = existing.unansweredPromptCount + 1;
+    }
+
+    // Provider answers an Ask-a-Pro question.
+    let awardedAnswer = false;
+    if (typeof responseText === "string") {
+      const trimmed = responseText.trim();
+      if (!trimmed) {
+        res.status(400).json({ error: "responseText must be non-empty" });
+        return;
+      }
+      updates.responseText = trimmed;
+      if (existing.kind === ASK_PRO && existing.status === STATUS_OPEN) {
+        updates.status = STATUS_ANSWERED;
+        awardedAnswer = true;
       }
     }
-  }
 
-  // Notify the asker when a pro has answered their Ask-a-Pro question.
-  // Only fire on the answer transition (open → answered), not on every
-  // edit of the response text or on confirm/complete updates.
-  if (
-    row &&
-    awardedAnswer &&
-    row.kind === ASK_PRO &&
-    row.userClerkId !== userId
-  ) {
-    const responderName = await getSenderName(userId);
-    await notifyQuestionRecipient({
-      recipientClerkId: row.userClerkId,
-      prefType: "question_answered",
-      title: responderName ? `${responderName} answered your question` : "Your question was answered",
-      body: truncate(row.responseText ?? ""),
-      questionId: row.id,
-    });
-  }
+    // Client confirms the answer was helpful — completes Ask-a-Pro and
+    // unlocks the next-step picker on the client side.
+    let awardedConfirm = false;
+    if (confirm === true && existing.kind === ASK_PRO) {
+      if (existing.userClerkId !== userId) {
+        res
+          .status(403)
+          .json({ error: "Only the asker can confirm an Ask-a-Pro question" });
+        return;
+      }
+      updates.status = STATUS_COMPLETED;
+      updates.confirmedAt = new Date();
+      awardedConfirm = true;
+    }
 
-  res.json(serialize(row));
-});
+    if (typeof nextStep === "string" && nextStep.trim()) {
+      const allowed = new Set(["appointment", "list", "curious"]);
+      if (!allowed.has(nextStep.trim())) {
+        res
+          .status(400)
+          .json({ error: "nextStep must be appointment | list | curious" });
+        return;
+      }
+      updates.nextStep = nextStep.trim();
+    }
 
-router.delete("/questions/:questionId", requireAuth, async (req, res): Promise<void> => {
-  const { userId } = req as AuthRequest;
-  const id = parseId(req.params.questionId);
-  if (!Number.isFinite(id)) {
-    res.status(404).json({ error: "Not found" });
-    return;
-  }
-  const [row] = await db
-    .delete(questionsTable)
-    .where(
-      and(eq(questionsTable.id, id), eq(questionsTable.userClerkId, userId)),
-    )
-    .returning({ id: questionsTable.id });
-  if (!row) {
-    res.status(404).json({ error: "Not found" });
-    return;
-  }
-  res.sendStatus(204);
-});
+    // Provider→client request marked complete by the client.
+    if (complete === true && existing.kind === REQUEST) {
+      updates.status = STATUS_COMPLETED;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      res.status(400).json({ error: "No supported fields to update" });
+      return;
+    }
+
+    const [row] = await db
+      .update(questionsTable)
+      .set(updates)
+      .where(eq(questionsTable.id, id))
+      .returning();
+
+    if (
+      row &&
+      followUp === true &&
+      row.counterpartyClerkId &&
+      row.counterpartyClerkId !== userId
+    ) {
+      const senderName = await getSenderName(userId);
+      const isQuestion = row.kind === ASK_PRO;
+      await notifyQuestionRecipient({
+        recipientClerkId: row.counterpartyClerkId,
+        prefType: isQuestion ? "question_asked" : "request_received",
+        title: senderName
+          ? `Follow-up from ${senderName}`
+          : isQuestion
+            ? "Follow-up on a question"
+            : "Follow-up on a request",
+        body: truncate(row.questionText),
+        questionId: row.id,
+      });
+    }
+
+    // Award points only for Ask-a-Pro flow, only to the responder
+    // (provider). The provider is the counterparty when a client owns the
+    // question (the common case). If the question was created without a
+    // bound counterparty there is nobody to credit.
+    if (row && row.kind === ASK_PRO) {
+      const responderId = row.counterpartyClerkId;
+      if (responderId) {
+        if (awardedAnswer) {
+          await recordPoints({
+            userClerkId: responderId,
+            eventType: "question_answered",
+            sourceRef: `question:${row.id}`,
+          });
+        }
+        if (awardedConfirm) {
+          await recordPoints({
+            userClerkId: responderId,
+            eventType: "question_confirmed_helpful",
+            sourceRef: `question:${row.id}`,
+          });
+        }
+      }
+    }
+
+    // Notify the asker when a pro has answered their Ask-a-Pro question.
+    // Only fire on the answer transition (open → answered), not on every
+    // edit of the response text or on confirm/complete updates.
+    if (
+      row &&
+      awardedAnswer &&
+      row.kind === ASK_PRO &&
+      row.userClerkId !== userId
+    ) {
+      const responderName = await getSenderName(userId);
+      await notifyQuestionRecipient({
+        recipientClerkId: row.userClerkId,
+        prefType: "question_answered",
+        title: responderName
+          ? `${responderName} answered your question`
+          : "Your question was answered",
+        body: truncate(row.responseText ?? ""),
+        questionId: row.id,
+      });
+    }
+
+    res.json(serialize(row));
+  },
+);
+
+router.delete(
+  "/questions/:questionId",
+  requireAuth,
+  async (req, res): Promise<void> => {
+    const { userId } = req as AuthRequest;
+    const id = parseId(req.params.questionId);
+    if (!Number.isFinite(id)) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    const [row] = await db
+      .delete(questionsTable)
+      .where(
+        and(eq(questionsTable.id, id), eq(questionsTable.userClerkId, userId)),
+      )
+      .returning({ id: questionsTable.id });
+    if (!row) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    res.sendStatus(204);
+  },
+);
 
 export default router;
