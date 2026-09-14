@@ -71,8 +71,9 @@ export async function uploadAsset(input: {
   size?: number | null;
 }): Promise<UploadedAsset> {
   const blob = await readFileAsBlob(input.uri);
-  const size = input.size ?? blob.size ?? 0;
+  const size = blob.size;
   if (!size) throw new Error("Cannot upload empty file");
+  if (size > 25 * 1024 * 1024) throw new Error("Please choose a file smaller than 25 MB");
   const name = input.name || input.uri.split("/").pop() || "upload";
   const contentType = guessContentType(name, input.contentType ?? blob.type ?? undefined);
 

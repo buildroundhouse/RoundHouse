@@ -1,15 +1,38 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { Readable } from "stream";
+import cookieParser from "cookie-parser";
+import { decodeJwt } from "jose";
 import {
   RequestUploadUrlBody,
   RequestUploadUrlResponse,
 } from "@workspace/api-zod";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage";
 import { canUserAccessObjectPath, isPublicProfileMedia, recordObjectUpload } from "../lib/objectAccess";
-import { requireAuth, type AuthRequest } from "../middlewares/requireAuth";
+import { requireAuth, tryAttachAuth, type AuthRequest } from "../middlewares/requireAuth";
 
 const router: IRouter = Router();
 const objectStorageService = new ObjectStorageService();
+const mediaCookie = "roundhouse_media";
+const cookieOptions = {
+  httpOnly: true, secure: process.env.NODE_ENV === "production",
+  sameSite: "strict" as const, path: "/api/storage",
+};
+router.use("/storage", cookieParser());
+
+// Browser images and download links cannot set a bearer header. Keep a
+// short-lived Firebase token in an HttpOnly cookie used ONLY for file reads.
+router.post("/storage/session", requireAuth, (req: Request, res: Response) => {
+  const token = req.headers.authorization!.slice("Bearer ".length).trim();
+  const expiresAt = decodeJwt(token).exp ?? 0; // requireAuth already verified it
+  res.cookie(mediaCookie, token, { ...cookieOptions, maxAge: Math.max(0, expiresAt * 1000 - Date.now()) });
+  res.setHeader("Cache-Control", "no-store");
+  res.status(204).end();
+});
+
+router.delete("/storage/session", (_req: Request, res: Response) => {
+  res.clearCookie(mediaCookie, cookieOptions);
+  res.status(204).end();
+});
 
 /**
  * POST /storage/uploads/request-url
@@ -28,9 +51,12 @@ router.post("/storage/uploads/request-url", requireAuth, async (req: Request, re
   try {
     const { userId, activeOutwardAccountId } = req as AuthRequest;
     const { name, size, contentType } = parsed.data;
+    if (!Number.isSafeInteger(size) || size <= 0 || size > 25 * 1024 * 1024) {
+      res.status(400).json({ error: "Choose a file between 1 byte and 25 MB" });
+      return;
+    }
 
-    const uploadURL = await objectStorageService.getObjectEntityUploadURL();
-    const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
+    const { uploadURL, objectPath } = await objectStorageService.requestUpload(contentType, size);
 
     // Track who uploaded this path so attachment-write routes can later
     // reject reference spoofing (writing someone else's path into your
@@ -121,8 +147,7 @@ router.get("/storage/objects/*path", async (req: Request, res: Response) => {
     // object via a profile field.
     const profilePublic = await isPublicProfileMedia(objectPath);
     if (profilePublic) {
-      const objectFile = await objectStorageService.getObjectEntityFile(objectPath);
-      const response = await objectStorageService.downloadObject(objectFile);
+      const response = await objectStorageService.downloadObjectEntity(objectPath);
       res.status(response.status);
       response.headers.forEach((value, key) => res.setHeader(key, value));
       if (response.body) {
@@ -136,18 +161,25 @@ router.get("/storage/objects/*path", async (req: Request, res: Response) => {
 
     // All other private object reads require an authenticated caller with
     // membership-based access to the path.
+    // Never accept a cookie from a cross-origin fetch, even if global CORS
+    // permits bearer-authenticated API clients on other origins.
+    const origin = req.get("origin");
+    const sameOrigin = !origin || origin === `https://${req.get("host")}` ||
+      (process.env.NODE_ENV !== "production" && origin === `http://${req.get("host")}`);
+    if (!req.headers.authorization && sameOrigin && req.get("sec-fetch-site") !== "cross-site") {
+      const token = req.cookies?.[mediaCookie];
+      if (typeof token === "string") req.headers.authorization = `Bearer ${token}`;
+    }
     const authHeader = req.header("authorization") ?? "";
     if (!authHeader.startsWith("Bearer ")) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
-    await new Promise<void>((resolve, reject) => {
-      requireAuth(req as AuthRequest, res, ((err?: unknown) => {
-        if (err) reject(err);
-        else resolve();
-      }) as never);
-    });
-    if (res.headersSent) return; // requireAuth already responded
+    await tryAttachAuth(req);
+    if (!(req as AuthRequest).userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
     const { userId } = req as AuthRequest;
 
     const allowed = await canUserAccessObjectPath(userId, objectPath);
@@ -158,8 +190,7 @@ router.get("/storage/objects/*path", async (req: Request, res: Response) => {
       return;
     }
 
-    const objectFile = await objectStorageService.getObjectEntityFile(objectPath);
-    const response = await objectStorageService.downloadObject(objectFile);
+    const response = await objectStorageService.downloadObjectEntity(objectPath);
 
     res.status(response.status);
     response.headers.forEach((value, key) => res.setHeader(key, value));

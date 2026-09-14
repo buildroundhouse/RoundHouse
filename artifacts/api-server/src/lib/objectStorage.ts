@@ -1,6 +1,7 @@
 import { Storage, File } from "@google-cloud/storage";
 import { Readable } from "stream";
 import { randomUUID } from "crypto";
+import { NEON_OBJECT_PREFIX, neonStorageEnabled, createNeonUpload, downloadNeonObject, deleteNeonObject } from "./neonStorage";
 import {
   ObjectAclPolicy,
   ObjectPermission,
@@ -21,6 +22,24 @@ export class ObjectNotFoundError extends Error {
 
 export class ObjectStorageService {
   constructor() {}
+
+  async requestUpload(contentType?: string, size?: number): Promise<{ uploadURL: string; objectPath: string }> {
+    if (neonStorageEnabled()) return createNeonUpload(contentType, size);
+    const uploadURL = await this.getObjectEntityUploadURL();
+    return { uploadURL, objectPath: this.normalizeObjectEntityPath(uploadURL) };
+  }
+
+  async downloadObjectEntity(path: string): Promise<Response> {
+    if (path.startsWith(NEON_OBJECT_PREFIX)) {
+      try {
+        return await downloadNeonObject(path);
+      } catch (error) {
+        if ((error as { name?: string }).name === "NoSuchKey") throw new ObjectNotFoundError();
+        throw error;
+      }
+    }
+    return this.downloadObject(await this.getObjectEntityFile(path));
+  }
 
   getPublicObjectSearchPaths(): Array<string> {
     const pathsStr = process.env.PUBLIC_OBJECT_SEARCH_PATHS || "";
@@ -181,6 +200,10 @@ export class ObjectStorageService {
     }
     if (!normalized.startsWith("/objects/")) return;
     try {
+      if (normalized.startsWith(NEON_OBJECT_PREFIX)) {
+        await deleteNeonObject(normalized);
+        return;
+      }
       const file = await this.getObjectEntityFile(normalized);
       await file.delete({ ignoreNotFound: true });
     } catch (err) {
