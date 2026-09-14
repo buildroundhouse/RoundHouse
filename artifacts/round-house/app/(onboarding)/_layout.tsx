@@ -1,11 +1,13 @@
+import React from "react";
 import { Redirect, Stack, useSegments } from "expo-router";
 import { View, ActivityIndicator } from "react-native";
 import { useAuth } from "@/lib/auth";
 import { useProfile } from "@/lib/profile";
+import { afterIdentityRoute, hasSavedIdentity } from "@/lib/identity-progress";
 
 export default function OnboardingLayout() {
   const { isSignedIn, isLoaded } = useAuth();
-  const { status } = useProfile();
+  const { status, profile, activeMode } = useProfile();
   const segments = useSegments();
   // Existing users can add a space, and identity saves must finish navigation
   // without the layout bouncing them out when the server becomes ready.
@@ -32,6 +34,10 @@ export default function OnboardingLayout() {
         <ActivityIndicator />
       </View>
     );
+  }
+  // A stale link or Back must never reopen completed personal identity.
+  if (setupScreen === "identity" && hasSavedIdentity(profile)) {
+    return <Redirect href={afterIdentityRoute(activeMode)} />;
   }
   if (status.kind === "ready" && !onSetupScreen) {
     return <Redirect href="/(tabs)" />;

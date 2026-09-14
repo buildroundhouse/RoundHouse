@@ -122,7 +122,7 @@ export default function IntakeScreen() {
     const ok = await confirm({
       title: "Start over — choose a different space?",
       message:
-        "Anything you've typed here will be discarded and this unfinished profile will be removed.",
+        "This unfinished space setup will be removed. Your saved personal photo, name, phone, and sign-in account will stay saved.",
       confirmLabel: "Start over",
       cancelLabel: "Cancel",
       destructive: true,

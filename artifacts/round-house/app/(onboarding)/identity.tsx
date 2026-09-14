@@ -3,6 +3,8 @@ import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleShee
 import * as ImagePicker from "expo-image-picker";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 import { useRouter } from "expo-router";
+import { customFetch } from "@workspace/api-client-react";
+import { afterIdentityRoute } from "@/lib/identity-progress";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useColorScheme } from "react-native";
@@ -26,16 +28,21 @@ export default function IdentityScreen() {
   useEffect(() => {
     if (!userId || !savedProfile || initialized.current === userId) return;
     let cancelled = false;
-    void loadEntryProfile(userId).then((draft) => {
+    void Promise.all([
+      loadEntryProfile(userId),
+      customFetch<{ name: string; phone: string | null; avatarUrl: string | null }>("/api/users/me/personal"),
+    ]).then(([draft, personal]) => {
       if (cancelled) return;
       initialized.current = userId;
-      const names = savedProfile.name.trim().split(/\s+/);
+      const names = personal.name.trim().split(/\s+/);
       setProfile({ ...draft,
         firstName: draft.firstName || names[0] || "",
         lastName: draft.lastName || names.slice(1).join(" "),
-        phone: draft.phone || savedProfile.phone || "",
-        photoUri: draft.photoUri || savedProfile.avatarUrl || "",
+        phone: personal.phone || draft.phone || "",
+        photoUri: personal.avatarUrl || draft.photoUri || "",
       });
+    }).catch(() => {
+      if (!cancelled) setError("Couldn't load your saved personal details. Reopen this page to retry; your saved identity has not been removed.");
     });
     return () => { cancelled = true; };
   }, [userId, savedProfile]);
@@ -61,6 +68,7 @@ export default function IdentityScreen() {
   };
 
   const submit = async () => {
+    if (saving) return;
     if (!userId) { setError("Your account session is not ready yet."); return; }
     if (!profileReady(profile)) { setError("Add your photo, first name, and last name to continue."); return; }
     setSaving(true); setError("");
@@ -68,10 +76,7 @@ export default function IdentityScreen() {
       const photoUri = await thumbnail(profile.photoUri);
       await saveEntryProfile(userId, { ...profile, photoUri });
       await refetchProfile();
-      if (activeMode && activeMode.kind !== "collab") {
-        if (activeMode.intakeCompletedAt) router.replace("/(tabs)");
-        else router.replace({ pathname: "/(onboarding)/intake", params: { modeId: String(activeMode.id), kind: activeMode.kind } });
-      } else router.replace("/(onboarding)/entry");
+      router.replace(afterIdentityRoute(activeMode));
     }
     catch (e) { setError(e instanceof Error ? e.message : "Couldn't save your profile. Please try again."); }
     finally { setSaving(false); }

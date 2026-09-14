@@ -36,3 +36,12 @@ PR #10 replaced that flow and merged into `fix/permanent-phone-hosting` as `3533
 Five flow tests and six actual screen-navigation/draft tests passed. Expo web export succeeded. Render reported the merged correction live, `/api/health` returned 200 with successful migrations, the deployed JavaScript included the new intake labels, and the sign-in page loaded in a browser. Full signed-in intake submission was not verified. The full frontend typecheck still reported ten existing errors outside the changed screens.
 
 The local export used synthetic build credentials and was not deployed. Render rebuilt the source with the service configuration. This verification record must not be presented as proof of every account's completed intake or native-app behavior.
+
+
+## Saved personal identity is a completed checkpoint
+
+Personal identity (photo, name, optional phone) is saved to the signed-in user's server record before space intake. Email belongs to the existing sign-in account. Failing, leaving, or restarting property/business intake must not clear that identity or require another account signup.
+
+`identityCompletedAt` is the durable completion checkpoint. Missing or changed display media must not send a completed person back into identity setup. Old identity links redirect to the active unfinished intake, or the Property/Business start if no unfinished space is available. It is acceptable to restart space selection when no progress can be recovered; it is not acceptable to restart completed identity. Personal corrections remain available through the personal profile editor.
+
+The identity form restores personal fields from `/users/me/personal`, not the business/property display overlay. Profile queries are scoped to the authenticated UID to prevent a previous account's cached state from influencing setup. A genuinely expired or signed-out session may still require sign-in; signing in to the same account must restore its saved identity rather than create it again.
