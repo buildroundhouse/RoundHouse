@@ -8,19 +8,20 @@ import { useColors } from "@/hooks/useColors";
 import { useProfile } from "@/lib/profile";
 import { resolveStorageUrl } from "@/lib/uploads";
 import { formatOwnerNameForSkin } from "@/lib/ownerNameDisplay";
-import { PERSONAL_FIELDS, personalDetailsFromIntake, profileContext, type ProfileEntity } from "@/lib/personal-profile";
+import { PERSONAL_FIELDS, personalDetailsFromIntake, profileContext, modeForAccount, type ProfileEntity } from "@/lib/personal-profile";
 import { ProfileNavigation } from "./ProfileNavigation";
 
 /** Every self-preview doorway uses the same current personal fields and visibility. */
 export function ProfilePreview({ visible, onClose, onExit }: { visible: boolean; onClose: () => void; onExit?: () => void }) {
   const c = useColors(); const insets = useSafeAreaInsets(); const router = useRouter();
-  const { profile, activeMode, activeOutwardAccount } = useProfile();
+  const { profile, activeMode: selectedMode, modes, activeOutwardAccount } = useProfile();
+  const activeMode = modeForAccount(activeOutwardAccount, modes, selectedMode);
   const accountId = activeOutwardAccount?.id;
   const entities = useQuery({ queryKey: ["/api/entities/mine", accountId], enabled: visible && !!accountId,
     queryFn: () => customFetch<{ entities: ProfileEntity[] }>("/api/entities/mine") });
   const md = (activeMode?.intakeData ?? {}) as Record<string, unknown>;
   const details = personalDetailsFromIntake(md);
-  const { role, entityName } = profileContext(activeMode?.kind, md, entities.data?.entities ?? []);
+  const { role, entityName } = profileContext(activeOutwardAccount?.kind ?? activeMode?.kind, md, entities.data?.entities ?? []);
   const avatar = resolveStorageUrl(profile?.avatarUrl);
   const banner = resolveStorageUrl(typeof md.profileBannerUrl === "string" ? md.profileBannerUrl : null);
   const publicFields = PERSONAL_FIELDS.filter(({ key }) => details[key]?.public && details[key]?.value);

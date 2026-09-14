@@ -1,3 +1,4 @@
+import { modeForAccount, type ProfileEntity } from "@/lib/personal-profile";
 import { commandCenterIdentity } from "@/lib/command-center-identity";
 import { OutwardAccountSwitcher } from "@/components/OutwardAccountSwitcher";
 import React, { useCallback, useMemo, useRef, useState } from "react";
@@ -18,7 +19,8 @@ import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import {
-  useGetFeed,
+  customFetch,
+  type GetFeedQueryResult,
   useGetMyRelationships,
   useSwitchActiveMode,
 } from "@workspace/api-client-react";
@@ -26,7 +28,7 @@ import type {
   RelationshipPerson,
   UserModeProfile,
 } from "@workspace/api-client-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MODE_LABELS } from "@/lib/intake-schemas";
 import { ProjectTimeline, workLogToEvent } from "@/components/ProjectTimeline";
 import { TimelineMotionDebugPanel } from "@/lib/timelineMotionDebug";
@@ -375,10 +377,13 @@ export default function TimelineScreen() {
 
   const headerAvatarUrl = resolveStorageUrl(profile?.avatarUrl);
 
-  const headerMode = modes.find(m => m.id === activeOutwardAccount?.sourceUserModeId) ?? activeMode;
-  const { entityName: activeAccountName, roleLabel: headerRoleLabel } = commandCenterIdentity(activeOutwardAccount, headerMode);
+  const headerMode = modeForAccount(activeOutwardAccount, modes, activeMode);
+  const entities = useQuery({ queryKey: ["/api/entities/mine", activeOutwardAccount?.id], enabled: !!activeOutwardAccount?.id,
+    queryFn: () => customFetch<{ entities: ProfileEntity[] }>("/api/entities/mine") });
+  const { entityName: activeAccountName, roleLabel: headerRoleLabel } = commandCenterIdentity(activeOutwardAccount, headerMode, entities.data?.entities ?? []);
 
-  const feedQuery = useGetFeed();
+  const feedQuery = useQuery({ queryKey: ["/api/logs/feed", "personal", profile?.clerkId, activeOutwardAccount?.id, headerMode?.id], enabled: !!profile,
+    queryFn: () => customFetch<GetFeedQueryResult>("/api/logs/feed?scope=personal") });
   const peopleQuery = useGetMyRelationships();
   const logs = feedQuery.data?.logs ?? [];
   const points = useMemo(

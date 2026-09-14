@@ -11,7 +11,7 @@ import { useColors } from "@/hooks/useColors";
 import { resolveStorageUrl, uploadAsset } from "@/lib/uploads";
 import { ProfileNavigation } from "./ProfileNavigation";
 import { ProfilePreview } from "./ProfilePreview";
-import { PERSONAL_FIELDS, personalDetailsFromIntake, profileContext, type ProfileEntity, type PersonalDetails } from "@/lib/personal-profile";
+import { PERSONAL_FIELDS, personalDetailsFromIntake, profileContext, modeForAccount, type ProfileEntity, type PersonalDetails } from "@/lib/personal-profile";
 
 export type { ProfileEntity } from "@/lib/personal-profile";
 
@@ -41,8 +41,9 @@ export function ProfileSubpage({ title, onClose, children }: { title: string; on
 
 export function CurrentProfileScreen({ onSettings }: { onSettings: () => void }) {
   const c = useColors(); const insets = useSafeAreaInsets(); const router = useRouter();
-  const { profile, activeMode, activeOutwardAccount, refetchProfile, refetchModes } = useProfile();
+  const { profile, activeMode: selectedMode, modes, activeOutwardAccount, refetchProfile, refetchModes } = useProfile();
   const queryClient = useQueryClient();
+  const activeMode = modeForAccount(activeOutwardAccount, modes, selectedMode);
   const accountId = activeOutwardAccount?.id;
   const entities = useQuery({ queryKey: ["/api/entities/mine", accountId], enabled: !!accountId,
     queryFn: () => customFetch<{ entities: ProfileEntity[] }>("/api/entities/mine") });
@@ -53,7 +54,7 @@ export function CurrentProfileScreen({ onSettings }: { onSettings: () => void })
   const updateMode = useCompleteModeIntake(); const updateMe = useUpdateMe();
   const md = (activeMode?.intakeData ?? {}) as Record<string, unknown>;
   const details = personalDetailsFromIntake(md);
-  const { role, entity, entityName, memberships: matching } = profileContext(activeMode?.kind, md, entities.data?.entities ?? []);
+  const { role, entity, entityName, memberships: matching } = profileContext(activeOutwardAccount?.kind ?? activeMode?.kind, md, entities.data?.entities ?? []);
   const title = typeof md.roleTitle === "string" ? md.roleTitle.trim() : "";
   const avatar = resolveStorageUrl(profile?.avatarUrl);
   const banner = resolveStorageUrl(typeof md.profileBannerUrl === "string" ? md.profileBannerUrl : null);

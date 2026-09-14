@@ -23,7 +23,7 @@ vi.mock("@/lib/ownerNameDisplay", () => import("./ownerNameDisplay"));
 vi.mock("@/lib/personal-profile", () => import("./personal-profile"));
 vi.mock("@/lib/uploads", () => ({ resolveStorageUrl: () => null, uploadAsset: vi.fn() }));
 vi.mock("@workspace/api-client-react", () => ({ customFetch: vi.fn(), useCompleteModeIntake: () => ({}), useUpdateMe: () => ({}), useGetMyPersonalProfile: () => ({ data: { email: "private@example.com" } }), useUpdateMyPersonalProfile: () => ({}), useSwitchActiveMode: () => ({}) }));
-vi.mock("@tanstack/react-query", () => ({ useQueryClient: () => ({}), useQuery: () => ({ data: { entities: [{ id: 12, displayName: "Oak House", kind: "property", myMembership: { status: "approved", role: state.entityRole } }] } }) }));
+vi.mock("@tanstack/react-query", () => ({ useQueryClient: () => ({}), useQuery: () => ({ data: { entities: [{ id: 12, displayName: "Oak House", kind: state.kind.startsWith("trade_pro") && state.kind !== "trade_pro_collab" ? "business" : state.kind.startsWith("facilities") ? "facility" : "property", myMembership: { status: "approved", role: state.entityRole } }] } }) }));
 vi.mock("@/lib/profile", () => ({ useProfile: () => ({
   profile: { name: state.name }, modes: [], outwardAccounts: [], activeOutwardAccount: { id: 7, lastInitialOnly: true },
   activeMode: { id: 4, kind: state.kind, intakeData: { entityId: 12, companyName: "Legacy Business", businessEmail: "private-business@example.com", personalProfile: {
@@ -40,7 +40,7 @@ import { profileContext } from "./personal-profile";
 beforeEach(() => { state.kind = "home"; state.entityRole = "owner"; state.replace.mockClear(); });
 const roles = [
   ["home", "owner", "Homeowner"], ["home", "manager", "Home Manager"],
-  ["home_teammate", "employee", "Home Team Member"], ["trade_pro", "owner", "Trade Professional (Owner)"],
+  ["home_teammate", "employee", "Home Team Member"], ["facilities", "manager", "Commercial Management (Manager)"], ["facilities_teammate", "employee", "Commercial Team Member"], ["trade_pro", "owner", "Trade Professional (Owner)"],
   ["trade_pro_teammate", "employee", "Trade Team Member"], ["collab", "collaborator", "Viewer"],
   ["trade_pro_collab", "collaborator", "Viewer"], ["facilities_collab", "collaborator", "Viewer"],
 ];
