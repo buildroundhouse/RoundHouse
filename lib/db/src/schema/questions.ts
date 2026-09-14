@@ -1,4 +1,11 @@
-import { pgTable, text, serial, timestamp, index } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  serial,
+  timestamp,
+  index,
+  integer,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -38,8 +45,15 @@ export const questionsTable = pgTable(
     requestedAction: text("requested_action"), // for "request": "reply" | "approve" | "upload" | "confirm"
     responseText: text("response_text"),
     nextStep: text("next_step"), // for "ask_pro" after confirmed: "appointment" | "list" | "curious"
+    // Counts prompts inside this one Resolution. It starts at one for the
+    // original question and increments only when its creator follows up.
+    unansweredPromptCount: integer("unanswered_prompt_count")
+      .notNull()
+      .default(1),
     confirmedAt: timestamp("confirmed_at", { withTimezone: true }),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()
       .defaultNow()
@@ -47,7 +61,9 @@ export const questionsTable = pgTable(
   },
   (t) => ({
     userIdx: index("reminder_questions_user_idx").on(t.userClerkId),
-    counterpartyIdx: index("reminder_questions_counterparty_idx").on(t.counterpartyClerkId),
+    counterpartyIdx: index("reminder_questions_counterparty_idx").on(
+      t.counterpartyClerkId,
+    ),
   }),
 );
 
