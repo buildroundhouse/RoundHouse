@@ -428,6 +428,33 @@ export const SCHEMA_STEPS: Step[] = [
     name: "reminders.notify_count (legacy DBs)",
     sql: `ALTER TABLE reminders ADD COLUMN IF NOT EXISTS notify_count integer NOT NULL DEFAULT 0;`,
   },
+  {
+    name: "reminder_questions table",
+    sql: `
+      CREATE TABLE IF NOT EXISTS reminder_questions (
+        id serial PRIMARY KEY,
+        user_clerk_id text NOT NULL,
+        counterparty_clerk_id text,
+        counterparty_name text,
+        kind text NOT NULL,
+        status text NOT NULL,
+        question_text text NOT NULL,
+        requested_action text,
+        response_text text,
+        next_step text,
+        unanswered_prompt_count integer NOT NULL DEFAULT 1,
+        confirmed_at timestamptz,
+        created_at timestamptz NOT NULL DEFAULT now(),
+        updated_at timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE INDEX IF NOT EXISTS reminder_questions_user_idx ON reminder_questions (user_clerk_id);
+      CREATE INDEX IF NOT EXISTS reminder_questions_counterparty_idx ON reminder_questions (counterparty_clerk_id);
+    `,
+  },
+  {
+    name: "reminder_questions.unanswered_prompt_count (legacy DBs)",
+    sql: `ALTER TABLE reminder_questions ADD COLUMN IF NOT EXISTS unanswered_prompt_count integer NOT NULL DEFAULT 1;`,
+  },
 
   // --- company_notices --------------------------------------------------
   {
@@ -994,7 +1021,9 @@ async function enforceNotNullConstraints(): Promise<{ unresolved: string[] }> {
           `    clerk_id to an outward_accounts row, or by deleting the orphaned rows)\n` +
           `    and re-run \`pnpm --filter @workspace/db migrate\`.`,
       );
-      unresolved.push(`${table}.${column} (${n} null row${n === 1 ? "" : "s"})`);
+      unresolved.push(
+        `${table}.${column} (${n} null row${n === 1 ? "" : "s"})`,
+      );
       continue;
     }
     // Wrap in a check so re-running is a no-op.
@@ -1075,7 +1104,8 @@ export async function migrate(): Promise<MigrateResult> {
 const isDirectRun =
   typeof process !== "undefined" &&
   process.argv[1] &&
-  (process.argv[1].endsWith("migrate.ts") || process.argv[1].endsWith("migrate.js"));
+  (process.argv[1].endsWith("migrate.ts") ||
+    process.argv[1].endsWith("migrate.js"));
 
 if (isDirectRun) {
   migrate()
