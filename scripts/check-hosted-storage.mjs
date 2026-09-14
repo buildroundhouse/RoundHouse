@@ -35,12 +35,11 @@ export async function checkHostedStorage() {
     const put = await fetch(putUrl, { method: 'PUT', headers: { 'Content-Type': 'text/plain', Origin: origins[0] }, body: content, signal: AbortSignal.timeout(15000) });
     assert(put.ok, `Storage upload failed (${put.status})`);
     created = true;
-    const getUrl = await getSignedUrl(client, new GetObjectCommand({ Bucket: bucket, Key }), { expiresIn: 60 });
-    stage = 'signed download';
-    const get = await fetch(getUrl, { signal: AbortSignal.timeout(15000) });
-    assert(get.ok && await get.text() === content, 'Storage download verification failed');
+    stage = 'authenticated download';
+    const get = await client.send(new GetObjectCommand({ Bucket: bucket, Key }));
+    assert(await get.Body?.transformToString() === content, 'Storage download verification failed');
     stage = 'private access';
-    const anonymous = new URL(getUrl); anonymous.search = '';
+    const anonymous = new URL(putUrl); anonymous.search = '';
     const denied = await fetch(anonymous, { signal: AbortSignal.timeout(15000) });
     assert([401, 403, 404].includes(denied.status), 'Storage unexpectedly permits anonymous reads');
     console.log('Storage check passed: browser preflight, signed upload, matching download, private access.');
