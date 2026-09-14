@@ -11,7 +11,7 @@ import {
   View,
   type LayoutChangeEvent,
 } from "react-native";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
@@ -29,10 +29,14 @@ import { MODE_LABELS } from "@/lib/intake-schemas";
 import { ProjectTimeline, workLogToEvent } from "@/components/ProjectTimeline";
 import { TimelineMotionDebugPanel } from "@/lib/timelineMotionDebug";
 import { useProfile } from "@/lib/profile";
-import { useActiveAccountAvatarUrl, InboxButton } from "@/components/TopBarAvatar";
+import {
+  MailboxButton,
+  NotificationBellButton,
+} from "@/components/TopBarAvatar";
+import { resolveStorageUrl } from "@/lib/uploads";
+import { tierForScore } from "@/components/BadgeTier";
 import { getModeAccent } from "@/lib/modeAccent";
 import { ModeSwitcher } from "@/components/ModeSwitcher";
-import { OutwardAccountSwitcher } from "@/components/OutwardAccountSwitcher";
 import {
   HomeSidePanelOverlay,
   type HomeSidePanelKey,
@@ -47,10 +51,12 @@ function TimelineHeader({
   avatarUrl,
   onOpenProfile,
   accountName,
+  points,
 }: {
   avatarUrl: string | null;
   onOpenProfile: () => void;
   accountName: string;
+  points: number;
 }) {
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -76,19 +82,42 @@ function TimelineHeader({
           <Image source={{ uri: avatarUrl }} style={styles.headerAvatarImg} />
         ) : null}
       </Pressable>
-      <View style={{ flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: 8 }}>
+      <View style={styles.headerIdentity}>
         <Text
-          style={[styles.headerCompany, { color: colors.foreground, flexShrink: 1 }]}
+          style={[styles.headerCompany, { color: colors.foreground }]}
           numberOfLines={1}
           ellipsizeMode="tail"
         >
           {accountName}
         </Text>
-        <OutwardAccountSwitcher variant="headerButton" />
       </View>
-
-      {/* RIGHT: personal inbox — follows the human across every screen */}
-      <InboxButton />
+      <Pressable
+        onPress={onOpenProfile}
+        accessibilityRole="button"
+        accessibilityLabel={`${tierForScore(points).label} status, ${points} points`}
+        style={[
+          styles.pointsTicker,
+          { borderColor: colors.border, backgroundColor: colors.card },
+        ]}
+      >
+        <Feather name="award" size={13} color={tierForScore(points).fg} />
+        <View>
+          <Text
+            style={[styles.pointsStatus, { color: tierForScore(points).fg }]}
+            numberOfLines={1}
+          >
+            {tierForScore(points).label}
+          </Text>
+          <Text
+            style={[styles.pointsValue, { color: colors.mutedForeground }]}
+            numberOfLines={1}
+          >
+            {points} pts
+          </Text>
+        </View>
+      </Pressable>
+      <NotificationBellButton />
+      <MailboxButton />
     </View>
   );
 }
@@ -155,7 +184,10 @@ function SideTabStack({
   onTabLayout?: (key: string, y: number) => void;
 }) {
   return (
-    <View pointerEvents="box-none" style={[styles.sideTabStack, { top: topOffset }]}>
+    <View
+      pointerEvents="box-none"
+      style={[styles.sideTabStack, { top: topOffset }]}
+    >
       {tabs.map((t) => (
         <SideTab
           key={t.key}
@@ -209,8 +241,6 @@ function TimelineSearchButton({
     </View>
   );
 }
-
-
 
 function PeopleStrip({
   people,
@@ -280,7 +310,10 @@ function PeopleStrip({
         style={[
           styles.avatar,
           styles.addAvatar,
-          { borderColor: colors.border, marginLeft: visible.length === 0 ? 0 : 6 },
+          {
+            borderColor: colors.border,
+            marginLeft: visible.length === 0 ? 0 : 6,
+          },
         ]}
       >
         <Feather name="plus" size={18} color={colors.mutedForeground} />
@@ -303,7 +336,14 @@ export default function TimelineScreen() {
   const HEADER_AREA = 46; // TimelineHeader rendered height (paddingTop + content)
   const PEOPLE_STRIP_BLOCK = 12 + 36; // marginTop + avatar row height
   const TIMELINE_PAD_TOP = 6; // ProjectTimeline root paddingTop
-  const { profile, activeMode, modes, refetchModes, refetchProfile, activeOutwardAccount } = useProfile();
+  const {
+    profile,
+    activeMode,
+    modes,
+    refetchModes,
+    refetchProfile,
+    activeOutwardAccount,
+  } = useProfile();
   const switchMutation = useSwitchActiveMode();
   const queryClient = useQueryClient();
   const handleSwitchMode = async (m: UserModeProfile) => {
@@ -317,9 +357,12 @@ export default function TimelineScreen() {
     }
   };
 
-  const accent = useMemo(() => getModeAccent(activeMode?.kind ?? null), [activeMode?.kind]);
+  const accent = useMemo(
+    () => getModeAccent(activeMode?.kind ?? null),
+    [activeMode?.kind],
+  );
 
-  const headerAvatarUrl = useActiveAccountAvatarUrl();
+  const headerAvatarUrl = resolveStorageUrl(profile?.avatarUrl);
 
   const activeAccountName = useMemo(() => {
     const a = activeOutwardAccount;
@@ -335,13 +378,21 @@ export default function TimelineScreen() {
   const feedQuery = useGetFeed();
   const peopleQuery = useGetMyRelationships();
   const logs = feedQuery.data?.logs ?? [];
+  const points = useMemo(
+    () => logs.reduce((total, log) => total + (log.score ?? 0), 0),
+    [logs],
+  );
   const peopleData = peopleQuery.data;
 
   const allPeople = useMemo<RelationshipPerson[]>(() => {
     if (!peopleData) return [];
     const seen = new Set<number>();
     const out: RelationshipPerson[] = [];
-    for (const p of [...peopleData.core, ...peopleData.clients, ...peopleData.collaborators]) {
+    for (const p of [
+      ...peopleData.core,
+      ...peopleData.clients,
+      ...peopleData.collaborators,
+    ]) {
       if (seen.has(p.id)) continue;
       seen.add(p.id);
       out.push(p);
@@ -349,8 +400,7 @@ export default function TimelineScreen() {
     return out;
   }, [peopleData]);
 
-  const refreshing =
-    feedQuery.isRefetching || peopleQuery.isRefetching;
+  const refreshing = feedQuery.isRefetching || peopleQuery.isRefetching;
   const onRefresh = () => {
     feedQuery.refetch();
     peopleQuery.refetch();
@@ -373,7 +423,9 @@ export default function TimelineScreen() {
     HEADER_AREA +
     (allPeople.length > 0 ? PEOPLE_STRIP_BLOCK : 0) +
     TIMELINE_PAD_TOP;
-  const [measuredTimelineTop, setMeasuredTimelineTop] = useState<number | null>(null);
+  const [measuredTimelineTop, setMeasuredTimelineTop] = useState<number | null>(
+    null,
+  );
   const handleTimelineWrapLayout = useCallback((e: LayoutChangeEvent) => {
     // layout.y is relative to the ScrollView's content container, which
     // sits at window y = 0 (the screen container is flex:1 with no
@@ -385,18 +437,19 @@ export default function TimelineScreen() {
       setMeasuredTimelineTop((prev) => (prev === y ? prev : y));
     }
   }, []);
-  const rightStackTop = measuredTimelineTop ?? estimatedTimelineTop;
+  const timelineStartTop = measuredTimelineTop ?? estimatedTimelineTop;
+  const rightStackTop = timelineStartTop + 52;
 
   const goPeople = () => router.push("/(tabs)/clients" as never);
   const goProperty = (id: number) => router.push(`/property/${id}` as never);
   const goProfile = () => router.push("/(tabs)/profile" as never);
-  const goNotifications = () => router.push("/(tabs)/notifications" as never);
 
   // Active side panel state — replaces the previous router.push for the
   // five right-edge tabs so they open as a dimmed overlay instead of a
   // new screen. Tapping the same tab again toggles it closed; tapping a
   // different tab swaps content without flicker.
-  const [activeSidePanel, setActiveSidePanel] = useState<HomeSidePanelKey | null>(null);
+  const [activeSidePanel, setActiveSidePanel] =
+    useState<HomeSidePanelKey | null>(null);
   const [timelineSearchOpen, setTimelineSearchOpen] = useState(false);
   const [timelineQuery, setTimelineQuery] = useState("");
   const [tabOriginYs, setTabOriginYs] = useState<Record<string, number>>({});
@@ -422,7 +475,13 @@ export default function TimelineScreen() {
     const needle = timelineQuery.trim().toLocaleLowerCase();
     if (!needle) return timelineEvents;
     return timelineEvents.filter((event) =>
-      [event.title, event.note, event.propertyName, event.authorName, event.kind]
+      [
+        event.title,
+        event.note,
+        event.propertyName,
+        event.authorName,
+        event.kind,
+      ]
         .filter(Boolean)
         .some((value) => String(value).toLocaleLowerCase().includes(needle)),
     );
@@ -436,7 +495,12 @@ export default function TimelineScreen() {
         icon: "sunrise",
         onPress: () => toggleSidePanel("reminders"),
       },
-      { key: "jobs", label: "Tasks / Lists", icon: "check-square", onPress: () => toggleSidePanel("jobs") },
+      {
+        key: "jobs",
+        label: "Tasks / Lists",
+        icon: "check-square",
+        onPress: () => toggleSidePanel("jobs"),
+      },
       {
         key: "receipts",
         label: "Receipts",
@@ -475,13 +539,18 @@ export default function TimelineScreen() {
         contentContainerStyle={{ paddingBottom: bottomPad }}
         keyboardShouldPersistTaps="handled"
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={accent.primary} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={accent.primary}
+          />
         }
       >
         <TimelineHeader
           avatarUrl={headerAvatarUrl}
           onOpenProfile={goProfile}
           accountName={activeAccountName}
+          points={points}
         />
 
         {/* The standalone OutwardAccountSwitcher card used to live here, but
@@ -494,12 +563,22 @@ export default function TimelineScreen() {
             adding contacts already lives on the Clients tab. */}
         {allPeople.length > 0 ? (
           <View style={{ paddingHorizontal: 14, marginTop: 12 }}>
-            <PeopleStrip people={allPeople} onOpen={goPeople} onAdd={goPeople} accent={accent} />
+            <PeopleStrip
+              people={allPeople}
+              onOpen={goPeople}
+              onAdd={goPeople}
+              accent={accent}
+            />
           </View>
         ) : null}
 
         {timelineSearchOpen ? (
-          <View style={[styles.timelineSearchWrap, { borderColor: colors.border, backgroundColor: colors.card }]}>
+          <View
+            style={[
+              styles.timelineSearchWrap,
+              { borderColor: colors.border, backgroundColor: colors.card },
+            ]}
+          >
             <Feather name="search" size={18} color={colors.mutedForeground} />
             <TextInput
               value={timelineQuery}
@@ -518,7 +597,11 @@ export default function TimelineScreen() {
                 accessibilityLabel="Clear Timeline search"
                 hitSlop={10}
               >
-                <Feather name="x-circle" size={18} color={colors.mutedForeground} />
+                <Feather
+                  name="x-circle"
+                  size={18}
+                  color={colors.mutedForeground}
+                />
               </Pressable>
             ) : null}
           </View>
@@ -534,11 +617,14 @@ export default function TimelineScreen() {
           onLayout={handleTimelineWrapLayout}
           collapsable={false}
         >
-          <ProjectTimeline events={visibleTimelineEvents} onOpenProperty={goProperty} />
+          <ProjectTimeline
+            events={visibleTimelineEvents}
+            onOpenProperty={goProperty}
+          />
         </View>
       </ScrollView>
       <TimelineSearchButton
-        topOffset={rightStackTop}
+        topOffset={timelineStartTop}
         color={colors.primary}
         open={timelineSearchOpen}
         onPress={() => {
@@ -566,7 +652,10 @@ export default function TimelineScreen() {
               onPress={() => remindersAddRef.current?.()}
               accessibilityLabel="Add reminder"
               hitSlop={10}
-              style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1, padding: 4 })}
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.6 : 1,
+                padding: 4,
+              })}
             >
               <Feather name="plus" size={22} color={colors.foreground} />
             </Pressable>
@@ -579,7 +668,9 @@ export default function TimelineScreen() {
         {activeSidePanel === "reminders" ? (
           <RemindersScreen embedded onRequestAdd={setRemindersAdd} />
         ) : null}
-        {activeSidePanel === "properties" ? <PropertiesScreen embedded /> : null}
+        {activeSidePanel === "properties" ? (
+          <PropertiesScreen embedded />
+        ) : null}
       </HomeSidePanelOverlay>
       <TimelineMotionDebugPanel />
     </View>
@@ -609,25 +700,55 @@ const styles = StyleSheet.create({
   homeHeader: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 6,
     paddingHorizontal: 12,
     paddingBottom: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   headerAvatar: {
-    width: 36, height: 36, borderRadius: 18, borderWidth: 1, overflow: "hidden",
-    alignItems: "center", justifyContent: "center",
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1,
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
   },
   headerAvatarImg: { width: "100%", height: "100%" },
   headerCompany: {
-    fontSize: 15, fontFamily: "Inter_700Bold",
+    fontSize: 14,
+    fontFamily: "Inter_700Bold",
+    flexShrink: 1,
   },
+  headerIdentity: { flex: 1, minWidth: 64, justifyContent: "center" },
+  pointsTicker: {
+    minWidth: 58,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1,
+    paddingHorizontal: 7,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
+  },
+  pointsStatus: { fontSize: 9, lineHeight: 11, fontFamily: "Inter_700Bold" },
+  pointsValue: { fontSize: 9, lineHeight: 11, fontFamily: "Inter_600SemiBold" },
 
   peopleRow: { flexDirection: "row", alignItems: "center" },
   avatar: {
-    width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center", overflow: "hidden",
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
   },
-  addAvatar: { borderWidth: 1, borderStyle: "solid", backgroundColor: "transparent" },
+  addAvatar: {
+    borderWidth: 1,
+    borderStyle: "solid",
+    backgroundColor: "transparent",
+  },
   avatarImg: { width: "100%", height: "100%" },
   avatarText: { fontSize: 13, fontFamily: "Inter_700Bold" },
 
@@ -646,7 +767,7 @@ const styles = StyleSheet.create({
   sideTabStack: {
     position: "absolute",
     right: 0,
-    gap: 12,
+    gap: 16,
   },
 
   // Slim tapered bookmark silhouette — quiet/ambient so the tabs whisper
@@ -655,7 +776,7 @@ const styles = StyleSheet.create({
   // the RIGHT pull the edges inward toward the screen edge for a soft taper.
   sideTab: {
     width: 22,
-    height: 80,
+    height: 74,
     backgroundColor: SIDE_TAB_BG,
     borderTopLeftRadius: 14,
     borderBottomLeftRadius: 14,
@@ -677,7 +798,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 5,
     transform: [{ rotate: "90deg" }],
-    width: 76,
+    width: 70,
     justifyContent: "center",
   },
   sideTabText: {
