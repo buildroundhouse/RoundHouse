@@ -1,14 +1,16 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { usePathname, useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { useProfile } from "@/lib/profile";
 import { resolveStorageUrl } from "@/lib/uploads";
 import { MODE_LABELS } from "@/lib/intake-schemas";
 import { OutwardAccountSwitcher } from "@/components/OutwardAccountSwitcher";
 import { DemoBadge } from "@/components/DemoBadge";
-import { useListNotifications } from "@workspace/api-client-react";
+import { BadgeTier } from "@/components/BadgeTier";
+import { AnalyticsRewardsModal } from "@/components/AnalyticsRewardsModal";
+import { useGetFeed, useListNotifications } from "@workspace/api-client-react";
 
 export function useActiveAccountAvatarUrl(): string | null {
   const { profile, activeOutwardAccount } = useProfile();
@@ -86,14 +88,22 @@ export function TopBarAccountIdentity({
 
 /**
  * Personal inbox entry point. The inbox follows the human across every
- * outward account / avatar and across every screen, so this button must be
- * available wherever the top-bar identity cluster appears. We reuse the
- * `["/api/notifications"]` query key the bottom-tab badge uses so the unread
- * count stays in lockstep without an extra request.
+ * outward account / avatar and across every screen. On the Command Center,
+ * the same cluster also carries the compact Reward status + points entry.
  */
 export function InboxButton({ style }: { style?: StyleProp<ViewStyle> }) {
   const colors = useColors();
   const router = useRouter();
+  const pathname = usePathname();
+  const [rewardsOpen, setRewardsOpen] = useState(false);
+  const showRewards = pathname === "/" || pathname === "/index";
+  const { data: feedData } = useGetFeed(undefined, {
+    query: {
+      enabled: showRewards,
+      queryKey: ["/api/feed"],
+    },
+  });
+  const points = (feedData?.logs ?? []).reduce((sum, log) => sum + log.score, 0);
   const { data: notifications } = useListNotifications(undefined, {
     query: {
       queryKey: ["/api/notifications"],
@@ -104,29 +114,67 @@ export function InboxButton({ style }: { style?: StyleProp<ViewStyle> }) {
   const unread = notifications?.unreadCount ?? 0;
   const badgeText = unread > 99 ? "99+" : String(unread);
   return (
-    <Pressable
-      onPress={() => router.push("/(tabs)/notifications" as never)}
-      accessibilityLabel={unread > 0 ? `Inbox, ${unread} unread` : "Inbox"}
-      hitSlop={10}
-      style={[
-        inboxStyles.btn,
-        { borderColor: colors.border, backgroundColor: colors.card },
-        style,
-      ]}
-    >
-      <Feather name="mail" size={16} color={colors.foreground} />
-      {unread > 0 ? (
-        <View style={inboxStyles.badge}>
-          <Text style={inboxStyles.badgeText} numberOfLines={1}>
-            {badgeText}
-          </Text>
-        </View>
-      ) : null}
-    </Pressable>
+    <>
+      <View style={inboxStyles.cluster}>
+        {showRewards ? (
+          <Pressable
+            onPress={() => setRewardsOpen(true)}
+            accessibilityRole="button"
+            accessibilityLabel={`Open Reward Center, ${points} points`}
+            hitSlop={8}
+            style={[inboxStyles.rewardButton, { borderColor: colors.border, backgroundColor: colors.card }]}
+          >
+            <BadgeTier score={points} />
+            <Text style={[inboxStyles.pointsText, { color: colors.foreground }]} numberOfLines={1}>
+              {points.toLocaleString()} pts
+            </Text>
+          </Pressable>
+        ) : null}
+        <Pressable
+          onPress={() => router.push("/(tabs)/notifications" as never)}
+          accessibilityLabel={unread > 0 ? `Inbox, ${unread} unread` : "Inbox"}
+          hitSlop={10}
+          style={[
+            inboxStyles.btn,
+            { borderColor: colors.border, backgroundColor: colors.card },
+            style,
+          ]}
+        >
+          <Feather name="mail" size={16} color={colors.foreground} />
+          {unread > 0 ? (
+            <View style={inboxStyles.badge}>
+              <Text style={inboxStyles.badgeText} numberOfLines={1}>
+                {badgeText}
+              </Text>
+            </View>
+          ) : null}
+        </Pressable>
+      </View>
+      <AnalyticsRewardsModal visible={rewardsOpen} onClose={() => setRewardsOpen(false)} />
+    </>
   );
 }
 
 const inboxStyles = StyleSheet.create({
+  cluster: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+  },
+  rewardButton: {
+    minHeight: 36,
+    borderRadius: 18,
+    borderWidth: 1,
+    paddingLeft: 6,
+    paddingRight: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  pointsText: {
+    fontSize: 11,
+    fontFamily: "Inter_700Bold",
+  },
   btn: {
     width: 36,
     height: 36,
