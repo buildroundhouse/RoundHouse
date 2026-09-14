@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { customFetch } from "@workspace/api-client-react";
 
 export type EntryProfile = {
   firstName: string;
@@ -27,8 +28,14 @@ export async function loadEntryProfile(uid: string): Promise<EntryProfile> {
 }
 
 export async function saveEntryProfile(uid: string, profile: EntryProfile): Promise<void> {
-  await AsyncStorage.setItem(key(uid), JSON.stringify({
+  const saved = {
     firstName: profile.firstName.trim(), nickname: profile.nickname.trim(), lastName: profile.lastName.trim(),
     phone: profile.phone.trim(), photoUri: profile.photoUri,
-  }));
+  };
+  await customFetch("/api/users/me/entry-profile", {
+    method: "PUT",
+    body: JSON.stringify({ ...saved, avatarUrl: saved.photoUri, photoUri: undefined }),
+  });
+  // The server is authoritative; unavailable device storage cannot undo a save.
+  await AsyncStorage.setItem(key(uid), JSON.stringify(saved)).catch(() => {});
 }

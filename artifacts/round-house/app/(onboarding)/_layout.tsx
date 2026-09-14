@@ -7,9 +7,10 @@ export default function OnboardingLayout() {
   const { isSignedIn, isLoaded } = useAuth();
   const { status } = useProfile();
   const segments = useSegments();
-  // The mode-picker is also reachable from the profile "Add another mode" entry,
-  // so allow ready users to stay on it. All other onboarding screens are bounce-back.
-  const onPicker = segments[segments.length - 1] === "mode-picker";
+  // Existing users can add a space, and identity saves must finish navigation
+  // without the layout bouncing them out when the server becomes ready.
+  const setupScreen = segments[segments.length - 1];
+  const onSetupScreen = ["mode-picker", "identity", "entry", "entry-entity", "entry-business", "intake"].includes(setupScreen ?? "");
 
   if (isLoaded && !isSignedIn) {
     return <Redirect href="/(auth)/sign-in" />;
@@ -21,13 +22,16 @@ export default function OnboardingLayout() {
       </View>
     );
   }
-  if (status.kind === "ready" && !onPicker) {
+  if (status.kind === "ready" && !onSetupScreen) {
     return <Redirect href="/(tabs)" />;
   }
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="identity" />
+      <Stack.Screen name="entry" />
+      <Stack.Screen name="entry-entity" />
+      <Stack.Screen name="entry-business" />
       <Stack.Screen name="mode-picker" />
       <Stack.Screen name="intake" />
     </Stack>

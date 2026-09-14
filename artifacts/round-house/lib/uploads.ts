@@ -15,6 +15,7 @@ export function resolveStorageUrl(
   bust?: string | number | Date | null,
 ): string | null {
   if (!path) return null;
+  if (path.startsWith("data:image/")) return path;
   const isAbsolute = /^https?:\/\//.test(path);
   const normalized = isAbsolute ? path : path.startsWith("/") ? path : `/${path}`;
   const apiPath = isAbsolute

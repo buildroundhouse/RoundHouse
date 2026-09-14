@@ -10,10 +10,12 @@ import {
   View,
 } from "react-native";
 import { useColors } from "@/hooks/useColors";
+import { customFetch } from "@workspace/api-client-react";
 import {
   US_STATES,
   findPropertyAddresses,
   formatPropertyAddress,
+  formatPostalCodeInput,
   type PropertyAddress,
 } from "@/lib/property-address";
 
@@ -44,13 +46,18 @@ export function PropertyAddressCard({
   ) => {
     stopLookup();
     setMessage("");
+    if (key === "unit") {
+      onChange({ ...value, unit: text });
+      return;
+    }
     onChange({
       ...value,
       [key]: text,
-      ...(key === "street" || key === "city" || key === "state"
-        ? { zip: "" }
-        : {}),
-      status: "unchecked",
+      // Keep a manually entered ZIP when correcting the street/city. A previous
+      // automatic match must be checked again for the changed address.
+      ...(key !== "zip" && value.status === "matched" ? { zip: "" } : {}),
+      zipPlus4: undefined,
+      status: /^\d{5}(-\d{4})?$/.test(key === "zip" ? text : value.status === "manual" ? value.zip : "") ? "manual" : "unchecked",
       placeId: null,
       latitude: null,
       longitude: null,
@@ -62,7 +69,7 @@ export function PropertyAddressCard({
       !value.street.trim() ||
       !value.city.trim() ||
       !value.state ||
-      value.status !== "unchecked"
+      value.status === "matched"
     )
       return;
     const seq = ++generation.current;
@@ -77,12 +84,25 @@ export function PropertyAddressCard({
           value,
           process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY,
           controller.signal,
+          async (address, signal) => {
+            const result = await customFetch<{ matches: PropertyAddress[] }>("/api/address-lookup", {
+              method: "POST", signal,
+              body: JSON.stringify({ street: address.street, city: address.city, state: address.state }),
+            });
+            return result.matches;
+          },
         );
         if (seq !== generation.current) return;
+        if (found.length === 1 && !value.zip.trim()) {
+          onChange({ ...found[0], unit: value.unit });
+          setMatches([]);
+          setMessage("");
+          return;
+        }
         setMatches(found);
         setMessage(
           found.length
-            ? "Select your address below to fill the ZIP Code."
+            ? "Select your address below to use its ZIP Code."
             : "No complete address match found. Check the street, city and state, or enter the ZIP Code manually.",
         );
       } catch (error) {
@@ -124,7 +144,7 @@ export function PropertyAddressCard({
         onChangeText={(text) =>
           edit(
             key,
-            key === "zip" ? text.replace(/[^\d-]/g, "").slice(0, 10) : text,
+            key === "zip" ? formatPostalCodeInput(text) : text,
           )
         }
         placeholder={placeholder}
@@ -173,7 +193,12 @@ export function PropertyAddressCard({
           </Text>
         </Pressable>
       </View>
-      {field("ZIP Code", "zip", "Filled from your address match")}
+      {field("ZIP Code", "zip", "Fills automatically from your address")}
+      {value.zipPlus4 && value.zip !== value.zipPlus4 ? (
+        <Pressable accessibilityRole="button" onPress={() => onChange({ ...value, zip: value.zipPlus4! })}>
+          <Text style={{ color: colors.primary }}>Use ZIP+4: {value.zipPlus4}</Text>
+        </Pressable>
+      ) : null}
       {loading ? (
         <ActivityIndicator
           accessibilityLabel="Looking up address"
@@ -248,7 +273,7 @@ export function PropertyAddressCard({
           ? "Address matched. This does not verify residency, ownership, or the apartment/unit."
           : value.status === "manual"
             ? "Address entered manually — not checked against address records."
-            : "ZIP Code comes from a matched address; it is never guessed from the city alone."}
+            : "Enter your street, city and state to fill the ZIP automatically. A five-digit ZIP is enough to continue."}
       </Text>
       <Modal
         visible={statesOpen}

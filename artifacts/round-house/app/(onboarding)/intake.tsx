@@ -249,7 +249,7 @@ export default function IntakeScreen() {
             // completions don't keep retrying forever.
             await clearPendingAppInviteToken();
           }
-          router.replace("/(tabs)/profile");
+          router.replace("/(tabs)");
         }}
       />
       {canStartOver ? (

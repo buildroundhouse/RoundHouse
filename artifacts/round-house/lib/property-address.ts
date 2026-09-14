@@ -58,6 +58,7 @@ export type PropertyAddress = {
   city: string;
   state: string;
   zip: string;
+  zipPlus4?: string;
   placeId: string | null;
   latitude: number | null;
   longitude: number | null;
@@ -74,6 +75,10 @@ export const emptyPropertyAddress = (): PropertyAddress => ({
   longitude: null,
   status: "unchecked",
 });
+export function formatPostalCodeInput(input: string): string {
+  const digits = input.replace(/\D/g, "").slice(0, 9);
+  return digits.length > 5 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : digits;
+}
 export function readPropertyAddress(value: unknown): PropertyAddress {
   const result = emptyPropertyAddress();
   if (!value || typeof value !== "object") return result;
@@ -82,6 +87,7 @@ export function readPropertyAddress(value: unknown): PropertyAddress {
     if (typeof v[key] === "string") result[key] = v[key];
   }
   if (v.status === "manual" || v.status === "matched") result.status = v.status;
+  if (typeof v.zipPlus4 === "string" && /^\d{5}-\d{4}$/.test(v.zipPlus4)) result.zipPlus4 = v.zipPlus4;
   if (typeof v.placeId === "string") result.placeId = v.placeId;
   if (typeof v.latitude === "number" && Number.isFinite(v.latitude))
     result.latitude = v.latitude;
@@ -127,6 +133,7 @@ export function addressFromPlace(place: PlaceResult): PropertyAddress | null {
     part("locality") || part("postal_town") || part("sublocality_level_1");
   const state = part("administrative_area_level_1", true),
     zip = part("postal_code");
+  const suffix = part("postal_code_suffix");
   if (
     !place.id ||
     !number ||
@@ -143,6 +150,7 @@ export function addressFromPlace(place: PlaceResult): PropertyAddress | null {
     city,
     state,
     zip,
+    ...(/^\d{4}$/.test(suffix) ? { zipPlus4: `${zip}-${suffix}` } : {}),
     placeId: place.id,
     latitude: place.location?.latitude ?? null,
     longitude: place.location?.longitude ?? null,
@@ -153,7 +161,9 @@ export async function findPropertyAddresses(
   a: PropertyAddress,
   apiKey: string | undefined,
   signal: AbortSignal,
+  fallback?: (address: PropertyAddress, signal: AbortSignal) => Promise<PropertyAddress[]>,
 ): Promise<PropertyAddress[]> {
+  if (!apiKey && fallback) return fallback(a, signal);
   if (!apiKey)
     throw new Error(
       "Address lookup is not configured. You can enter the ZIP Code and continue with an unchecked address.",

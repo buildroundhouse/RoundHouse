@@ -1,5 +1,7 @@
 import { Router, type IRouter } from "express";
 import healthRouter from "./health";
+import addressLookupRouter from "./address-lookup";
+import entryProfileRouter from "./entry-profile";
 import usersRouter from "./users";
 import propertiesRouter from "./properties";
 import propertyKnowledgeRouter from "./property-knowledge";
@@ -30,6 +32,8 @@ import conciergeRouter from "./concierge";
 const router: IRouter = Router();
 
 router.use(healthRouter);
+router.use(addressLookupRouter);
+router.use(entryProfileRouter);
 router.use(usersRouter);
 router.use(propertiesRouter);
 router.use(propertyKnowledgeRouter);

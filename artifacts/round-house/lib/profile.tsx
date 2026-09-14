@@ -72,10 +72,9 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
 
     let status: OnboardingStatus;
     const profileLoading =
-      meQuery.isPending || meQuery.fetchStatus === "fetching" || (!profile && !meQuery.isError);
+      meQuery.isPending || (!profile && !meQuery.isError);
     const modesLoading =
       modesQuery.isPending ||
-      modesQuery.fetchStatus === "fetching" ||
       (!modesQuery.data && !modesQuery.isError);
     if (!isLoaded || !isSignedIn) {
       status = { kind: "loading" };

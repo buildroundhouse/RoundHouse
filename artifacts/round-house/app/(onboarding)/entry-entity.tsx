@@ -42,7 +42,7 @@ export default function EntryEntityScreen() {
           kind: "home",
           title: "Add your property",
           intro:
-            "Enter the full address. Confirm a match to fill the ZIP Code automatically.",
+            "Enter the street, city and state. Your ZIP Code will fill in when the address is found.",
           homeTitle: "Home",
           homeSubtitle: "",
           fields: [
