@@ -29,9 +29,9 @@ const KIND_LABEL: Record<OutwardAccount["kind"], string> = {
   trade_pro_teammate: "Trade Teammate",
   facilities_teammate: "Facility Teammate",
   home_teammate: "Home Teammate",
-  trade_pro_collab: "Collaborator",
-  facilities_collab: "Collaborator",
-  collab: "Collaborator",
+  trade_pro_collab: "Viewer",
+  facilities_collab: "Viewer",
+  collab: "Viewer",
 };
 
 function formatPrice(cents: number, currency: string) {

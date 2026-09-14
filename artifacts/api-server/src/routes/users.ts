@@ -1,3 +1,4 @@
+import { protectPersonalProfile, validatePersonalProfile } from "../lib/personalProfilePrivacy";
 import { Router, type IRouter } from "express";
 import { eq, and, ne, or, ilike, sql, inArray, isNull } from "drizzle-orm";
 import {
@@ -1271,6 +1272,17 @@ router.put("/users/me/modes/:modeId", requireAuth, async (req, res): Promise<voi
     res.status(404).json({ error: "Mode not found" });
     return;
   }
+  if ("personalProfile" in incoming) {
+    const error = validatePersonalProfile(incoming.personalProfile);
+    if (error) { res.status(400).json({ error }); return; }
+  }
+  if ("profileBannerUrl" in incoming) {
+    const banner = incoming.profileBannerUrl;
+    if (typeof banner !== "string" || !banner.startsWith("/objects/")) {
+      res.status(400).json({ error: "Choose an uploaded profile banner." }); return;
+    }
+    await assertCallerOwnsUploads(userId, [banner]);
+  }
   // Merge incoming on top of existing so partial updates (e.g. just changing the
   // banner image) don't drop other required intake fields. If the caller wants
   // to clear a value, sending the key with null/"" still lets validation catch
@@ -1652,10 +1664,12 @@ router.get("/users/:userId", requireAuth, async (req, res): Promise<void> => {
     }
   }
 
+  const personal = protectPersonalProfile(intakeSnapshot, isSelf, teamSeatRedactsContacts);
+  Object.assign(sanitized, personal.userOverrides);
   res.json({
     user: sanitized,
     activeModeKind,
-    intakeSnapshot,
+    intakeSnapshot: personal.intake,
     connection,
     myReverseConnection,
     counterpartOutwardAccount,
