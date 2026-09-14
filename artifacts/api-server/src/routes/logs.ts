@@ -1,3 +1,4 @@
+import { personalTimelineWhere } from "../lib/personalTimeline";
 import { Router, type IRouter } from "express";
 import { eq, and, asc, desc, inArray, sql, or, isNull } from "drizzle-orm";
 import {
@@ -76,9 +77,9 @@ async function enrichLog(log: typeof workLogsTable.$inferSelect) {
   return { ...log, author, property, assignee };
 }
 
-async function enrichLogs(logs: (typeof workLogsTable.$inferSelect)[]) {
+async function enrichLogs(logs: (typeof workLogsTable.$inferSelect)[], personal = false) {
   if (logs.length === 0) return [];
-  const userIds = [...new Set(logs.flatMap((l) => [l.authorClerkId, l.assigneeClerkId].filter(Boolean) as string[]))];
+  const userIds = [...new Set(logs.flatMap((l) => [personal ? l.actedByClerkId ?? l.authorClerkId : l.authorClerkId, l.assigneeClerkId].filter(Boolean) as string[]))];
   const propertyIds = [...new Set(logs.map((l) => l.propertyId))];
   const [users, properties] = await Promise.all([
     userIds.length > 0
@@ -92,7 +93,7 @@ async function enrichLogs(logs: (typeof workLogsTable.$inferSelect)[]) {
   const pMap = Object.fromEntries(properties.map((p) => [p.id, p]));
   return logs.map((l) => ({
     ...l,
-    author: uMap[l.authorClerkId],
+    author: uMap[personal ? l.actedByClerkId ?? l.authorClerkId : l.authorClerkId],
     property: pMap[l.propertyId],
     assignee: l.assigneeClerkId ? uMap[l.assigneeClerkId] || null : null,
   }));
@@ -327,6 +328,19 @@ router.get("/logs/feed", requireAuth, async (req, res): Promise<void> => {
   const { activeOutwardAccountId } = req as AuthRequest;
   const limit = Math.min(parseInt(String(req.query.limit || "30"), 10), 100);
   const offset = parseInt(String(req.query.offset || "0"), 10);
+
+  if (req.query.scope === "personal") {
+    // Personal history is attribution-based, including legitimate former work.
+    // Company ownership never makes a teammate's work the owner's work.
+    const where = personalTimelineWhere(userId, activeOutwardAccountId, activeModeId);
+    const [logs, [{ count }]] = await Promise.all([
+      db.select().from(workLogsTable).where(where).orderBy(desc(workLogsTable.createdAt)).limit(limit).offset(offset),
+      db.select({ count: sql<number>`count(*)` }).from(workLogsTable).where(where),
+    ]);
+    const enriched = await enrichLogs(logs, true);
+    res.json({ logs: enriched.map(log => ({ ...log, property: log.property ? { id: log.property.id, name: log.property.name } : null })), total: Number(count) });
+    return;
+  }
 
   const memberships = await listMembershipsForUser(userId);
 

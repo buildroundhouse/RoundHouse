@@ -1,3 +1,5 @@
+import { useProfile } from "@/lib/profile";
+import { isViewerKind } from "@/lib/personal-profile";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -97,6 +99,9 @@ function isoFromDays(days: number | null): string | null {
 }
 
 export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = {}) {
+  const { activeOutwardAccount, activeMode } = useProfile();
+  const readOnly = isViewerKind(activeOutwardAccount?.kind ?? activeMode?.kind);
+  const explainReadOnly = () => Alert.alert("Viewer account", "Viewer access is read-only. Switch to an account with contribution permission to capture work.");
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
@@ -132,6 +137,7 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
   // Expose a global "open log mode directly" hook for other screens.
   useEffect(() => {
     externalOpenLog = () => {
+      if (readOnly) { explainReadOnly(); return; }
       setChooserOpen(false);
       setMode("log");
     };
@@ -140,6 +146,7 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
       openMode("photo");
     };
     externalOpenPhotoForLog = (pid: number) => {
+      if (readOnly) { explainReadOnly(); return; }
       // Pre-assign the chosen log BEFORE switching modes so the
       // composer mounts with "WHERE IS THIS FOR?" already filled in
       // and the upload tile points at the right property.
@@ -163,7 +170,7 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
       if (externalOpenNote) externalOpenNote = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [readOnly]);
 
   function reset() {
     setNote("");
@@ -208,6 +215,7 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
   }
 
   function openMode(next: Mode) {
+    if (readOnly) { explainReadOnly(); return; }
     setChooserOpen(false);
     Haptics.selectionAsync();
     setMode(next);
@@ -265,6 +273,7 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
   }
 
   async function handleSubmit() {
+    if (readOnly) { explainReadOnly(); return; }
     const hasText = note.trim().length > 0;
     if (!hasText && !photoUri && attachments.length === 0) {
       Alert.alert("Empty entry", "Add a note, photo, or file to log.");
@@ -359,7 +368,7 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
             delayLongPress={350}
             accessibilityRole="button"
             accessibilityLabel="Capture"
-            accessibilityHint="Tap to open the camera. Press and hold to open the assistant."
+            accessibilityHint={readOnly ? "Viewer access is read-only. Press and hold to open the assistant." : "Tap to open the camera. Press and hold to open the assistant."}
             style={({ pressed }) => [
               styles.fab,
               {

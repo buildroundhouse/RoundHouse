@@ -9,9 +9,9 @@ import { useProfile } from "@/lib/profile";
 import { CaptureFAB } from "@/components/CaptureFAB";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { AdminQuickExit } from "@/components/admin/AdminQuickExit";
-import { useListQuestions } from "@workspace/api-client-react";
+import { useResolutions } from "@/lib/useResolutions";
+import { resolutionSignalForItems } from "@/lib/resolutions";
 import {
-  resolutionSignalForQuestions,
   type ResolutionSignal,
 } from "@/lib/resolutionSignal";
 
@@ -101,14 +101,10 @@ function CommandCenterTabs() {
   const isWeb = Platform.OS === "web";
   const { userId } = useAuth();
 
-  const questionsQuery = useListQuestions();
+  const resolutionsQuery = useResolutions();
   const resolutionSignal = useMemo(
-    () =>
-      resolutionSignalForQuestions(
-        questionsQuery.data?.questions ?? [],
-        userId,
-      ),
-    [questionsQuery.data?.questions, userId],
+    () => resolutionSignalForItems(resolutionsQuery.data?.resolutions ?? []),
+    [resolutionsQuery.data?.resolutions],
   );
 
   const renderIcon =
@@ -204,7 +200,7 @@ function CommandCenterTabs() {
 
 export default function TabLayout() {
   const { isSignedIn, isLoaded } = useAuth();
-  const { status } = useProfile();
+  const { status, activeOutwardAccountId } = useProfile();
   if (!isLoaded) return <LoadingScreen />;
   if (!isSignedIn) return <Redirect href="/(auth)/sign-in" />;
   if (status.kind === "needs-identity")
@@ -218,7 +214,7 @@ export default function TabLayout() {
   return (
     <View style={{ flex: 1 }}>
       <CommandCenterTabs />
-      <CaptureFAB />
+      <CaptureFAB key={activeOutwardAccountId} />
       <AdminQuickExit />
     </View>
   );
