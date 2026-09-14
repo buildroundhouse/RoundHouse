@@ -1,4 +1,5 @@
 export type Resolution = {
+  canAct?: boolean;
   id: number; creatorId: string; creatorName: string; otherName: string;
   recipientLinked: boolean; question: string; requestedAction: string | null; nextStep: string | null; context: string | null;
   status: "attention" | "waiting" | "resolved"; unread: boolean; followUps: number;
@@ -16,4 +17,12 @@ export function orderedResolutions(items: Resolution[], status: Resolution["stat
     if (status !== "resolved" && a.followUps !== b.followUps) return b.followUps - a.followUps;
     return Date.parse(b.updatedAt) - Date.parse(a.updatedAt);
   });
+}
+
+export function resolutionSignalForItems(items: Resolution[]) {
+  const active = items.filter(r => r.status !== "resolved" && r.canAct === true);
+  const attention = active.filter(r => r.status === "attention").sort((a, b) => b.followUps - a.followUps)[0];
+  return attention ? { responsibility: "you" as const, unansweredPrompts: attention.followUps + 1 }
+    : active.length ? { responsibility: "them" as const, unansweredPrompts: 1 }
+    : { responsibility: "empty" as const, unansweredPrompts: 0 };
 }

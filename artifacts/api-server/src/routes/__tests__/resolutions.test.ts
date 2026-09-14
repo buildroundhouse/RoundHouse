@@ -1,8 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import express from "express";
 import request from "supertest";
-const state = vi.hoisted(() => ({ row: {} as any, updates: {} as any, locked: false, member: null as any, recipientAllowed: false }));
-vi.mock("../../lib/entityAccess", () => ({ getApprovedMembership: async () => state.member, canParticipateInEntity: async () => state.recipientAllowed }));
+const state = vi.hoisted(() => ({ row: {} as any, updates: {} as any, locked: false, member: null as any, recipientAllowed: false, kind: "home", memberships: [] as any[] }));
+vi.mock("../../lib/entityAccess", () => ({ getApprovedMembership: async () => state.recipientAllowed ? { role: "worker" } : null }));
+vi.mock("../../lib/resolutionAccess", async (importOriginal) => {
+  const original = await importOriginal<any>();
+  return { ...original, resolutionAccess: async () => ({ kind: state.kind, memberships: state.member ? [{ ...state.member, entityId: 1 }] : state.memberships }) };
+});
+vi.mock("../../lib/outwardAccounts", () => ({ resolveActiveOutwardAccountId: vi.fn() }));
 vi.mock("../../middlewares/requireAuth", () => ({ requireAuth: (req: any, res: any, next: any) => {
   if (!req.headers["x-test-user"]) return res.sendStatus(401);
   req.userId = req.headers["x-test-user"]; next();
@@ -16,7 +21,7 @@ vi.mock("@workspace/db", () => {
 });
 const router = (await import("../resolutions")).default;
 const app = express(); app.use(express.json()); app.use("/api", router);
-beforeEach(() => { state.row = { id: 1, userClerkId: "creator", counterpartyClerkId: "recipient", status: "open", responseText: null, updatedAt: new Date("2026-09-01"), resolutionState: null }; state.updates = {}; state.locked = false; });
+beforeEach(() => { state.row = { id: 1, userClerkId: "creator", counterpartyClerkId: "recipient", status: "open", responseText: null, updatedAt: new Date("2026-09-01"), resolutionState: null }; state.updates = {}; state.locked = false; state.kind = "home"; state.member = null; state.memberships = []; state.recipientAllowed = false; });
 describe("Resolution action endpoints", () => {
   it("rejects unrelated recipients and read-only creators before creating a record", async () => {
     const body = { entityId: 1, recipientId: "recipient", question: "Can you verify this?" };
@@ -49,5 +54,31 @@ describe("Resolution action endpoints", () => {
     await request(app).post("/api/resolutions/1/actions").set("x-test-user", "recipient").send({ action: "read" }).expect(204);
     expect(state.row.updatedAt).toEqual(originalDate); expect(state.row.resolutionState.readBy).toContain("recipient");
     await request(app).post("/api/resolutions/1/actions").set("x-test-user", "creator").send({ action: "reply", text: "Change history" }).expect(409);
+  });
+});
+
+describe("current account permission versus permanent history", () => {
+  it.each(["collab", "trade_pro_collab", "facilities_collab", "viewer"])("%s cannot reply, follow up, or close even with an old owner membership", async kind => {
+    state.kind = kind; state.member = { role: "owner" };
+    for (const action of ["reply", "follow_up", "resolve"]) {
+      await request(app).post("/api/resolutions/1/actions").set("x-test-user", "creator").send({ action, text: "Done", verified: true }).expect(403);
+    }
+    expect(state.updates).toEqual({});
+    await request(app).post("/api/resolutions/1/actions").set("x-test-user", "creator").send({ action: "read" }).expect(204);
+  });
+  it("keeps Entity history readable after membership ends but rejects new contributions", async () => {
+    state.row.resolutionState = { context: { id: 1, name: "Home" }, responsibleId: "recipient", followUps: 0, readBy: [], events: [] };
+    await request(app).post("/api/resolutions/1/actions").set("x-test-user", "recipient").send({ action: "reply", text: "Change" }).expect(403);
+    await request(app).post("/api/resolutions/1/actions").set("x-test-user", "recipient").send({ action: "read" }).expect(204);
+  });
+  it.each(["owner", "manager", "employee", "worker"])("allows an approved %s to reply within the selected Entity", async role => {
+    state.member = { role };
+    state.row.resolutionState = { context: { id: 1, name: "Home" }, responsibleId: "recipient", followUps: 0, readBy: [], events: [] };
+    await request(app).post("/api/resolutions/1/actions").set("x-test-user", "recipient").send({ action: "reply", text: "My response" }).expect(204);
+  });
+  it("honors explicit contribution restrictions", async () => {
+    state.member = { role: "worker", permissions: { createOnProperties: false } };
+    state.row.resolutionState = { context: { id: 1, name: "Home" }, responsibleId: "recipient", followUps: 0, readBy: [], events: [] };
+    await request(app).post("/api/resolutions/1/actions").set("x-test-user", "recipient").send({ action: "reply", text: "My response" }).expect(403);
   });
 });

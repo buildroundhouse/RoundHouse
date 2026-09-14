@@ -5,6 +5,9 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { customFetch } from "@workspace/api-client-react";
+import { useProfile } from "@/lib/profile";
+import { useResolutions } from "@/lib/useResolutions";
+import { isViewerKind } from "@/lib/personal-profile";
 import { useAuth } from "@/lib/auth";
 import { useColors } from "@/hooks/useColors";
 import { ResolutionIndicator } from "@/components/ResolutionIndicator";
@@ -13,7 +16,14 @@ import { orderedResolutions, resolutionGroups, type Resolution } from "@/lib/res
 const formatDate = (value: string) => new Date(value).toLocaleString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" });
 
 export default function ResolutionCenter() {
+  const { activeOutwardAccountId, activeMode } = useProfile();
+  return <ResolutionWorkspace key={`${activeOutwardAccountId}:${activeMode?.id}`} />;
+}
+
+function ResolutionWorkspace() {
   const c = useColors(); const insets = useSafeAreaInsets(); const router = useRouter();
+  const { activeOutwardAccount, activeMode } = useProfile();
+  const viewer = isViewerKind(activeOutwardAccount?.kind ?? activeMode?.kind);
   const { userId } = useAuth(); const cache = useQueryClient();
   const params = useLocalSearchParams<{ resolutionId?: string }>();
   const openedLink = useRef<string | undefined>(undefined);
@@ -24,7 +34,7 @@ export default function ResolutionCenter() {
   const [contextId, setContextId] = useState<number | null>(null);
   const [recipientId, setRecipientId] = useState("");
   const [question, setQuestion] = useState("");
-  const contexts = useQuery({ queryKey: ["resolution-contexts", userId], enabled: creating && !!userId,
+  const contexts = useQuery({ queryKey: ["resolution-contexts", userId, activeOutwardAccount?.id], enabled: !viewer && !!userId,
     queryFn: () => customFetch<{ contexts: { id: number; name: string; people: { id: string; name: string }[] }[] }>("/api/resolution-contexts") });
   const create = useMutation({
     mutationFn: () => customFetch<{ id: number }>("/api/resolutions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ entityId: contextId, recipientId, question }) }),
@@ -35,8 +45,7 @@ export default function ResolutionCenter() {
     },
     onError: () => setError("The resolution wasn’t created. Check the selected space and participant, then try again."),
   });
-  const query = useQuery({ queryKey: ["resolutions", userId], enabled: !!userId,
-    queryFn: () => customFetch<{ resolutions: Resolution[] }>("/api/resolutions"), refetchInterval: 30000 });
+  const query = useResolutions();
   const items = query.data?.resolutions ?? [];
   const selected = items.find(r => r.id === selectedId);
   useEffect(() => {
@@ -59,7 +68,7 @@ export default function ResolutionCenter() {
   useEffect(() => {
     if (selected?.unread && !act.isPending && !error) act.mutate({ id: selected.id, action: "read" });
   }, [selected?.id, selected?.unread]);
-  const home = () => { setSelectedId(null); router.replace("/(tabs)"); };
+  const home = () => { setCreating(false); setSelectedId(null); router.replace("/(tabs)"); };
   const open = (r: Resolution) => { setText(""); setVerified(false); setError(""); setSelectedId(r.id); };
   const send = (action: string) => {
     if (!selected) return;
@@ -78,7 +87,9 @@ export default function ResolutionCenter() {
       {back}
       <View style={s.heading}><Text style={[s.title, { color: c.text }]}>Resolution Center</Text>
         <Text style={[s.subtitle, { color: c.mutedForeground }]}>Keep the conversation moving. Verify the outcome.</Text>
-        <View style={{ marginTop: 16, alignSelf: "flex-start" }}>{button("New resolution", () => { setError(""); setQuestion(""); setContextId(null); setRecipientId(""); setCreating(true); }, false, true)}</View></View>
+        {!viewer && !!contexts.data?.contexts.length && <View style={{ marginTop: 16, alignSelf: "flex-start" }}>{button("New resolution", () => { setError(""); setQuestion(""); setContextId(null); setRecipientId(""); setCreating(true); }, false, true)}</View>}
+        {viewer && <Text style={[s.subtitle, { color: c.mutedForeground }]}>Viewer · Read-only history</Text>}
+        {!viewer && contexts.isError && button("Retry loading resolution permissions", () => void contexts.refetch())}</View>
     </View>
     <ScrollView contentContainerStyle={[s.content, { paddingBottom: Math.max(insets.bottom, 24) + 90 }]} refreshControl={<RefreshControl refreshing={query.isRefetching} onRefresh={() => void query.refetch()} tintColor={c.text} />}>
       {query.isPending ? <ActivityIndicator style={s.loading} color={c.text} /> : query.isError ? <View style={s.empty}>
@@ -105,7 +116,7 @@ export default function ResolutionCenter() {
 
     <Modal visible={creating} animationType="slide" onRequestClose={() => setCreating(false)}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={[s.screen, { backgroundColor: c.background, paddingTop: insets.top }]}>
-        <View style={s.content}><Pressable accessibilityRole="button" onPress={() => setCreating(false)} style={s.back}><Feather name="arrow-left" size={22} color={c.text} /><Text style={[s.backText, { color: c.text }]}>Resolution Center</Text></Pressable></View>
+        <View style={[s.content, s.detailNav]}>{button("Command Center", home)}<Pressable accessibilityRole="button" onPress={() => setCreating(false)} style={s.back}><Feather name="arrow-left" size={22} color={c.text} /><Text style={[s.backText, { color: c.text }]}>Resolution Center</Text></Pressable></View>
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={[s.content, { paddingBottom: insets.bottom + 30 }]}>
           <Text style={[s.detailTitle, { color: c.text }]}>New resolution</Text>
           <Text style={[s.sectionTitle, { color: c.text }]}>Which property or business?</Text>
@@ -143,7 +154,7 @@ export default function ResolutionCenter() {
               <Text style={[s.eventText, { color: c.text }]} selectable>{event.text}</Text>
               <Text style={[s.meta, { color: c.mutedForeground }]}>{event.actorId ? formatDate(event.at) : "Original author and response time weren’t recorded."}</Text>
             </View>)}
-            {selected.status === "resolved" ? <View style={[s.closeout, { borderColor: c.border }]}><Text style={[s.author, { color: c.text }]}>Resolved history</Text><Text style={[s.subtitle, { color: c.mutedForeground }]}>{selected.closedAt ? `Closed ${formatDate(selected.closedAt)}. ` : ""}This conversation stays on record.</Text></View> : <>
+            {selected.status === "resolved" ? <View style={[s.closeout, { borderColor: c.border }]}><Text style={[s.author, { color: c.text }]}>Resolved history</Text><Text style={[s.subtitle, { color: c.mutedForeground }]}>{selected.closedAt ? `Closed ${formatDate(selected.closedAt)}. ` : ""}This conversation stays on record.</Text></View> : selected.canAct !== true || viewer ? <Text style={[s.subtitle, { color: c.mutedForeground }]}>Read-only history. Responding requires an account with current contribution permission in this space.</Text> : <>
               <Text style={[s.sectionTitle, { color: c.text }]}>Respond or record the outcome</Text>
               <TextInput accessibilityLabel="Resolution response" value={text} onChangeText={setText} multiline maxLength={10000} placeholder="Write your response, next action, or verified result…" placeholderTextColor={c.mutedForeground} style={[s.input, { color: c.text, backgroundColor: c.card, borderColor: c.border }]} />
               <Text style={[s.subtitle, { color: c.mutedForeground }]}>A response passes responsibility back. It does not close the resolution.</Text>
