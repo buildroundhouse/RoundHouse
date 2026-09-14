@@ -39,3 +39,14 @@ Validation: 22 focused rendering/navigation/privacy tests across the avatar role
 Expo web production export passes. Changed application files have no TypeScript
 errors; unrelated existing account/switcher errors still block the full typecheck.
 These tests use mocked account data; signed-in handset validation is separate.
+
+## Unaffiliated profile identity
+
+Follow the governing [Unaffiliated Viewer lifecycle](UNAFFILIATED_VIEWER_LOGIC.md). When the last
+approved Entity affiliation ends, every former role defaults to Viewer. Show
+**Unaffiliated** on the Entity/name line and **Viewer** immediately underneath;
+replace stale Entity identity and former authority consistently across Command
+Center, Profile, and View Profile. Preserve the personal account and its own work
+history, including work performed through a former business, without restoring
+former Entity access. New users do not qualify for this intake exception.
+The linked document distinguishes required behavior from implementation status.

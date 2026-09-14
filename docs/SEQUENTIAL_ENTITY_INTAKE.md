@@ -71,3 +71,20 @@ a raw role-first mode. This change does not grant or migrate membership permissi
 The entry screen also offers saved owner spaces: Resume setup for unfinished
 intake, Open for completed spaces. Choosing one switches to that existing mode
 and rechecks entry, so recovery from the baseline does not create duplicate spaces.
+
+
+## Unaffiliated Viewer — former participants of any role
+
+The governing [Unaffiliated Viewer lifecycle](UNAFFILIATED_VIEWER_LOGIC.md) applies
+to former homeowners, Trade Pro owners, teammates, managers, and Viewers alike.
+Once the last approved affiliation ends, retain the personal account and its own
+work history and display **Unaffiliated**, with **Viewer** immediately underneath.
+This is the only Entity-free Viewer entry exception; new users and never-accepted
+invitations do not qualify. Another active affiliation keeps its assigned role.
+See the lifecycle document for sale, employment, re-affiliation, history retention,
+and implementation acceptance requirements.
+
+The prepared server implementation uses a server-owned `removedAfterApproval`
+history flag; legacy removals require matching evidence of actual participation.
+Neither a client-supplied role nor a removed invitation proves prior membership.
+Implementation and deployment limitations are recorded in the lifecycle document.

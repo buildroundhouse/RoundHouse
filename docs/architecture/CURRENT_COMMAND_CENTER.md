@@ -27,3 +27,14 @@ The bottom bar has exactly five positions:
 - Do not add a separate permanent Concierge control.
 - Do not use the unstable native-tabs implementation; the shared tab bar must work consistently in Expo Go, iOS builds, Android, and web.
 - Do not substitute an emoji, lightning bolt, or generic on/off glyph for the documented centered-pivot Resolution control.
+
+## Unaffiliated account identity
+
+Follow the governing [Unaffiliated Viewer lifecycle](../UNAFFILIATED_VIEWER_LOGIC.md). When the last
+approved Entity affiliation ends, every former role defaults to Viewer. Show
+**Unaffiliated** on the Entity/name line and **Viewer** immediately underneath;
+replace stale Entity identity and former authority consistently across Command
+Center, Profile, and View Profile. Preserve the personal account and its own work
+history, including work performed through a former business, without restoring
+former Entity access. New users do not qualify for this intake exception.
+The linked document distinguishes required behavior from implementation status.
