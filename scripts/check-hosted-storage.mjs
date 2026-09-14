@@ -19,29 +19,34 @@ export async function checkHostedStorage() {
   const Key = `deployment-checks/${randomUUID()}`;
   const content = 'RoundHouse private storage deployment check';
   let created = false;
+  let stage = 'configure CORS';
   const assert = (ok, message) => { if (!ok) throw new Error(message); };
   try {
     await client.send(new PutBucketCorsCommand({ Bucket: bucket, CORSConfiguration: { CORSRules: [{
       AllowedOrigins: origins, AllowedMethods: ['PUT'], AllowedHeaders: ['content-type', 'x-amz-*'], ExposeHeaders: ['ETag'], MaxAgeSeconds: 300,
     }] } }));
     const putUrl = await getSignedUrl(client, new PutObjectCommand({ Bucket: bucket, Key, ContentType: 'text/plain', ContentLength: Buffer.byteLength(content) }), { expiresIn: 60 });
+    stage = 'browser preflight';
     const preflight = await fetch(putUrl, { method: 'OPTIONS', headers: {
       Origin: origins[0], 'Access-Control-Request-Method': 'PUT', 'Access-Control-Request-Headers': 'content-type',
     }, signal: AbortSignal.timeout(15000) });
     assert(preflight.ok && preflight.headers.get('access-control-allow-origin') === origins[0], 'Storage browser preflight failed');
+    stage = 'signed upload';
     const put = await fetch(putUrl, { method: 'PUT', headers: { 'Content-Type': 'text/plain', Origin: origins[0] }, body: content, signal: AbortSignal.timeout(15000) });
     assert(put.ok, `Storage upload failed (${put.status})`);
     created = true;
     const getUrl = await getSignedUrl(client, new GetObjectCommand({ Bucket: bucket, Key }), { expiresIn: 60 });
+    stage = 'signed download';
     const get = await fetch(getUrl, { signal: AbortSignal.timeout(15000) });
     assert(get.ok && await get.text() === content, 'Storage download verification failed');
+    stage = 'private access';
     const anonymous = new URL(getUrl); anonymous.search = '';
     const denied = await fetch(anonymous, { signal: AbortSignal.timeout(15000) });
     assert([401, 403, 404].includes(denied.status), 'Storage unexpectedly permits anonymous reads');
     console.log('Storage check passed: browser preflight, signed upload, matching download, private access.');
   } catch (error) {
     // SDK errors can contain signed URLs; expose a safe error name/status only.
-    console.error('Storage check failed', { name: error.name, status: error.$metadata?.httpStatusCode });
+    console.error('Storage check failed', { stage, name: error.name, code: error.code ?? error.cause?.code, status: error.$metadata?.httpStatusCode });
     throw new Error('Hosted storage verification failed');
   } finally {
     if (created) await client.send(new DeleteObjectCommand({ Bucket: bucket, Key }));
