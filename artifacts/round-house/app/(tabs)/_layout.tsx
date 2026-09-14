@@ -23,13 +23,14 @@ type TabSpec = { label: string; sf: SfPair; feather: keyof typeof Feather.glyphM
 // four navigable destinations. Invoices and Inbox were intentionally
 // removed from the bar; Inbox is reachable from the Timeline header's mail icon.
 const TABS: Record<
-  "timeline" | "clients" | "myTeam" | "profile",
+  "timeline" | "clients" | "myTeam" | "profile" | "logs",
   TabSpec
 > = {
   timeline: { label: "Timeline", sf: { default: "house",    selected: "house.fill" },    feather: "home" },
   clients:  { label: "Clients",  sf: { default: "person.2", selected: "person.2.fill" }, feather: "users" },
   myTeam:   { label: "My Team",  sf: { default: "person.3", selected: "person.3.fill" }, feather: "user-check" },
   profile:  { label: "Profile",  sf: { default: "person",   selected: "person.fill" },   feather: "user" },
+  logs:     { label: "Logs",     sf: { default: "doc.text", selected: "doc.text.fill" }, feather: "clipboard" },
 };
 
 function NativeTabLayout() {
@@ -167,6 +168,8 @@ function ClassicTabLayout({ isProfileActive }: { isProfileActive: boolean }) {
 export default function TabLayout() {
   const { isSignedIn, isLoaded } = useAuth();
   const { status } = useProfile();
+  // Keep hooks unconditional as authentication/onboarding state changes.
+  const segments = useSegments();
 
   if (!isLoaded) return <LoadingScreen />;
   if (!isSignedIn) return <Redirect href="/(auth)/sign-in" />;
@@ -180,7 +183,6 @@ export default function TabLayout() {
   // FAB (everywhere else). The CaptureFAB stays mounted so its modal
   // composers remain available, but its visible button is hidden on
   // Profile to make room for the new center button.
-  const segments = useSegments();
   const isProfileActive = (segments as string[]).includes("profile");
 
   if (isLiquidGlassAvailable()) {
