@@ -22,6 +22,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useColors } from "@/hooks/useColors";
 import { confirm } from "@/lib/confirm";
+import { useAuth } from "@/lib/auth";
 import { useRouter } from "expo-router";
 import {
   useListReminders,
@@ -127,14 +128,61 @@ type SectionKey =
   | "needFromYou"
   | "askPro";
 
-const SECTIONS: { key: SectionKey; title: string; icon: keyof typeof Feather.glyphMap; defaultOpen: boolean; subtitle?: string }[] = [
-  { key: "company", title: "Company Reminders", icon: "briefcase", defaultOpen: true, subtitle: "Important notices from the business" },
-  { key: "shopping", title: "Shopping List", icon: "shopping-cart", defaultOpen: true },
-  { key: "active", title: "Active Clients", icon: "users", defaultOpen: true, subtitle: "Current jobs in flight" },
-  { key: "top5", title: "Top 5", icon: "star", defaultOpen: false, subtitle: "Your priority reminders" },
-  { key: "lists", title: "New Lists", icon: "list", defaultOpen: true, subtitle: "Custom lists you create" },
-  { key: "needFromYou", title: "What I Need From You", icon: "alert-circle", defaultOpen: true, subtitle: "Provider requests waiting on you" },
-  { key: "askPro", title: "Ask a Pro", icon: "help-circle", defaultOpen: true, subtitle: "Questions you've sent to a pro" },
+const SECTIONS: {
+  key: SectionKey;
+  title: string;
+  icon: keyof typeof Feather.glyphMap;
+  defaultOpen: boolean;
+  subtitle?: string;
+}[] = [
+  {
+    key: "company",
+    title: "Company Reminders",
+    icon: "briefcase",
+    defaultOpen: true,
+    subtitle: "Important notices from the business",
+  },
+  {
+    key: "shopping",
+    title: "Shopping List",
+    icon: "shopping-cart",
+    defaultOpen: true,
+  },
+  {
+    key: "active",
+    title: "Active Clients",
+    icon: "users",
+    defaultOpen: true,
+    subtitle: "Current jobs in flight",
+  },
+  {
+    key: "top5",
+    title: "Top 5",
+    icon: "star",
+    defaultOpen: false,
+    subtitle: "Your priority reminders",
+  },
+  {
+    key: "lists",
+    title: "New Lists",
+    icon: "list",
+    defaultOpen: true,
+    subtitle: "Custom lists you create",
+  },
+  {
+    key: "needFromYou",
+    title: "What I Need From You",
+    icon: "alert-circle",
+    defaultOpen: true,
+    subtitle: "Provider requests waiting on you",
+  },
+  {
+    key: "askPro",
+    title: "Ask a Pro",
+    icon: "help-circle",
+    defaultOpen: true,
+    subtitle: "Questions you've sent to a pro",
+  },
 ];
 
 export default function RemindersScreen({
@@ -156,16 +204,21 @@ export default function RemindersScreen({
 
   const [now, setNow] = useState(() => new Date());
   const [collapsed, setCollapsed] = useState<Record<SectionKey, boolean>>(() =>
-    SECTIONS.reduce((acc, s) => {
-      acc[s.key] = !s.defaultOpen;
-      return acc;
-    }, {} as Record<SectionKey, boolean>),
+    SECTIONS.reduce(
+      (acc, s) => {
+        acc[s.key] = !s.defaultOpen;
+        return acc;
+      },
+      {} as Record<SectionKey, boolean>,
+    ),
   );
   const [addingReminder, setAddingReminder] = useState(false);
   const [snoozeFor, setSnoozeFor] = useState<Reminder | null>(null);
   const [askingPro, setAskingPro] = useState(false);
   const [requestingFromClient, setRequestingFromClient] = useState(false);
-  const [answeringQuestion, setAnsweringQuestion] = useState<Question | null>(null);
+  const [answeringQuestion, setAnsweringQuestion] = useState<Question | null>(
+    null,
+  );
   const [pickingNextStep, setPickingNextStep] = useState<Question | null>(null);
   const [customLists, setCustomLists] = useState<CustomList[]>([]);
   const [addingList, setAddingList] = useState(false);
@@ -239,9 +292,11 @@ export default function RemindersScreen({
     const recvSub = Notifications.addNotificationReceivedListener((n) => {
       handle(n?.request?.content?.data?.reminderId);
     });
-    const respSub = Notifications.addNotificationResponseReceivedListener((r) => {
-      handle(r?.notification?.request?.content?.data?.reminderId);
-    });
+    const respSub = Notifications.addNotificationResponseReceivedListener(
+      (r) => {
+        handle(r?.notification?.request?.content?.data?.reminderId);
+      },
+    );
     return () => {
       recvSub.remove();
       respSub.remove();
@@ -286,7 +341,10 @@ export default function RemindersScreen({
       bumpScheduleGeneration(id);
       cancelTrackedNotification(id);
       try {
-        await updateReminder.mutateAsync({ reminderId: id, data: { done: true } });
+        await updateReminder.mutateAsync({
+          reminderId: id,
+          data: { done: true },
+        });
         await refetch();
       } catch {
         Alert.alert("Couldn't update reminder", "Please try again.");
@@ -299,7 +357,10 @@ export default function RemindersScreen({
     async (id: number) => {
       const target = items.find((r) => r.id === id);
       try {
-        await updateReminder.mutateAsync({ reminderId: id, data: { done: false } });
+        await updateReminder.mutateAsync({
+          reminderId: id,
+          data: { done: false },
+        });
         await refetch();
         if (target) scheduleAndStore({ ...target, done: false });
       } catch {
@@ -367,7 +428,11 @@ export default function RemindersScreen({
   );
 
   const submitRequest = useCallback(
-    async (text: string, requestedAction: string, counterpartyName?: string) => {
+    async (
+      text: string,
+      requestedAction: string,
+      counterpartyName?: string,
+    ) => {
       try {
         await createQuestion.mutateAsync({
           data: {
@@ -449,6 +514,21 @@ export default function RemindersScreen({
     [updateQuestion, refetchQuestions],
   );
 
+  const followUpQuestion = useCallback(
+    async (q: Question) => {
+      try {
+        await updateQuestion.mutateAsync({
+          questionId: q.id,
+          data: { followUp: true },
+        });
+        await refetchQuestions();
+      } catch {
+        Alert.alert("Couldn't send follow-up", "Please try again.");
+      }
+    },
+    [updateQuestion, refetchQuestions],
+  );
+
   const removeQuestion = useCallback(
     async (id: number) => {
       try {
@@ -507,7 +587,9 @@ export default function RemindersScreen({
     (listId: string, itemId: string) => {
       updateList(listId, (l) => ({
         ...l,
-        items: l.items.map((i) => (i.id === itemId ? { ...i, done: !i.done } : i)),
+        items: l.items.map((i) =>
+          i.id === itemId ? { ...i, done: !i.done } : i,
+        ),
       }));
     },
     [updateList],
@@ -552,13 +634,17 @@ export default function RemindersScreen({
   }, []);
 
   const bottomPad = Platform.OS === "web" ? 34 + 24 : insets.bottom + 24;
-  const shoppingList = customLists.find((l) => l.id === SHOPPING_LIST_ID) ?? null;
+  const shoppingList =
+    customLists.find((l) => l.id === SHOPPING_LIST_ID) ?? null;
   const userLists = customLists.filter((l) => l.kind === "user");
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {embedded ? (
-        <RemindersAddBridge onReady={onRequestAdd} open={() => setAddingReminder(true)} />
+        <RemindersAddBridge
+          onReady={onRequestAdd}
+          open={() => setAddingReminder(true)}
+        />
       ) : (
         <Stack.Screen
           options={{
@@ -584,15 +670,21 @@ export default function RemindersScreen({
           <ActivityIndicator color={colors.primary} />
         </View>
       ) : (
-        <ScrollView contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]}>
+        <ScrollView
+          contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]}
+        >
           {SECTIONS.map((s) => {
             const open = !collapsed[s.key];
             let count = 0;
-            if (s.key === "shopping") count = shoppingList?.items.filter((i) => !i.done).length ?? 0;
+            if (s.key === "shopping")
+              count = shoppingList?.items.filter((i) => !i.done).length ?? 0;
             else if (s.key === "top5") count = upcomingTop5.length;
             else if (s.key === "lists") count = userLists.length;
             else if (s.key === "active") count = activeClients.length;
-            else if (s.key === "needFromYou") count = requestQuestions.filter((q) => q.status !== "completed").length;
+            else if (s.key === "needFromYou")
+              count = requestQuestions.filter(
+                (q) => q.status !== "completed",
+              ).length;
             else if (s.key === "askPro") count = askProQuestions.length;
             return (
               <View key={s.key} style={{ marginBottom: 6 }}>
@@ -619,7 +711,9 @@ export default function RemindersScreen({
                       <ActiveClientsSection
                         clients={activeClients}
                         loading={activeClientsQuery.isLoading}
-                        onOpen={(c) => router.push(`/work-order/${c.mostRecentWorkOrderId}`)}
+                        onOpen={(c) =>
+                          router.push(`/work-order/${c.mostRecentWorkOrderId}`)
+                        }
                       />
                     ) : null}
                     {s.key === "top5" ? (
@@ -629,7 +723,9 @@ export default function RemindersScreen({
                         now={now}
                         onMarkDone={markDone}
                         onSnooze={(r) => setSnoozeFor(r)}
-                        onDelete={(r) => confirmDelete(r.title, () => removeReminder(r.id))}
+                        onDelete={(r) =>
+                          confirmDelete(r.title, () => removeReminder(r.id))
+                        }
                         onUndo={markUndone}
                         onAdd={() => setAddingReminder(true)}
                       />
@@ -642,7 +738,9 @@ export default function RemindersScreen({
                         onToggleItem={toggleListItem}
                         onRemoveItem={removeListItem}
                         onRemoveList={(l) =>
-                          confirmDelete(`List "${l.name}"`, () => removeList(l.id))
+                          confirmDelete(`List "${l.name}"`, () =>
+                            removeList(l.id),
+                          )
                         }
                       />
                     ) : null}
@@ -651,7 +749,12 @@ export default function RemindersScreen({
                         items={requestQuestions}
                         onAdd={() => setRequestingFromClient(true)}
                         onComplete={completeRequest}
-                        onDelete={(q) => confirmDelete(q.questionText, () => removeQuestion(q.id))}
+                        onFollowUp={followUpQuestion}
+                        onDelete={(q) =>
+                          confirmDelete(q.questionText, () =>
+                            removeQuestion(q.id),
+                          )
+                        }
                       />
                     ) : null}
                     {s.key === "askPro" ? (
@@ -661,7 +764,12 @@ export default function RemindersScreen({
                         onAnswer={(q) => setAnsweringQuestion(q)}
                         onConfirm={confirmAnswered}
                         onPickNextStep={(q) => setPickingNextStep(q)}
-                        onDelete={(q) => confirmDelete(q.questionText, () => removeQuestion(q.id))}
+                        onFollowUp={followUpQuestion}
+                        onDelete={(q) =>
+                          confirmDelete(q.questionText, () =>
+                            removeQuestion(q.id),
+                          )
+                        }
                       />
                     ) : null}
                   </View>
@@ -704,13 +812,16 @@ export default function RemindersScreen({
         question={answeringQuestion}
         onClose={() => setAnsweringQuestion(null)}
         onSubmit={(answer) => {
-          if (answeringQuestion) void submitAnswer(answeringQuestion.id, answer);
+          if (answeringQuestion)
+            void submitAnswer(answeringQuestion.id, answer);
           setAnsweringQuestion(null);
         }}
       />
       <NextStepSheet
         question={pickingNextStep}
-        onPick={(step) => pickingNextStep && pickNextStep(pickingNextStep, step)}
+        onPick={(step) =>
+          pickingNextStep && pickNextStep(pickingNextStep, step)
+        }
         onClose={() => setPickingNextStep(null)}
       />
       <NewListModal
@@ -748,24 +859,48 @@ function SectionHeader({
     <Pressable
       onPress={onToggle}
       accessibilityLabel={`${open ? "Collapse" : "Expand"} ${label}`}
-      style={[styles.sectionHeader, { backgroundColor: colors.card, borderColor: colors.border }]}
+      style={[
+        styles.sectionHeader,
+        { backgroundColor: colors.card, borderColor: colors.border },
+      ]}
     >
-      <View style={[styles.sectionIconWrap, { backgroundColor: colors.background, borderColor: colors.border }]}>
+      <View
+        style={[
+          styles.sectionIconWrap,
+          { backgroundColor: colors.background, borderColor: colors.border },
+        ]}
+      >
         <Feather name={icon} size={14} color={colors.foreground} />
       </View>
       <View style={{ flex: 1, minWidth: 0 }}>
         <View style={styles.sectionTitleRow}>
-          <Text style={[styles.sectionTitle, { color: colors.foreground }]} numberOfLines={1}>
+          <Text
+            style={[styles.sectionTitle, { color: colors.foreground }]}
+            numberOfLines={1}
+          >
             {label}
           </Text>
           {count > 0 ? (
-            <View style={[styles.countPill, { backgroundColor: colors.primary + "1A", borderColor: colors.primary + "44" }]}>
-              <Text style={[styles.countPillText, { color: colors.primary }]}>{count}</Text>
+            <View
+              style={[
+                styles.countPill,
+                {
+                  backgroundColor: colors.primary + "1A",
+                  borderColor: colors.primary + "44",
+                },
+              ]}
+            >
+              <Text style={[styles.countPillText, { color: colors.primary }]}>
+                {count}
+              </Text>
             </View>
           ) : null}
         </View>
         {subtitle ? (
-          <Text style={[styles.sectionSubtitle, { color: colors.mutedForeground }]} numberOfLines={1}>
+          <Text
+            style={[styles.sectionSubtitle, { color: colors.mutedForeground }]}
+            numberOfLines={1}
+          >
             {subtitle}
           </Text>
         ) : null}
@@ -784,12 +919,25 @@ function SectionHeader({
 // they're wired into the structure so future tasks can drop their data
 // in without re-doing the page layout.
 // ---------------------------------------------------------------------------
-function PlaceholderCard({ icon, message }: { icon: keyof typeof Feather.glyphMap; message: string }) {
+function PlaceholderCard({
+  icon,
+  message,
+}: {
+  icon: keyof typeof Feather.glyphMap;
+  message: string;
+}) {
   const colors = useColors();
   return (
-    <View style={[styles.placeholder, { backgroundColor: colors.card, borderColor: colors.border }]}>
+    <View
+      style={[
+        styles.placeholder,
+        { backgroundColor: colors.card, borderColor: colors.border },
+      ]}
+    >
       <Feather name={icon} size={18} color={colors.mutedForeground} />
-      <Text style={[styles.placeholderText, { color: colors.mutedForeground }]}>{message}</Text>
+      <Text style={[styles.placeholderText, { color: colors.mutedForeground }]}>
+        {message}
+      </Text>
     </View>
   );
 }
@@ -867,7 +1015,12 @@ function CompanyRemindersSection() {
 
   if (noticesQuery.isLoading) {
     return (
-      <View style={[styles.placeholder, { borderColor: colors.border, backgroundColor: colors.card }]}>
+      <View
+        style={[
+          styles.placeholder,
+          { borderColor: colors.border, backgroundColor: colors.card },
+        ]}
+      >
         <ActivityIndicator color={colors.primary} />
       </View>
     );
@@ -891,7 +1044,10 @@ function CompanyRemindersSection() {
         ))
       )}
       {canPost ? (
-        <AddRowButton label="Post a company notice" onPress={() => setComposing(true)} />
+        <AddRowButton
+          label="Post a company notice"
+          onPress={() => setComposing(true)}
+        />
       ) : null}
       <ComposeCompanyNoticeModal
         visible={composing}
@@ -944,9 +1100,7 @@ function CompanyNoticeRow({
     : notice.senderName?.trim() ||
       (notice.senderUsername ? `@${notice.senderUsername}` : "Team admin");
   const companyLabel = notice.companyName?.trim();
-  const sub = companyLabel
-    ? `${senderLabel} · ${companyLabel}`
-    : senderLabel;
+  const sub = companyLabel ? `${senderLabel} · ${companyLabel}` : senderLabel;
   return (
     <View
       style={[
@@ -956,14 +1110,20 @@ function CompanyNoticeRow({
     >
       <View style={styles.noticeHeaderRow}>
         <Feather name="briefcase" size={14} color={colors.primary} />
-        <Text style={[styles.noticeTitle, { color: colors.foreground }]} numberOfLines={2}>
+        <Text
+          style={[styles.noticeTitle, { color: colors.foreground }]}
+          numberOfLines={2}
+        >
           {notice.title}
         </Text>
       </View>
       <Text style={[styles.noticeBody, { color: colors.foreground }]}>
         {notice.body}
       </Text>
-      <Text style={[styles.noticeMeta, { color: colors.mutedForeground }]} numberOfLines={1}>
+      <Text
+        style={[styles.noticeMeta, { color: colors.mutedForeground }]}
+        numberOfLines={1}
+      >
         {sub} · {relativeTime(notice.createdAt)}
       </Text>
       {notice.acks ? (
@@ -983,7 +1143,12 @@ function CompanyNoticeRow({
           style={[styles.primaryAction, { backgroundColor: colors.primary }]}
         >
           <Feather name="check" size={14} color={colors.primaryForeground} />
-          <Text style={[styles.primaryActionText, { color: colors.primaryForeground }]}>
+          <Text
+            style={[
+              styles.primaryActionText,
+              { color: colors.primaryForeground },
+            ]}
+          >
             Got it
           </Text>
         </TouchableOpacity>
@@ -1003,8 +1168,7 @@ function CompanyNoticeRow({
 
 function ackDisplayName(ack: CompanyNoticeAck): string {
   return (
-    ack.name?.trim() ||
-    (ack.username ? `@${ack.username}` : "Team member")
+    ack.name?.trim() || (ack.username ? `@${ack.username}` : "Team member")
   );
 }
 
@@ -1111,7 +1275,10 @@ function NoticeReadByRow({
         </Text>
         {namesLabel ? (
           <Text
-            style={[styles.noticeReadByNames, { color: colors.mutedForeground }]}
+            style={[
+              styles.noticeReadByNames,
+              { color: colors.mutedForeground },
+            ]}
             numberOfLines={1}
           >
             {namesLabel}
@@ -1258,7 +1425,10 @@ function NoticeReadReceiptsSheet({
                 Read receipts
               </Text>
               <Text
-                style={[styles.sheetSubtitle, { color: colors.mutedForeground }]}
+                style={[
+                  styles.sheetSubtitle,
+                  { color: colors.mutedForeground },
+                ]}
                 numberOfLines={2}
               >
                 {noticeTitle} · {summary}
@@ -1279,13 +1449,19 @@ function NoticeReadReceiptsSheet({
             showsVerticalScrollIndicator={false}
           >
             <Text
-              style={[styles.readReceiptsSection, { color: colors.mutedForeground }]}
+              style={[
+                styles.readReceiptsSection,
+                { color: colors.mutedForeground },
+              ]}
             >
               Read by ({acks.length})
             </Text>
             {acks.length === 0 ? (
               <Text
-                style={[styles.readReceiptsEmpty, { color: colors.mutedForeground }]}
+                style={[
+                  styles.readReceiptsEmpty,
+                  { color: colors.mutedForeground },
+                ]}
               >
                 No one has acknowledged this notice yet.
               </Text>
@@ -1295,7 +1471,10 @@ function NoticeReadReceiptsSheet({
                   {a.avatarUrl ? (
                     <Image
                       source={{ uri: a.avatarUrl }}
-                      style={[styles.noticeAvatar, { borderColor: colors.card }]}
+                      style={[
+                        styles.noticeAvatar,
+                        { borderColor: colors.card },
+                      ]}
                     />
                   ) : (
                     <View
@@ -1319,7 +1498,10 @@ function NoticeReadReceiptsSheet({
                   )}
                   <View style={{ flex: 1 }}>
                     <Text
-                      style={[styles.readReceiptName, { color: colors.foreground }]}
+                      style={[
+                        styles.readReceiptName,
+                        { color: colors.foreground },
+                      ]}
                       numberOfLines={1}
                     >
                       {ackDisplayName(a)}
@@ -1399,7 +1581,10 @@ function NoticeReadReceiptsSheet({
                       )}
                       <View style={{ flex: 1 }}>
                         <Text
-                          style={[styles.readReceiptName, { color: colors.foreground }]}
+                          style={[
+                            styles.readReceiptName,
+                            { color: colors.foreground },
+                          ]}
                           numberOfLines={1}
                         >
                           {displayName}
@@ -1415,7 +1600,9 @@ function NoticeReadReceiptsSheet({
                         </Text>
                       </View>
                       <TouchableOpacity
-                        onPress={() => handleNudge(p.memberClerkId, displayName)}
+                        onPress={() =>
+                          handleNudge(p.memberClerkId, displayName)
+                        }
                         disabled={isPending || isSent}
                         accessibilityRole="button"
                         accessibilityLabel={
@@ -1427,7 +1614,9 @@ function NoticeReadReceiptsSheet({
                         style={[
                           styles.nudgeBtn,
                           {
-                            borderColor: isSent ? colors.border : colors.primary,
+                            borderColor: isSent
+                              ? colors.border
+                              : colors.primary,
                             backgroundColor: isSent
                               ? "transparent"
                               : colors.primary + "1A",
@@ -1436,7 +1625,10 @@ function NoticeReadReceiptsSheet({
                         ]}
                       >
                         {isPending ? (
-                          <ActivityIndicator size="small" color={colors.primary} />
+                          <ActivityIndicator
+                            size="small"
+                            color={colors.primary}
+                          />
                         ) : (
                           <>
                             <Feather
@@ -1474,10 +1666,7 @@ function NoticeReadReceiptsSheet({
 }
 
 function pendingDisplayName(p: CompanyNoticePendingMember): string {
-  return (
-    p.name?.trim() ||
-    (p.username ? `@${p.username}` : "Team member")
-  );
+  return p.name?.trim() || (p.username ? `@${p.username}` : "Team member");
 }
 
 function pendingInitial(p: CompanyNoticePendingMember): string {
@@ -1531,16 +1720,34 @@ function ComposeCompanyNoticeModal({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
       <View style={styles.modalBackdrop}>
-        <View style={[styles.sheet, { backgroundColor: colors.background, borderColor: colors.border }]}>
-          <Text style={[styles.sheetTitle, { color: colors.foreground }]}>New company notice</Text>
-          <Text style={[styles.sheetSubtitle, { color: colors.mutedForeground }]}>
+        <View
+          style={[
+            styles.sheet,
+            { backgroundColor: colors.background, borderColor: colors.border },
+          ]}
+        >
+          <Text style={[styles.sheetTitle, { color: colors.foreground }]}>
+            New company notice
+          </Text>
+          <Text
+            style={[styles.sheetSubtitle, { color: colors.mutedForeground }]}
+          >
             Posted to every member of the team.
           </Text>
           {companies.length > 1 ? (
             <>
-              <Text style={[styles.formLabel, { color: colors.mutedForeground }]}>Team</Text>
+              <Text
+                style={[styles.formLabel, { color: colors.mutedForeground }]}
+              >
+                Team
+              </Text>
               <View style={styles.choiceRow}>
                 {companies.map((c) => {
                   const active = c.id === companyId;
@@ -1553,14 +1760,18 @@ function ComposeCompanyNoticeModal({
                         styles.choice,
                         {
                           borderColor: active ? colors.primary : colors.border,
-                          backgroundColor: active ? colors.primary + "1A" : "transparent",
+                          backgroundColor: active
+                            ? colors.primary + "1A"
+                            : "transparent",
                         },
                       ]}
                     >
                       <Text
                         style={{
                           color: active ? colors.primary : colors.foreground,
-                          fontFamily: active ? "Inter_600SemiBold" : "Inter_400Regular",
+                          fontFamily: active
+                            ? "Inter_600SemiBold"
+                            : "Inter_400Regular",
                           fontSize: 13,
                         }}
                       >
@@ -1579,7 +1790,11 @@ function ComposeCompanyNoticeModal({
             onChangeText={setTitle}
             style={[
               styles.input,
-              { borderColor: colors.border, color: colors.foreground, backgroundColor: colors.card },
+              {
+                borderColor: colors.border,
+                color: colors.foreground,
+                backgroundColor: colors.card,
+              },
             ]}
             autoFocus
           />
@@ -1592,22 +1807,47 @@ function ComposeCompanyNoticeModal({
             style={[
               styles.input,
               styles.inputMulti,
-              { borderColor: colors.border, color: colors.foreground, backgroundColor: colors.card },
+              {
+                borderColor: colors.border,
+                color: colors.foreground,
+                backgroundColor: colors.card,
+              },
             ]}
           />
           <View style={styles.formActions}>
             <TouchableOpacity
               onPress={onClose}
-              style={[styles.formBtn, { borderWidth: 1, borderColor: colors.border }]}
+              style={[
+                styles.formBtn,
+                { borderWidth: 1, borderColor: colors.border },
+              ]}
             >
-              <Text style={{ color: colors.foreground, fontFamily: "Inter_500Medium" }}>Cancel</Text>
+              <Text
+                style={{
+                  color: colors.foreground,
+                  fontFamily: "Inter_500Medium",
+                }}
+              >
+                Cancel
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={submit}
               disabled={submitting}
-              style={[styles.formBtn, { backgroundColor: colors.primary, opacity: submitting ? 0.6 : 1 }]}
+              style={[
+                styles.formBtn,
+                {
+                  backgroundColor: colors.primary,
+                  opacity: submitting ? 0.6 : 1,
+                },
+              ]}
             >
-              <Text style={{ color: colors.primaryForeground, fontFamily: "Inter_600SemiBold" }}>
+              <Text
+                style={{
+                  color: colors.primaryForeground,
+                  fontFamily: "Inter_600SemiBold",
+                }}
+              >
                 {submitting ? "Posting…" : "Post notice"}
               </Text>
             </TouchableOpacity>
@@ -1629,7 +1869,10 @@ function formatLastActivity(iso: string): string {
   if (hrs < 24) return `${hrs}h ago`;
   const days = Math.floor(hrs / 24);
   if (days < 7) return `${days}d ago`;
-  return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  return new Date(iso).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+  });
 }
 
 function ActiveClientsSection({
@@ -1644,7 +1887,12 @@ function ActiveClientsSection({
   const colors = useColors();
   if (loading && clients.length === 0) {
     return (
-      <View style={[styles.placeholder, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <View
+        style={[
+          styles.placeholder,
+          { backgroundColor: colors.card, borderColor: colors.border },
+        ]}
+      >
         <ActivityIndicator color={colors.primary} />
       </View>
     );
@@ -1673,24 +1921,61 @@ function ActiveClientsSection({
             key={c.clientClerkId}
             onPress={() => onOpen(c)}
             accessibilityLabel={`Open ${display}, ${jobsLabel}`}
-            style={[styles.activeClientRow, { backgroundColor: colors.card, borderColor: colors.border }]}
+            style={[
+              styles.activeClientRow,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
           >
-            <View style={[styles.activeClientAvatar, { backgroundColor: colors.primary + "1A", borderColor: colors.primary + "44" }]}>
-              <Text style={[styles.activeClientAvatarText, { color: colors.primary }]}>{initial}</Text>
+            <View
+              style={[
+                styles.activeClientAvatar,
+                {
+                  backgroundColor: colors.primary + "1A",
+                  borderColor: colors.primary + "44",
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.activeClientAvatarText,
+                  { color: colors.primary },
+                ]}
+              >
+                {initial}
+              </Text>
             </View>
             <View style={{ flex: 1, minWidth: 0 }}>
-              <Text style={[styles.activeClientTitle, { color: colors.foreground }]} numberOfLines={1}>
+              <Text
+                style={[styles.activeClientTitle, { color: colors.foreground }]}
+                numberOfLines={1}
+              >
                 {display}
               </Text>
-              <Text style={[styles.activeClientSubtitle, { color: colors.mutedForeground }]} numberOfLines={1}>
+              <Text
+                style={[
+                  styles.activeClientSubtitle,
+                  { color: colors.mutedForeground },
+                ]}
+                numberOfLines={1}
+              >
                 {subtitle}
               </Text>
-              <Text style={[styles.activeClientMeta, { color: colors.mutedForeground }]} numberOfLines={1}>
+              <Text
+                style={[
+                  styles.activeClientMeta,
+                  { color: colors.mutedForeground },
+                ]}
+                numberOfLines={1}
+              >
                 Latest: {c.mostRecentWorkOrderTitle}
                 {activity ? ` · ${activity}` : ""}
               </Text>
             </View>
-            <Feather name="chevron-right" size={18} color={colors.mutedForeground} />
+            <Feather
+              name="chevron-right"
+              size={18}
+              color={colors.mutedForeground}
+            />
           </TouchableOpacity>
         );
       })}
@@ -1744,7 +2029,8 @@ function Top5Section({
       )}
       {overflow > 0 ? (
         <Text style={[styles.overflowHint, { color: colors.mutedForeground }]}>
-          + {overflow} more reminder{overflow === 1 ? "" : "s"} below your top five.
+          + {overflow} more reminder{overflow === 1 ? "" : "s"} below your top
+          five.
         </Text>
       ) : null}
       <AddRowButton label="Add a reminder" onPress={onAdd} />
@@ -1792,9 +2078,17 @@ function ListSection({
     setDraft("");
   };
   return (
-    <View style={[styles.listCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+    <View
+      style={[
+        styles.listCard,
+        { backgroundColor: colors.card, borderColor: colors.border },
+      ]}
+    >
       <View style={styles.listHeader}>
-        <Text style={[styles.listTitle, { color: colors.foreground }]} numberOfLines={1}>
+        <Text
+          style={[styles.listTitle, { color: colors.foreground }]}
+          numberOfLines={1}
+        >
           {list.name}
         </Text>
         {onDeleteList ? (
@@ -1819,7 +2113,15 @@ function ListSection({
               onPress={() => onToggle(it.id)}
               accessibilityLabel={`${it.done ? "Mark not done" : "Mark done"}: ${it.text}`}
               hitSlop={6}
-              style={[styles.checkbox, { borderColor: colors.border, width: 22, height: 22, borderRadius: 11 }]}
+              style={[
+                styles.checkbox,
+                {
+                  borderColor: colors.border,
+                  width: 22,
+                  height: 22,
+                  borderRadius: 11,
+                },
+              ]}
             >
               <Feather
                 name={it.done ? "check-circle" : "circle"}
@@ -1844,7 +2146,15 @@ function ListSection({
               onPress={() => onRemove(it.id)}
               accessibilityLabel={`Remove ${it.text}`}
               hitSlop={6}
-              style={[styles.iconBtn, { borderColor: colors.border, width: 26, height: 26, borderRadius: 13 }]}
+              style={[
+                styles.iconBtn,
+                {
+                  borderColor: colors.border,
+                  width: 26,
+                  height: 26,
+                  borderRadius: 13,
+                },
+              ]}
             >
               <Feather name="x" size={12} color={colors.mutedForeground} />
             </TouchableOpacity>
@@ -1861,13 +2171,20 @@ function ListSection({
           returnKeyType="done"
           style={[
             styles.inlineInput,
-            { borderColor: colors.border, color: colors.foreground, backgroundColor: colors.background },
+            {
+              borderColor: colors.border,
+              color: colors.foreground,
+              backgroundColor: colors.background,
+            },
           ]}
         />
         <TouchableOpacity
           onPress={submit}
           disabled={!draft.trim()}
-          style={[styles.smallBtn, { backgroundColor: draft.trim() ? colors.primary : colors.border }]}
+          style={[
+            styles.smallBtn,
+            { backgroundColor: draft.trim() ? colors.primary : colors.border },
+          ]}
         >
           <Feather name="plus" size={14} color={colors.primaryForeground} />
         </TouchableOpacity>
@@ -1923,11 +2240,13 @@ function NeedFromYouSection({
   items,
   onAdd,
   onComplete,
+  onFollowUp,
   onDelete,
 }: {
   items: Question[];
   onAdd: () => void;
   onComplete: (q: Question) => void;
+  onFollowUp: (q: Question) => void;
   onDelete: (q: Question) => void;
 }) {
   return (
@@ -1939,7 +2258,13 @@ function NeedFromYouSection({
         />
       ) : (
         items.map((q) => (
-          <RequestRow key={q.id} question={q} onComplete={onComplete} onDelete={onDelete} />
+          <RequestRow
+            key={q.id}
+            question={q}
+            onComplete={onComplete}
+            onFollowUp={onFollowUp}
+            onDelete={onDelete}
+          />
         ))
       )}
       <AddRowButton label="New provider request (demo)" onPress={onAdd} />
@@ -1950,20 +2275,28 @@ function NeedFromYouSection({
 function RequestRow({
   question,
   onComplete,
+  onFollowUp,
   onDelete,
 }: {
   question: Question;
   onComplete: (q: Question) => void;
+  onFollowUp: (q: Question) => void;
   onDelete: (q: Question) => void;
 }) {
   const colors = useColors();
+  const { userId } = useAuth();
   const done = question.status === "completed";
+  const isCreator = question.userClerkId === userId;
   const action = (question.requestedAction ?? "respond").toString();
   return (
     <View
       style={[
         styles.qaCard,
-        { backgroundColor: colors.card, borderColor: colors.border, opacity: done ? 0.65 : 1 },
+        {
+          backgroundColor: colors.card,
+          borderColor: colors.border,
+          opacity: done ? 0.65 : 1,
+        },
       ]}
     >
       <View style={styles.qaHeaderRow}>
@@ -1977,12 +2310,25 @@ function RequestRow({
             What I Need From You · {action}
           </Text>
         </View>
-        <Text style={[styles.qaStatus, { color: done ? colors.primary : "#E11D2E" }]}>
-          {done ? "Completed" : "Waiting on you"}
+        <Text
+          style={[
+            styles.qaStatus,
+            {
+              color: done ? colors.primary : isCreator ? "#0A7F3F" : "#E11D2E",
+            },
+          ]}
+        >
+          {done
+            ? "Completed"
+            : isCreator
+              ? "Waiting on them"
+              : "Waiting on you"}
         </Text>
       </View>
       {question.counterpartyName ? (
-        <Text style={[styles.qaCounterparty, { color: colors.mutedForeground }]}>
+        <Text
+          style={[styles.qaCounterparty, { color: colors.mutedForeground }]}
+        >
           From {question.counterpartyName}
         </Text>
       ) : null}
@@ -1995,14 +2341,33 @@ function RequestRow({
         </Text>
       ) : null}
       <View style={styles.qaActionsRow}>
-        {!done ? (
+        {!done && !isCreator ? (
           <TouchableOpacity
             onPress={() => onComplete(question)}
             style={[styles.primaryAction, { backgroundColor: colors.primary }]}
           >
             <Feather name="check" size={14} color={colors.primaryForeground} />
-            <Text style={[styles.primaryActionText, { color: colors.primaryForeground }]}>
+            <Text
+              style={[
+                styles.primaryActionText,
+                { color: colors.primaryForeground },
+              ]}
+            >
               Mark handled
+            </Text>
+          </TouchableOpacity>
+        ) : null}
+        {!done && isCreator ? (
+          <TouchableOpacity
+            onPress={() => onFollowUp(question)}
+            accessibilityLabel="Send a follow-up on this Resolution"
+            style={[styles.secondaryAction, { borderColor: colors.border }]}
+          >
+            <Feather name="repeat" size={14} color={colors.foreground} />
+            <Text
+              style={[styles.secondaryActionText, { color: colors.foreground }]}
+            >
+              Follow up
             </Text>
           </TouchableOpacity>
         ) : null}
@@ -2030,6 +2395,7 @@ function AskAProSection({
   onAnswer,
   onConfirm,
   onPickNextStep,
+  onFollowUp,
   onDelete,
 }: {
   items: Question[];
@@ -2037,6 +2403,7 @@ function AskAProSection({
   onAnswer: (q: Question) => void;
   onConfirm: (q: Question) => void;
   onPickNextStep: (q: Question) => void;
+  onFollowUp: (q: Question) => void;
   onDelete: (q: Question) => void;
 }) {
   return (
@@ -2054,6 +2421,7 @@ function AskAProSection({
             onAnswer={onAnswer}
             onConfirm={onConfirm}
             onPickNextStep={onPickNextStep}
+            onFollowUp={onFollowUp}
             onDelete={onDelete}
           />
         ))
@@ -2068,19 +2436,25 @@ function AskProRow({
   onAnswer,
   onConfirm,
   onPickNextStep,
+  onFollowUp,
   onDelete,
 }: {
   question: Question;
   onAnswer: (q: Question) => void;
   onConfirm: (q: Question) => void;
   onPickNextStep: (q: Question) => void;
+  onFollowUp: (q: Question) => void;
   onDelete: (q: Question) => void;
 }) {
   const colors = useColors();
+  const { userId } = useAuth();
+  const isCreator = question.userClerkId === userId;
   const status = question.status;
   const statusLabel =
     status === "open"
-      ? "Open"
+      ? isCreator
+        ? "Waiting on them"
+        : "Waiting on you"
       : status === "answered"
         ? "Answered · waiting on you"
         : status === "completed"
@@ -2091,12 +2465,18 @@ function AskProRow({
       ? colors.primary
       : status === "answered"
         ? "#0A7F3F"
-        : colors.mutedForeground;
+        : isCreator
+          ? "#0A7F3F"
+          : "#E11D2E";
   return (
     <View
       style={[
         styles.qaCard,
-        { backgroundColor: colors.card, borderColor: colors.border, opacity: status === "completed" ? 0.75 : 1 },
+        {
+          backgroundColor: colors.card,
+          borderColor: colors.border,
+          opacity: status === "completed" ? 0.75 : 1,
+        },
       ]}
     >
       <View style={styles.qaHeaderRow}>
@@ -2110,10 +2490,14 @@ function AskProRow({
             Ask a Pro
           </Text>
         </View>
-        <Text style={[styles.qaStatus, { color: statusColor }]}>{statusLabel}</Text>
+        <Text style={[styles.qaStatus, { color: statusColor }]}>
+          {statusLabel}
+        </Text>
       </View>
       {question.counterpartyName ? (
-        <Text style={[styles.qaCounterparty, { color: colors.mutedForeground }]}>
+        <Text
+          style={[styles.qaCounterparty, { color: colors.mutedForeground }]}
+        >
           To {question.counterpartyName}
         </Text>
       ) : null}
@@ -2131,24 +2515,56 @@ function AskProRow({
         </Text>
       ) : null}
       <View style={styles.qaActionsRow}>
-        {status === "open" ? (
+        {status === "open" && !isCreator ? (
           <TouchableOpacity
             onPress={() => onAnswer(question)}
-            style={[styles.primaryAction, { backgroundColor: colors.foreground }]}
+            style={[
+              styles.primaryAction,
+              { backgroundColor: colors.foreground },
+            ]}
           >
-            <Feather name="message-square" size={14} color={colors.background} />
-            <Text style={[styles.primaryActionText, { color: colors.background }]}>
+            <Feather
+              name="message-square"
+              size={14}
+              color={colors.background}
+            />
+            <Text
+              style={[styles.primaryActionText, { color: colors.background }]}
+            >
               Answer (as pro · +5 pts)
             </Text>
           </TouchableOpacity>
         ) : null}
-        {status === "answered" ? (
+        {status === "open" && isCreator ? (
+          <TouchableOpacity
+            onPress={() => onFollowUp(question)}
+            accessibilityLabel="Send a follow-up on this Resolution"
+            style={[styles.secondaryAction, { borderColor: colors.border }]}
+          >
+            <Feather name="repeat" size={14} color={colors.foreground} />
+            <Text
+              style={[styles.secondaryActionText, { color: colors.foreground }]}
+            >
+              Follow up
+            </Text>
+          </TouchableOpacity>
+        ) : null}
+        {status === "answered" && isCreator ? (
           <TouchableOpacity
             onPress={() => onConfirm(question)}
             style={[styles.primaryAction, { backgroundColor: colors.primary }]}
           >
-            <Feather name="check-circle" size={14} color={colors.primaryForeground} />
-            <Text style={[styles.primaryActionText, { color: colors.primaryForeground }]}>
+            <Feather
+              name="check-circle"
+              size={14}
+              color={colors.primaryForeground}
+            />
+            <Text
+              style={[
+                styles.primaryActionText,
+                { color: colors.primaryForeground },
+              ]}
+            >
               This answered my question (+20 pts)
             </Text>
           </TouchableOpacity>
@@ -2159,7 +2575,9 @@ function AskProRow({
             style={[styles.secondaryAction, { borderColor: colors.border }]}
           >
             <Feather name="arrow-right" size={14} color={colors.foreground} />
-            <Text style={[styles.secondaryActionText, { color: colors.foreground }]}>
+            <Text
+              style={[styles.secondaryActionText, { color: colors.foreground }]}
+            >
               Pick a next step
             </Text>
           </TouchableOpacity>
@@ -2213,32 +2631,52 @@ function ReminderRow({
         onPress={onDone}
         accessibilityLabel={`Mark "${reminder.title}" done`}
         hitSlop={8}
-        style={[styles.checkbox, { borderColor: overdue ? "#E11D2E" : colors.border }]}
+        style={[
+          styles.checkbox,
+          { borderColor: overdue ? "#E11D2E" : colors.border },
+        ]}
       >
         <Feather name="circle" size={18} color={colors.mutedForeground} />
       </Pressable>
       <View style={{ flex: 1, minWidth: 0 }}>
-        <Text style={[styles.rowTitle, { color: colors.foreground }]} numberOfLines={2}>
+        <Text
+          style={[styles.rowTitle, { color: colors.foreground }]}
+          numberOfLines={2}
+        >
           {reminder.title}
         </Text>
         {reminder.note ? (
-          <Text style={[styles.rowNote, { color: colors.mutedForeground }]} numberOfLines={2}>
+          <Text
+            style={[styles.rowNote, { color: colors.mutedForeground }]}
+            numberOfLines={2}
+          >
             {reminder.note}
           </Text>
         ) : null}
         <View style={styles.rowMeta}>
           <Text
-            style={[styles.rowDue, { color: overdue ? "#E11D2E" : colors.mutedForeground }]}
+            style={[
+              styles.rowDue,
+              { color: overdue ? "#E11D2E" : colors.mutedForeground },
+            ]}
           >
             {describeDue(dueIso, now)}
           </Text>
           {reminder.notifyCount > 1 ? (
             <View
               accessibilityLabel="Reminded again because the first push didn't reach you"
-              style={[styles.retryPill, { borderColor: colors.border, backgroundColor: colors.card }]}
+              style={[
+                styles.retryPill,
+                { borderColor: colors.border, backgroundColor: colors.card },
+              ]}
             >
               <Feather name="bell" size={10} color={colors.mutedForeground} />
-              <Text style={[styles.retryPillText, { color: colors.mutedForeground }]}>
+              <Text
+                style={[
+                  styles.retryPillText,
+                  { color: colors.mutedForeground },
+                ]}
+              >
                 Reminded again
               </Text>
             </View>
@@ -2279,7 +2717,11 @@ function CompletedRow({
     <View
       style={[
         styles.row,
-        { backgroundColor: colors.card, borderColor: colors.border, opacity: 0.7 },
+        {
+          backgroundColor: colors.card,
+          borderColor: colors.border,
+          opacity: 0.7,
+        },
       ]}
     >
       <Pressable
@@ -2328,15 +2770,28 @@ function SnoozeSheet({
 }) {
   const colors = useColors();
   return (
-    <Modal visible={!!reminder} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={!!reminder}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
       <Pressable style={styles.modalBackdrop} onPress={onClose}>
         <Pressable
-          style={[styles.sheet, { backgroundColor: colors.background, borderColor: colors.border }]}
+          style={[
+            styles.sheet,
+            { backgroundColor: colors.background, borderColor: colors.border },
+          ]}
           onPress={() => {}}
         >
-          <Text style={[styles.sheetTitle, { color: colors.foreground }]}>Snooze</Text>
+          <Text style={[styles.sheetTitle, { color: colors.foreground }]}>
+            Snooze
+          </Text>
           {reminder ? (
-            <Text style={[styles.sheetSubtitle, { color: colors.mutedForeground }]} numberOfLines={2}>
+            <Text
+              style={[styles.sheetSubtitle, { color: colors.mutedForeground }]}
+              numberOfLines={2}
+            >
               {reminder.title}
             </Text>
           ) : null}
@@ -2347,14 +2802,25 @@ function SnoozeSheet({
               style={[styles.sheetItem, { borderColor: colors.border }]}
             >
               <Feather name="clock" size={16} color={colors.foreground} />
-              <Text style={[styles.sheetItemText, { color: colors.foreground }]}>{opt.label}</Text>
+              <Text
+                style={[styles.sheetItemText, { color: colors.foreground }]}
+              >
+                {opt.label}
+              </Text>
             </TouchableOpacity>
           ))}
           <TouchableOpacity
             onPress={onClose}
-            style={[styles.sheetItem, { borderColor: colors.border, justifyContent: "center" }]}
+            style={[
+              styles.sheetItem,
+              { borderColor: colors.border, justifyContent: "center" },
+            ]}
           >
-            <Text style={[styles.sheetItemText, { color: colors.mutedForeground }]}>Cancel</Text>
+            <Text
+              style={[styles.sheetItemText, { color: colors.mutedForeground }]}
+            >
+              Cancel
+            </Text>
           </TouchableOpacity>
         </Pressable>
       </Pressable>
@@ -2372,20 +2838,36 @@ function NextStepSheet({
   onClose: () => void;
 }) {
   const colors = useColors();
-  const options: { key: "appointment" | "list" | "curious"; label: string; icon: keyof typeof Feather.glyphMap }[] = [
+  const options: {
+    key: "appointment" | "list" | "curious";
+    label: string;
+    icon: keyof typeof Feather.glyphMap;
+  }[] = [
     { key: "appointment", label: "Set up an appointment", icon: "calendar" },
     { key: "list", label: "Add to a list", icon: "list" },
     { key: "curious", label: "I was just curious", icon: "smile" },
   ];
   return (
-    <Modal visible={!!question} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={!!question}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
       <Pressable style={styles.modalBackdrop} onPress={onClose}>
         <Pressable
-          style={[styles.sheet, { backgroundColor: colors.background, borderColor: colors.border }]}
+          style={[
+            styles.sheet,
+            { backgroundColor: colors.background, borderColor: colors.border },
+          ]}
           onPress={() => {}}
         >
-          <Text style={[styles.sheetTitle, { color: colors.foreground }]}>What's next?</Text>
-          <Text style={[styles.sheetSubtitle, { color: colors.mutedForeground }]}>
+          <Text style={[styles.sheetTitle, { color: colors.foreground }]}>
+            What's next?
+          </Text>
+          <Text
+            style={[styles.sheetSubtitle, { color: colors.mutedForeground }]}
+          >
             Pick a follow-up so this question doesn't drop off your radar.
           </Text>
           {options.map((opt) => (
@@ -2395,14 +2877,25 @@ function NextStepSheet({
               style={[styles.sheetItem, { borderColor: colors.border }]}
             >
               <Feather name={opt.icon} size={16} color={colors.foreground} />
-              <Text style={[styles.sheetItemText, { color: colors.foreground }]}>{opt.label}</Text>
+              <Text
+                style={[styles.sheetItemText, { color: colors.foreground }]}
+              >
+                {opt.label}
+              </Text>
             </TouchableOpacity>
           ))}
           <TouchableOpacity
             onPress={onClose}
-            style={[styles.sheetItem, { borderColor: colors.border, justifyContent: "center" }]}
+            style={[
+              styles.sheetItem,
+              { borderColor: colors.border, justifyContent: "center" },
+            ]}
           >
-            <Text style={[styles.sheetItemText, { color: colors.mutedForeground }]}>Skip</Text>
+            <Text
+              style={[styles.sheetItemText, { color: colors.mutedForeground }]}
+            >
+              Skip
+            </Text>
           </TouchableOpacity>
         </Pressable>
       </Pressable>
@@ -2437,19 +2930,41 @@ function AskAProModal({
     onSubmit(t, name.trim() || undefined);
   };
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
       <View style={styles.modalBackdrop}>
-        <View style={[styles.sheet, { backgroundColor: colors.background, borderColor: colors.border }]}>
-          <Text style={[styles.sheetTitle, { color: colors.foreground }]}>Ask a Pro</Text>
-          <Text style={[styles.sheetSubtitle, { color: colors.mutedForeground }]}>
-            They earn 5 points for answering and another 20 when you confirm it helped.
+        <View
+          style={[
+            styles.sheet,
+            { backgroundColor: colors.background, borderColor: colors.border },
+          ]}
+        >
+          <Text style={[styles.sheetTitle, { color: colors.foreground }]}>
+            Ask a Pro
+          </Text>
+          <Text
+            style={[styles.sheetSubtitle, { color: colors.mutedForeground }]}
+          >
+            They earn 5 points for answering and another 20 when you confirm it
+            helped.
           </Text>
           <TextInput
             placeholder="Pro's name (optional)"
             placeholderTextColor={colors.mutedForeground}
             value={name}
             onChangeText={setName}
-            style={[styles.input, { borderColor: colors.border, color: colors.foreground, backgroundColor: colors.card }]}
+            style={[
+              styles.input,
+              {
+                borderColor: colors.border,
+                color: colors.foreground,
+                backgroundColor: colors.card,
+              },
+            ]}
           />
           <TextInput
             placeholder="What do you want to know?"
@@ -2461,18 +2976,36 @@ function AskAProModal({
             style={[
               styles.input,
               styles.inputMulti,
-              { borderColor: colors.border, color: colors.foreground, backgroundColor: colors.card },
+              {
+                borderColor: colors.border,
+                color: colors.foreground,
+                backgroundColor: colors.card,
+              },
             ]}
           />
           <View style={styles.formActions}>
             <TouchableOpacity onPress={onClose} style={styles.formBtn}>
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_600SemiBold" }}>Cancel</Text>
+              <Text
+                style={{
+                  color: colors.mutedForeground,
+                  fontFamily: "Inter_600SemiBold",
+                }}
+              >
+                Cancel
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={submit}
               style={[styles.formBtn, { backgroundColor: colors.primary }]}
             >
-              <Text style={{ color: colors.primaryForeground, fontFamily: "Inter_600SemiBold" }}>Post</Text>
+              <Text
+                style={{
+                  color: colors.primaryForeground,
+                  fontFamily: "Inter_600SemiBold",
+                }}
+              >
+                Post
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -2516,11 +3049,25 @@ function RequestModal({
     onSubmit(t, action, name.trim() || undefined);
   };
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
       <View style={styles.modalBackdrop}>
-        <View style={[styles.sheet, { backgroundColor: colors.background, borderColor: colors.border }]}>
-          <Text style={[styles.sheetTitle, { color: colors.foreground }]}>What I Need From You</Text>
-          <Text style={[styles.sheetSubtitle, { color: colors.mutedForeground }]}>
+        <View
+          style={[
+            styles.sheet,
+            { backgroundColor: colors.background, borderColor: colors.border },
+          ]}
+        >
+          <Text style={[styles.sheetTitle, { color: colors.foreground }]}>
+            What I Need From You
+          </Text>
+          <Text
+            style={[styles.sheetSubtitle, { color: colors.mutedForeground }]}
+          >
             Provider-side request. No points awarded — this is a workflow nudge.
           </Text>
           <TextInput
@@ -2528,7 +3075,14 @@ function RequestModal({
             placeholderTextColor={colors.mutedForeground}
             value={name}
             onChangeText={setName}
-            style={[styles.input, { borderColor: colors.border, color: colors.foreground, backgroundColor: colors.card }]}
+            style={[
+              styles.input,
+              {
+                borderColor: colors.border,
+                color: colors.foreground,
+                backgroundColor: colors.card,
+              },
+            ]}
           />
           <TextInput
             placeholder="What do you need from the client?"
@@ -2540,10 +3094,16 @@ function RequestModal({
             style={[
               styles.input,
               styles.inputMulti,
-              { borderColor: colors.border, color: colors.foreground, backgroundColor: colors.card },
+              {
+                borderColor: colors.border,
+                color: colors.foreground,
+                backgroundColor: colors.card,
+              },
             ]}
           />
-          <Text style={[styles.formLabel, { color: colors.mutedForeground }]}>Action type</Text>
+          <Text style={[styles.formLabel, { color: colors.mutedForeground }]}>
+            Action type
+          </Text>
           <View style={styles.choiceRow}>
             {actions.map((a) => {
               const active = action === a.key;
@@ -2555,14 +3115,18 @@ function RequestModal({
                     styles.choice,
                     {
                       borderColor: active ? colors.primary : colors.border,
-                      backgroundColor: active ? colors.primary + "1A" : "transparent",
+                      backgroundColor: active
+                        ? colors.primary + "1A"
+                        : "transparent",
                     },
                   ]}
                 >
                   <Text
                     style={{
                       color: active ? colors.primary : colors.foreground,
-                      fontFamily: active ? "Inter_600SemiBold" : "Inter_400Regular",
+                      fontFamily: active
+                        ? "Inter_600SemiBold"
+                        : "Inter_400Regular",
                       fontSize: 13,
                     }}
                   >
@@ -2574,13 +3138,27 @@ function RequestModal({
           </View>
           <View style={styles.formActions}>
             <TouchableOpacity onPress={onClose} style={styles.formBtn}>
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_600SemiBold" }}>Cancel</Text>
+              <Text
+                style={{
+                  color: colors.mutedForeground,
+                  fontFamily: "Inter_600SemiBold",
+                }}
+              >
+                Cancel
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={submit}
               style={[styles.formBtn, { backgroundColor: colors.primary }]}
             >
-              <Text style={{ color: colors.primaryForeground, fontFamily: "Inter_600SemiBold" }}>Send</Text>
+              <Text
+                style={{
+                  color: colors.primaryForeground,
+                  fontFamily: "Inter_600SemiBold",
+                }}
+              >
+                Send
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -2606,18 +3184,36 @@ function AnswerModal({
   const submit = () => {
     const t = text.trim();
     if (!t) {
-      Alert.alert("Type your answer", "Add a response so the client knows what to do next.");
+      Alert.alert(
+        "Type your answer",
+        "Add a response so the client knows what to do next.",
+      );
       return;
     }
     onSubmit(t);
   };
   return (
-    <Modal visible={!!question} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={!!question}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
       <View style={styles.modalBackdrop}>
-        <View style={[styles.sheet, { backgroundColor: colors.background, borderColor: colors.border }]}>
-          <Text style={[styles.sheetTitle, { color: colors.foreground }]}>Answer as the pro</Text>
+        <View
+          style={[
+            styles.sheet,
+            { backgroundColor: colors.background, borderColor: colors.border },
+          ]}
+        >
+          <Text style={[styles.sheetTitle, { color: colors.foreground }]}>
+            Answer as the pro
+          </Text>
           {question ? (
-            <Text style={[styles.sheetSubtitle, { color: colors.mutedForeground }]} numberOfLines={3}>
+            <Text
+              style={[styles.sheetSubtitle, { color: colors.mutedForeground }]}
+              numberOfLines={3}
+            >
               Q: {question.questionText}
             </Text>
           ) : null}
@@ -2631,7 +3227,11 @@ function AnswerModal({
             style={[
               styles.input,
               styles.inputMulti,
-              { borderColor: colors.border, color: colors.foreground, backgroundColor: colors.card },
+              {
+                borderColor: colors.border,
+                color: colors.foreground,
+                backgroundColor: colors.card,
+              },
             ]}
           />
           <Text style={[styles.formHint, { color: colors.mutedForeground }]}>
@@ -2639,13 +3239,27 @@ function AnswerModal({
           </Text>
           <View style={styles.formActions}>
             <TouchableOpacity onPress={onClose} style={styles.formBtn}>
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_600SemiBold" }}>Cancel</Text>
+              <Text
+                style={{
+                  color: colors.mutedForeground,
+                  fontFamily: "Inter_600SemiBold",
+                }}
+              >
+                Cancel
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={submit}
               style={[styles.formBtn, { backgroundColor: colors.primary }]}
             >
-              <Text style={{ color: colors.primaryForeground, fontFamily: "Inter_600SemiBold" }}>Send answer</Text>
+              <Text
+                style={{
+                  color: colors.primaryForeground,
+                  fontFamily: "Inter_600SemiBold",
+                }}
+              >
+                Send answer
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -2677,27 +3291,60 @@ function NewListModal({
     onSubmit(t);
   };
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
       <View style={styles.modalBackdrop}>
-        <View style={[styles.sheet, { backgroundColor: colors.background, borderColor: colors.border }]}>
-          <Text style={[styles.sheetTitle, { color: colors.foreground }]}>New list</Text>
+        <View
+          style={[
+            styles.sheet,
+            { backgroundColor: colors.background, borderColor: colors.border },
+          ]}
+        >
+          <Text style={[styles.sheetTitle, { color: colors.foreground }]}>
+            New list
+          </Text>
           <TextInput
             placeholder="List name (e.g. Spring projects)"
             placeholderTextColor={colors.mutedForeground}
             value={name}
             onChangeText={setName}
             autoFocus
-            style={[styles.input, { borderColor: colors.border, color: colors.foreground, backgroundColor: colors.card }]}
+            style={[
+              styles.input,
+              {
+                borderColor: colors.border,
+                color: colors.foreground,
+                backgroundColor: colors.card,
+              },
+            ]}
           />
           <View style={styles.formActions}>
             <TouchableOpacity onPress={onClose} style={styles.formBtn}>
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_600SemiBold" }}>Cancel</Text>
+              <Text
+                style={{
+                  color: colors.mutedForeground,
+                  fontFamily: "Inter_600SemiBold",
+                }}
+              >
+                Cancel
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={submit}
               style={[styles.formBtn, { backgroundColor: colors.primary }]}
             >
-              <Text style={{ color: colors.primaryForeground, fontFamily: "Inter_600SemiBold" }}>Create</Text>
+              <Text
+                style={{
+                  color: colors.primaryForeground,
+                  fontFamily: "Inter_600SemiBold",
+                }}
+              >
+                Create
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -2706,15 +3353,26 @@ function NewListModal({
   );
 }
 
-function AddRowButton({ label, onPress }: { label: string; onPress: () => void }) {
+function AddRowButton({
+  label,
+  onPress,
+}: {
+  label: string;
+  onPress: () => void;
+}) {
   const colors = useColors();
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={[styles.addRow, { borderColor: colors.border, backgroundColor: colors.background }]}
+      style={[
+        styles.addRow,
+        { borderColor: colors.border, backgroundColor: colors.background },
+      ]}
     >
       <Feather name="plus" size={14} color={colors.primary} />
-      <Text style={[styles.addRowText, { color: colors.primary }]}>{label}</Text>
+      <Text style={[styles.addRowText, { color: colors.primary }]}>
+        {label}
+      </Text>
     </TouchableOpacity>
   );
 }
@@ -2757,7 +3415,10 @@ function formatCustomDate(d: Date): string {
   });
 }
 function formatCustomTime(d: Date): string {
-  return d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  return d.toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
 function AddReminderModal({
@@ -2820,10 +3481,22 @@ function AddReminderModal({
   const isCustom = dueChoice === "custom";
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
       <View style={styles.modalBackdrop}>
-        <View style={[styles.sheet, { backgroundColor: colors.background, borderColor: colors.border }]}>
-          <Text style={[styles.sheetTitle, { color: colors.foreground }]}>New reminder</Text>
+        <View
+          style={[
+            styles.sheet,
+            { backgroundColor: colors.background, borderColor: colors.border },
+          ]}
+        >
+          <Text style={[styles.sheetTitle, { color: colors.foreground }]}>
+            New reminder
+          </Text>
           <TextInput
             placeholder="Reminder title"
             placeholderTextColor={colors.mutedForeground}
@@ -2831,7 +3504,11 @@ function AddReminderModal({
             onChangeText={setTitle}
             style={[
               styles.input,
-              { borderColor: colors.border, color: colors.foreground, backgroundColor: colors.card },
+              {
+                borderColor: colors.border,
+                color: colors.foreground,
+                backgroundColor: colors.card,
+              },
             ]}
             autoFocus
             returnKeyType="next"
@@ -2845,10 +3522,16 @@ function AddReminderModal({
             style={[
               styles.input,
               styles.inputMulti,
-              { borderColor: colors.border, color: colors.foreground, backgroundColor: colors.card },
+              {
+                borderColor: colors.border,
+                color: colors.foreground,
+                backgroundColor: colors.card,
+              },
             ]}
           />
-          <Text style={[styles.formLabel, { color: colors.mutedForeground }]}>Remind me</Text>
+          <Text style={[styles.formLabel, { color: colors.mutedForeground }]}>
+            Remind me
+          </Text>
           <View style={styles.choiceRow}>
             {dueOptions.map((opt) => {
               const active = dueChoice === opt.hours;
@@ -2863,14 +3546,18 @@ function AddReminderModal({
                     styles.choice,
                     {
                       borderColor: active ? colors.primary : colors.border,
-                      backgroundColor: active ? colors.primary + "1A" : "transparent",
+                      backgroundColor: active
+                        ? colors.primary + "1A"
+                        : "transparent",
                     },
                   ]}
                 >
                   <Text
                     style={{
                       color: active ? colors.primary : colors.foreground,
-                      fontFamily: active ? "Inter_600SemiBold" : "Inter_400Regular",
+                      fontFamily: active
+                        ? "Inter_600SemiBold"
+                        : "Inter_400Regular",
                       fontSize: 13,
                     }}
                   >
@@ -2886,18 +3573,26 @@ function AddReminderModal({
                 styles.choice,
                 {
                   borderColor: isCustom ? colors.primary : colors.border,
-                  backgroundColor: isCustom ? colors.primary + "1A" : "transparent",
+                  backgroundColor: isCustom
+                    ? colors.primary + "1A"
+                    : "transparent",
                   flexDirection: "row",
                   alignItems: "center",
                   gap: 6,
                 },
               ]}
             >
-              <Feather name="calendar" size={13} color={isCustom ? colors.primary : colors.foreground} />
+              <Feather
+                name="calendar"
+                size={13}
+                color={isCustom ? colors.primary : colors.foreground}
+              />
               <Text
                 style={{
                   color: isCustom ? colors.primary : colors.foreground,
-                  fontFamily: isCustom ? "Inter_600SemiBold" : "Inter_400Regular",
+                  fontFamily: isCustom
+                    ? "Inter_600SemiBold"
+                    : "Inter_400Regular",
                   fontSize: 13,
                 }}
               >
@@ -2911,7 +3606,10 @@ function AddReminderModal({
                 <View
                   style={[
                     styles.customField,
-                    { borderColor: colors.border, backgroundColor: colors.card },
+                    {
+                      borderColor: colors.border,
+                      backgroundColor: colors.card,
+                    },
                   ]}
                 >
                   {React.createElement("input", {
@@ -2960,10 +3658,19 @@ function AddReminderModal({
                     accessibilityLabel="Pick reminder date"
                     style={[
                       styles.customField,
-                      { flex: 1, borderColor: colors.border, backgroundColor: colors.card },
+                      {
+                        flex: 1,
+                        borderColor: colors.border,
+                        backgroundColor: colors.card,
+                      },
                     ]}
                   >
-                    <Text style={[styles.customFieldText, { color: colors.foreground }]}>
+                    <Text
+                      style={[
+                        styles.customFieldText,
+                        { color: colors.foreground },
+                      ]}
+                    >
                       {formatCustomDate(customDate)}
                     </Text>
                   </TouchableOpacity>
@@ -2972,10 +3679,19 @@ function AddReminderModal({
                     accessibilityLabel="Pick reminder time"
                     style={[
                       styles.customField,
-                      { flex: 1, borderColor: colors.border, backgroundColor: colors.card },
+                      {
+                        flex: 1,
+                        borderColor: colors.border,
+                        backgroundColor: colors.card,
+                      },
                     ]}
                   >
-                    <Text style={[styles.customFieldText, { color: colors.foreground }]}>
+                    <Text
+                      style={[
+                        styles.customFieldText,
+                        { color: colors.foreground },
+                      ]}
+                    >
                       {formatCustomTime(customDate)}
                     </Text>
                   </TouchableOpacity>
@@ -2989,7 +3705,11 @@ function AddReminderModal({
                         setShowAndroidDate(false);
                         if (d) {
                           const merged = new Date(customDate);
-                          merged.setFullYear(d.getFullYear(), d.getMonth(), d.getDate());
+                          merged.setFullYear(
+                            d.getFullYear(),
+                            d.getMonth(),
+                            d.getDate(),
+                          );
                           setCustomDate(merged);
                           setCustomError(null);
                         }
@@ -3015,19 +3735,35 @@ function AddReminderModal({
                 </View>
               )}
               {customError ? (
-                <Text style={[styles.customError, { color: "#E11D2E" }]}>{customError}</Text>
+                <Text style={[styles.customError, { color: "#E11D2E" }]}>
+                  {customError}
+                </Text>
               ) : null}
             </View>
           ) : null}
           <View style={styles.formActions}>
             <TouchableOpacity onPress={onClose} style={styles.formBtn}>
-              <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_600SemiBold" }}>Cancel</Text>
+              <Text
+                style={{
+                  color: colors.mutedForeground,
+                  fontFamily: "Inter_600SemiBold",
+                }}
+              >
+                Cancel
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={submit}
               style={[styles.formBtn, { backgroundColor: colors.primary }]}
             >
-              <Text style={{ color: colors.primaryForeground, fontFamily: "Inter_600SemiBold" }}>Add</Text>
+              <Text
+                style={{
+                  color: colors.primaryForeground,
+                  fontFamily: "Inter_600SemiBold",
+                }}
+              >
+                Add
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -3059,7 +3795,11 @@ const styles = StyleSheet.create({
   },
   sectionTitleRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   sectionTitle: { fontSize: 15, fontFamily: "Inter_700Bold" },
-  sectionSubtitle: { fontSize: 12, fontFamily: "Inter_400Regular", marginTop: 1 },
+  sectionSubtitle: {
+    fontSize: 12,
+    fontFamily: "Inter_400Regular",
+    marginTop: 1,
+  },
   countPill: {
     paddingHorizontal: 8,
     paddingVertical: 1,
@@ -3116,7 +3856,11 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     marginTop: 2,
   },
-  overflowHint: { fontSize: 12, fontFamily: "Inter_500Medium", paddingHorizontal: 4 },
+  overflowHint: {
+    fontSize: 12,
+    fontFamily: "Inter_500Medium",
+    paddingHorizontal: 4,
+  },
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -3136,7 +3880,13 @@ const styles = StyleSheet.create({
   rowTitle: { fontSize: 15, fontFamily: "Inter_600SemiBold" },
   rowNote: { fontSize: 13, fontFamily: "Inter_400Regular", marginTop: 2 },
   rowDue: { fontSize: 12, fontFamily: "Inter_500Medium" },
-  rowMeta: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 6, marginTop: 4 },
+  rowMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 6,
+    marginTop: 4,
+  },
   retryPill: {
     flexDirection: "row",
     alignItems: "center",
@@ -3192,7 +3942,12 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
   },
   inputMulti: { minHeight: 80, textAlignVertical: "top" },
-  customField: { borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 12 },
+  customField: {
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
   customFieldText: { fontSize: 15, fontFamily: "Inter_500Medium" },
   customError: { fontSize: 12, fontFamily: "Inter_500Medium" },
   formLabel: {
@@ -3237,7 +3992,11 @@ const styles = StyleSheet.create({
     padding: 12,
     gap: 8,
   },
-  listHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  listHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
   listTitle: { fontSize: 14, fontFamily: "Inter_700Bold", flex: 1 },
   emptyHint: { fontSize: 12, fontFamily: "Inter_400Regular" },
   listItemRow: { flexDirection: "row", alignItems: "center", gap: 8 },
@@ -3265,20 +4024,37 @@ const styles = StyleSheet.create({
     padding: 12,
     gap: 8,
   },
-  qaHeaderRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  qaHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
   qaTag: {
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 999,
     borderWidth: 1,
   },
-  qaTagText: { fontSize: 10, fontFamily: "Inter_600SemiBold", letterSpacing: 0.4 },
+  qaTagText: {
+    fontSize: 10,
+    fontFamily: "Inter_600SemiBold",
+    letterSpacing: 0.4,
+  },
   qaStatus: { fontSize: 11, fontFamily: "Inter_600SemiBold" },
   qaCounterparty: { fontSize: 12, fontFamily: "Inter_500Medium" },
   qaText: { fontSize: 14, fontFamily: "Inter_500Medium" },
   qaResponse: { fontSize: 13, fontFamily: "Inter_400Regular" },
-  qaNextStep: { fontSize: 12, fontFamily: "Inter_500Medium", fontStyle: "italic" },
-  qaActionsRow: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 8 },
+  qaNextStep: {
+    fontSize: 12,
+    fontFamily: "Inter_500Medium",
+    fontStyle: "italic",
+  },
+  qaActionsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 8,
+  },
   primaryAction: {
     flexDirection: "row",
     alignItems: "center",
@@ -3366,7 +4142,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   readReceiptName: { fontSize: 14, fontFamily: "Inter_600SemiBold" },
-  readReceiptMeta: { fontSize: 11, fontFamily: "Inter_400Regular", marginTop: 1 },
+  readReceiptMeta: {
+    fontSize: 11,
+    fontFamily: "Inter_400Regular",
+    marginTop: 1,
+  },
   nudgeBtn: {
     flexDirection: "row",
     alignItems: "center",
