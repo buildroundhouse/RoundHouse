@@ -1,0 +1,34 @@
+# Prepared configuration. Applying this creates a paid, non-sleeping service.
+# Confirm the current compute price before creating it. No database is replaced.
+services:
+  - type: web
+    name: roundhouse-web
+    runtime: docker
+    repo: https://github.com/buildroundhouse/RoundHouse
+    branch: fix/permanent-phone-hosting
+    dockerfilePath: ./Dockerfile.web
+    dockerContext: .
+    plan: 0.5c-512mb
+    region: ohio
+    numInstances: 1
+    autoDeployTrigger: off
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3001"
+      - key: ROUNDHOUSE_WEB_DIR
+        value: /app/web
+      - key: FIREBASE_PROJECT_ID
+        value: round-house-nfm9r
+      - key: EXPO_PUBLIC_FIREBASE_PROJECT_ID
+        value: round-house-nfm9r
+      - key: EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN
+        value: round-house-nfm9r.firebaseapp.com
+      - key: EXPO_PUBLIC_FIREBASE_API_KEY
+        sync: false
+      - key: EXPO_PUBLIC_FIREBASE_APP_ID
+        sync: false
+      - key: DATABASE_URL
+        sync: false

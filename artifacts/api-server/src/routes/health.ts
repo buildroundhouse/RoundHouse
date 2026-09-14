@@ -17,9 +17,8 @@ router.get("/healthz", (_req, res) => {
 //   200 — migrations completed cleanly (`state: "ok"`)
 //   503 — migrations are still running (`state: "pending"`)
 //   500 — migrations failed during startup (`state: "failed"`)
-// Note: index.ts refuses to start the server when any required
-// NOT NULL column was left nullable, so a reachable /health will
-// always show `unresolved: []`.
+// Schema warnings also return 503: the API gate refuses traffic until
+// required backfills are resolved. Only a clean schema is ready.
 router.get("/health", (_req, res) => {
   const migrations = getMigrationStatus();
   if (migrations.state === "pending") {
@@ -28,6 +27,10 @@ router.get("/health", (_req, res) => {
   }
   if (migrations.state === "failed") {
     res.status(500).json({ status: "error", migrations });
+    return;
+  }
+  if (migrations.state === "warning") {
+    res.status(503).json({ status: "degraded", migrations });
     return;
   }
   res.status(200).json({ status: "ok", migrations });

@@ -4,6 +4,7 @@
   "license": "MIT",
   "packageManager": "pnpm@10.11.0",
   "scripts": {
+    "build:hosted": "node scripts/build-hosted.mjs",
     "build:vercel": "node scripts/build-vercel.mjs",
     "test:hosting": "node --test scripts/vercel-config.test.mjs",
     "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
