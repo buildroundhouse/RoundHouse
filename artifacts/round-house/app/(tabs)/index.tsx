@@ -50,7 +50,8 @@ import LogsScreen from "@/app/(tabs)/logs";
 import { ReceiptsPanel } from "@/components/ReceiptsPanel";
 import PropertiesScreen from "@/app/(tabs)/properties";
 import MyJobsScreen from "@/app/my-jobs";
-import RemindersScreen from "@/app/reminders";
+import { DailyGrind } from "@/components/DailyGrind";
+import { useDailyGrindOpening } from "@/lib/useDailyGrindOpening";
 
 function TimelineHeader({
   avatarUrl,
@@ -449,13 +450,8 @@ export default function TimelineScreen() {
   }, []);
   const closeSidePanel = useCallback(() => setActiveSidePanel(null), []);
 
-  // Reminders panel exposes its "+" handler to the overlay header via a
-  // ref-style setter so the overlay header can render an Add button that
-  // opens the same modal the standalone screen would have shown.
-  const remindersAddRef = useRef<(() => void) | null>(null);
-  const setRemindersAdd = useCallback((open: () => void) => {
-    remindersAddRef.current = open;
-  }, []);
+  const openDailyGrind = useCallback(() => setActiveSidePanel("reminders"), []);
+  useDailyGrindOpening(openDailyGrind);
 
   const feedLoaded = !feedQuery.isLoading;
   const timelineEvents = useMemo(() => logs.map(workLogToEvent), [logs]);
@@ -633,30 +629,16 @@ export default function TimelineScreen() {
       <HomeSidePanelOverlay
         panelKey={activeSidePanel}
         originY={overlayOriginY}
-        topOffset={rightStackTop}
+        topOffset={activeSidePanel === "reminders" ? (Platform.OS === "web" ? 8 : insets.top + 4) : rightStackTop}
         title={activeSidePanel ? PANEL_TITLES[activeSidePanel] : ""}
         onClose={closeSidePanel}
-        headerRight={
-          activeSidePanel === "reminders" ? (
-            <Pressable
-              onPress={() => remindersAddRef.current?.()}
-              accessibilityLabel="Add reminder"
-              hitSlop={10}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.6 : 1,
-                padding: 4,
-              })}
-            >
-              <Feather name="plus" size={22} color={colors.foreground} />
-            </Pressable>
-          ) : null
-        }
+
       >
         {activeSidePanel === "logs" ? <LogsScreen embedded /> : null}
         {activeSidePanel === "jobs" ? <MyJobsScreen embedded /> : null}
         {activeSidePanel === "receipts" ? <ReceiptsPanel /> : null}
         {activeSidePanel === "reminders" ? (
-          <RemindersScreen embedded onRequestAdd={setRemindersAdd} />
+          <DailyGrind />
         ) : null}
         {activeSidePanel === "properties" ? (
           <PropertiesScreen embedded />
