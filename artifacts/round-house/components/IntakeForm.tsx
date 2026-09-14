@@ -20,6 +20,12 @@ import {
 } from "@/lib/intake-schemas";
 import { ZipPicker } from "./ZipPicker";
 import { AddressAutocompleteInput } from "./AddressAutocompleteInput";
+import { PropertyAddressCard } from "./PropertyAddressCard";
+import {
+  formatPropertyAddress,
+  propertyAddressError,
+  readPropertyAddress,
+} from "@/lib/property-address";
 
 interface Props {
   intake: ModeIntake;
@@ -38,7 +44,10 @@ function getFieldError(field: IntakeField, value: unknown): string | null {
       return !Array.isArray(value) || value.length === 0;
     }
     if (field.kind === "single-select") {
-      return value == null || (typeof value === "string" && value.trim().length === 0);
+      return (
+        value == null ||
+        (typeof value === "string" && value.trim().length === 0)
+      );
     }
     return typeof value !== "string" || value.trim().length === 0;
   })();
@@ -81,14 +90,26 @@ export function IntakeForm({
     setTouched((t) => (t[key] ? t : { ...t, [key]: true }));
   }, []);
 
-  const ready = isIntakeComplete(intake, data);
+  const hasPropertyAddress =
+    intake.kind === "home" &&
+    intake.fields.some((f) => f.key === "placeAddress");
+  const addressError = hasPropertyAddress
+    ? propertyAddressError(readPropertyAddress(data.propertyAddress))
+    : null;
+  const ready = isIntakeComplete(intake, data) && !addressError;
 
   const missing = useMemo(
     () =>
       intake.fields
-        .map((f) => ({ field: f, err: getFieldError(f, data[f.key]) }))
+        .map((f) => ({
+          field: f,
+          err:
+            f.key === "placeAddress" && hasPropertyAddress
+              ? addressError
+              : getFieldError(f, data[f.key]),
+        }))
         .filter((m) => m.err != null),
-    [intake, data],
+    [intake, data, hasPropertyAddress, addressError],
   );
 
   const submit = async () => {
@@ -99,7 +120,10 @@ export function IntakeForm({
       if (first) {
         const y = fieldYRef.current[first];
         if (typeof y === "number") {
-          scrollRef.current?.scrollTo({ y: Math.max(y - 16, 0), animated: true });
+          scrollRef.current?.scrollTo({
+            y: Math.max(y - 16, 0),
+            animated: true,
+          });
         }
       }
       return;
@@ -142,11 +166,17 @@ export function IntakeForm({
             hitSlop={12}
             accessibilityRole="button"
             accessibilityLabel="Close"
-            style={({ pressed }) => [styles.headerBtn, { opacity: pressed ? 0.6 : 1 }]}
+            style={({ pressed }) => [
+              styles.headerBtn,
+              { opacity: pressed ? 0.6 : 1 },
+            ]}
           >
             <Feather name="x" size={22} color={colors.foreground} />
           </Pressable>
-          <Text style={[styles.headerTitle, { color: colors.foreground }]} numberOfLines={1}>
+          <Text
+            style={[styles.headerTitle, { color: colors.foreground }]}
+            numberOfLines={1}
+          >
             {intake.title}
           </Text>
           <View style={styles.headerBtn} />
@@ -164,10 +194,14 @@ export function IntakeForm({
         keyboardShouldPersistTaps="handled"
       >
         {!onClose ? (
-          <Text style={[styles.title, { color: colors.foreground }]}>{intake.title}</Text>
+          <Text style={[styles.title, { color: colors.foreground }]}>
+            {intake.title}
+          </Text>
         ) : null}
         {intake.intro ? (
-          <Text style={[styles.intro, { color: colors.mutedForeground }]}>{intake.intro}</Text>
+          <Text style={[styles.intro, { color: colors.mutedForeground }]}>
+            {intake.intro}
+          </Text>
         ) : null}
 
         <View style={styles.fields}>
@@ -181,20 +215,47 @@ export function IntakeForm({
                   fieldYRef.current[field.key] = e.nativeEvent.layout.y;
                 }}
               >
-                <FieldRenderer
-                  field={field}
-                  value={data[field.key]}
-                  onChange={(v) => setValue(field.key, v)}
-                  onBlur={() => markTouched(field.key)}
-                  allValues={data}
-                  errorText={showError ? fieldError : null}
-                />
+                {field.key === "placeAddress" && hasPropertyAddress ? (
+                  <>
+                    <PropertyAddressCard
+                      value={readPropertyAddress(data.propertyAddress)}
+                      onChange={(address) => {
+                        setData((d) => ({
+                          ...d,
+                          propertyAddress: address,
+                          placeAddress: formatPropertyAddress(address),
+                        }));
+                        setTouched((t) => ({ ...t, placeAddress: true }));
+                        setError("");
+                      }}
+                    />
+                    {submitAttempted && addressError ? (
+                      <Text
+                        accessibilityRole="alert"
+                        style={{ color: ERROR_COLOR }}
+                      >
+                        {addressError}
+                      </Text>
+                    ) : null}
+                  </>
+                ) : (
+                  <FieldRenderer
+                    field={field}
+                    value={data[field.key]}
+                    onChange={(v) => setValue(field.key, v)}
+                    onBlur={() => markTouched(field.key)}
+                    allValues={data}
+                    errorText={showError ? fieldError : null}
+                  />
+                )}
               </View>
             );
           })}
         </View>
 
-        {error ? <Text style={[styles.error, { color: ERROR_COLOR }]}>{error}</Text> : null}
+        {error ? (
+          <Text style={[styles.error, { color: ERROR_COLOR }]}>{error}</Text>
+        ) : null}
 
         {showSummary ? (
           <View
@@ -204,7 +265,9 @@ export function IntakeForm({
             ]}
           >
             <Feather name="alert-circle" size={16} color={ERROR_COLOR} />
-            <Text style={[styles.summaryText, { color: ERROR_COLOR }]}>{summaryText}</Text>
+            <Text style={[styles.summaryText, { color: ERROR_COLOR }]}>
+              {summaryText}
+            </Text>
           </View>
         ) : null}
 
@@ -227,7 +290,11 @@ export function IntakeForm({
           <Text
             style={[
               styles.btnText,
-              { color: ready ? colors.primaryForeground : colors.mutedForeground },
+              {
+                color: ready
+                  ? colors.primaryForeground
+                  : colors.mutedForeground,
+              },
             ]}
           >
             {submitting ? "Saving..." : submitLabel}
@@ -260,13 +327,19 @@ function FieldRenderer({
   return (
     <View style={styles.field}>
       <View style={styles.labelRow}>
-        <Text style={[styles.label, { color: colors.foreground }]}>{field.label}</Text>
+        <Text style={[styles.label, { color: colors.foreground }]}>
+          {field.label}
+        </Text>
         {field.required ? (
-          <Text style={[styles.requiredTag, { color: ERROR_COLOR }]}>Required</Text>
+          <Text style={[styles.requiredTag, { color: ERROR_COLOR }]}>
+            Required
+          </Text>
         ) : null}
       </View>
       {field.helper ? (
-        <Text style={[styles.helper, { color: colors.mutedForeground }]}>{field.helper}</Text>
+        <Text style={[styles.helper, { color: colors.mutedForeground }]}>
+          {field.helper}
+        </Text>
       ) : null}
 
       {field.kind === "text" && (
@@ -317,7 +390,12 @@ function FieldRenderer({
           style={[
             styles.optionsWrap,
             errorText
-              ? { borderColor: wrapBorder, borderWidth: 1, borderRadius: 12, padding: 6 }
+              ? {
+                  borderColor: wrapBorder,
+                  borderWidth: 1,
+                  borderRadius: 12,
+                  padding: 6,
+                }
               : null,
           ]}
         >
@@ -339,7 +417,11 @@ function FieldRenderer({
                   <Text
                     style={[
                       styles.optionText,
-                      { color: selected ? colors.primaryForeground : colors.foreground },
+                      {
+                        color: selected
+                          ? colors.primaryForeground
+                          : colors.foreground,
+                      },
                     ]}
                   >
                     {opt.label}
@@ -351,7 +433,8 @@ function FieldRenderer({
                             : colors.mutedForeground,
                         }}
                       >
-                        {" "}{opt.sublabel}
+                        {" "}
+                        {opt.sublabel}
                       </Text>
                     ) : null}
                   </Text>
@@ -400,12 +483,21 @@ function FieldRenderer({
         <View
           style={
             errorText
-              ? { borderColor: wrapBorder, borderWidth: 1, borderRadius: 12, padding: 8 }
+              ? {
+                  borderColor: wrapBorder,
+                  borderWidth: 1,
+                  borderRadius: 12,
+                  padding: 8,
+                }
               : null
           }
         >
           <ZipPicker
-            primaryZip={typeof allValues.primaryZip === "string" ? allValues.primaryZip : ""}
+            primaryZip={
+              typeof allValues.primaryZip === "string"
+                ? allValues.primaryZip
+                : ""
+            }
             value={Array.isArray(value) ? (value as string[]) : []}
             onChange={onChange}
           />
@@ -417,7 +509,12 @@ function FieldRenderer({
           style={[
             styles.optionsWrap,
             errorText
-              ? { borderColor: wrapBorder, borderWidth: 1, borderRadius: 12, padding: 6 }
+              ? {
+                  borderColor: wrapBorder,
+                  borderWidth: 1,
+                  borderRadius: 12,
+                  padding: 6,
+                }
               : null,
           ]}
         >
@@ -444,7 +541,11 @@ function FieldRenderer({
                   <Text
                     style={[
                       styles.optionText,
-                      { color: selected ? colors.primaryForeground : colors.foreground },
+                      {
+                        color: selected
+                          ? colors.primaryForeground
+                          : colors.foreground,
+                      },
                     ]}
                   >
                     {opt.label}
@@ -456,7 +557,8 @@ function FieldRenderer({
                             : colors.mutedForeground,
                         }}
                       >
-                        {" "}{opt.sublabel}
+                        {" "}
+                        {opt.sublabel}
                       </Text>
                     ) : null}
                   </Text>
@@ -483,7 +585,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     gap: 8,
   },
-  headerBtn: { width: 40, height: 40, alignItems: "center", justifyContent: "center" },
+  headerBtn: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   headerTitle: {
     flex: 1,
     textAlign: "center",
@@ -492,12 +599,21 @@ const styles = StyleSheet.create({
   },
   scroll: { paddingHorizontal: 24, gap: 16 },
   title: { fontSize: 26, fontFamily: "Inter_700Bold" },
-  intro: { fontSize: 14, fontFamily: "Inter_400Regular", lineHeight: 20, marginBottom: 8 },
+  intro: {
+    fontSize: 14,
+    fontFamily: "Inter_400Regular",
+    lineHeight: 20,
+    marginBottom: 8,
+  },
   fields: { gap: 18 },
   field: { gap: 8 },
   labelRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   label: { fontSize: 15, fontFamily: "Inter_600SemiBold" },
-  requiredTag: { fontSize: 11, fontFamily: "Inter_700Bold", letterSpacing: 0.4 },
+  requiredTag: {
+    fontSize: 11,
+    fontFamily: "Inter_700Bold",
+    letterSpacing: 0.4,
+  },
   helper: { fontSize: 12, fontFamily: "Inter_400Regular" },
   input: {
     height: 50,
@@ -527,7 +643,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginTop: 4,
   },
-  summaryText: { flex: 1, fontSize: 13, fontFamily: "Inter_500Medium", lineHeight: 18 },
-  btn: { height: 52, borderRadius: 14, alignItems: "center", justifyContent: "center", marginTop: 8 },
+  summaryText: {
+    flex: 1,
+    fontSize: 13,
+    fontFamily: "Inter_500Medium",
+    lineHeight: 18,
+  },
+  btn: {
+    height: 52,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 8,
+  },
   btnText: { fontSize: 16, fontFamily: "Inter_600SemiBold" },
 });

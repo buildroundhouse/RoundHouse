@@ -219,9 +219,10 @@ export const MODE_INTAKES: Record<UserModeKind, ModeIntake> = {
       },
       {
         key: "placeAddress",
-        label: "Street address (optional)",
-        helper: "Helps with mapping, deals nearby, and matching service-area pros. Never shown publicly.",
+        label: "Property address",
+        helper: "Enter the complete property address and confirm the ZIP Code.",
         kind: "address",
+        required: true,
         placeholder: "123 Main St, Austin, TX",
         maxLength: 200,
       },

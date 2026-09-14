@@ -1,9 +1,27 @@
-import React, { useCallback } from "react";
-import { Alert, BackHandler, Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  Alert,
+  ActivityIndicator,
+  BackHandler,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { IntakeForm } from "@/components/IntakeForm";
 import { MODE_INTAKES } from "@/lib/intake-schemas";
+import {
+  formatPropertyAddress,
+  readPropertyAddress,
+  type PropertyAddress,
+} from "@/lib/property-address";
+import { useAuth } from "@/lib/auth";
+import {
+  loadPropertyAddressDraft,
+  clearPropertyAddressDraft,
+} from "@/lib/property-address-draft";
 import { useResolvedIntake } from "@/lib/presetChips";
 import { confirm } from "@/lib/confirm";
 import {
@@ -24,20 +42,45 @@ import {
 export default function IntakeScreen() {
   const colors = useColors();
   const router = useRouter();
-  const params = useLocalSearchParams<{ modeId?: string; kind?: string }>();
-  const { profile, activeMode, modes, refetchModes, refetchProfile } = useProfile();
+  const params = useLocalSearchParams<{
+    modeId?: string;
+    kind?: string;
+  }>();
+  const { profile, activeMode, modes, refetchModes, refetchProfile } =
+    useProfile();
   const completeIntake = useCompleteModeIntake();
   const updateMe = useUpdateMe();
   const discardMode = useDiscardMode();
 
   const modeId = Number(params.modeId ?? activeMode?.id);
   const kind = (params.kind as UserModeKind | undefined) ?? activeMode?.kind;
+  const { userId } = useAuth();
+  const [draft, setDraft] = useState<{
+    key: string;
+    address: PropertyAddress | null;
+  } | null>(null);
+  const draftKey = `${userId}:${modeId}`;
+  useEffect(() => {
+    if (kind !== "home" || !userId || !modeId) return;
+    let cancelled = false;
+    loadPropertyAddressDraft(userId, modeId)
+      .then((address) => {
+        if (!cancelled) setDraft({ key: draftKey, address });
+      })
+      .catch(() => {
+        if (!cancelled) setDraft({ key: draftKey, address: null });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, modeId, kind, draftKey]);
 
   const targetMode = modes.find((m) => m.id === modeId) ?? null;
   // #625: Once an intake is complete, this is no longer the "build a new
   // avatar" flow — completed avatars are managed from Profile, so we
   // do not offer Start Over.
-  const canStartOver = !!modeId && !!targetMode && targetMode.intakeCompletedAt == null;
+  const canStartOver =
+    !!modeId && !!targetMode && targetMode.intakeCompletedAt == null;
 
   const exit = useCallback(() => {
     if (router.canGoBack()) router.back();
@@ -101,11 +144,24 @@ export default function IntakeScreen() {
   if (!modeId || !kind || !MODE_INTAKES[kind]) {
     return <View style={{ flex: 1, backgroundColor: colors.background }} />;
   }
+  if (kind === "home" && userId && draft?.key !== draftKey) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center" }}>
+        <ActivityIndicator accessibilityLabel="Loading address" />
+      </View>
+    );
+  }
 
   // Pre-populate user-scoped fields from the existing user record so a
   // returning user can edit their contact details inline.
-  const initialModeData = (targetMode?.intakeData as Record<string, unknown>) ?? {};
+  const initialModeData =
+    (targetMode?.intakeData as Record<string, unknown>) ?? {};
   const initialData: Record<string, unknown> = { ...initialModeData };
+  if (kind === "home" && draft?.address && !initialData.propertyAddress) {
+    const address = draft.address;
+    initialData.propertyAddress = address;
+    initialData.placeAddress = formatPropertyAddress(address);
+  }
   // Inherit personal info from the user account when starting a fresh profile.
   if (kind === "trade_pro" && !initialData.ownerName && profile?.name) {
     initialData.ownerName = profile.name;
@@ -120,6 +176,7 @@ export default function IntakeScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <IntakeForm
+        key={draftKey}
         intake={intake}
         initialData={initialData}
         submitLabel="Enter your space"
@@ -141,11 +198,21 @@ export default function IntakeScreen() {
               modeData[f.key] = data[f.key];
             }
           }
+          if (kind === "home") {
+            const address = readPropertyAddress(data.propertyAddress);
+            modeData.propertyAddress = address;
+            modeData.placeAddress = formatPropertyAddress(address);
+          }
           if (kind === "trade_pro") {
-            const zip = typeof modeData.primaryZip === "string" ? modeData.primaryZip.trim() : "";
+            const zip =
+              typeof modeData.primaryZip === "string"
+                ? modeData.primaryZip.trim()
+                : "";
             if (/^\d{5}$/.test(zip)) {
               const street =
-                typeof modeData.streetAddress === "string" ? modeData.streetAddress.trim() : "";
+                typeof modeData.streetAddress === "string"
+                  ? modeData.streetAddress.trim()
+                  : "";
               const coords = await geocodeZip(zip, street);
               if (coords) {
                 modeData.lat = coords.lat;
@@ -160,7 +227,13 @@ export default function IntakeScreen() {
           if (Object.keys(userUpdates).length > 0) {
             await updateMe.mutateAsync({ data: userUpdates });
           }
-          await completeIntake.mutateAsync({ modeId, data: { intakeData: modeData } });
+          await completeIntake.mutateAsync({
+            modeId,
+            data: { intakeData: modeData },
+          });
+          if (kind === "home" && userId) {
+            await clearPropertyAddressDraft(userId, modeId).catch(() => {});
+          }
           await Promise.all([refetchModes(), refetchProfile()]);
           // If this user landed via a "Share Round House" SMS invite, mark
           // it accepted now that they've completed intake. Failures are
@@ -183,7 +256,10 @@ export default function IntakeScreen() {
         <View
           style={[
             styles.startOverBar,
-            { backgroundColor: colors.background, borderTopColor: colors.border },
+            {
+              backgroundColor: colors.background,
+              borderTopColor: colors.border,
+            },
           ]}
         >
           <Pressable
@@ -197,7 +273,9 @@ export default function IntakeScreen() {
             ]}
             hitSlop={8}
           >
-            <Text style={[styles.startOverText, { color: colors.mutedForeground }]}>
+            <Text
+              style={[styles.startOverText, { color: colors.mutedForeground }]}
+            >
               {discardMode.isPending
                 ? "Starting over…"
                 : "Start over — pick a different hat"}
