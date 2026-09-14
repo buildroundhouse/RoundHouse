@@ -5,7 +5,7 @@ on the documentation branch/main. This implementation replaces the Resolution
 tab's old export of the Reminders page. Command Center appearance is a separate
 change; this page does not modify its tabs, header, or bottom control styling.
 
-- Explicit **Control Center** back button, including inside an opened resolution.
+- Explicit **Command Center** back button, including inside an opened resolution.
 - New resolutions require an existing property/business and an approved participant.
   Server-side membership checks reject unrelated recipients and read-only creators.
 - Red **Needs Your Attention**, green **Waiting on Them**, gray **Resolved**.
