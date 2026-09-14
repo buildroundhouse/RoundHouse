@@ -11,6 +11,11 @@ import {
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import { IntakeForm } from "@/components/IntakeForm";
+import {
+  loadEntryDraft,
+  clearEntryDraft,
+  type EntryDraft,
+} from "@/lib/entry-draft";
 import { MODE_INTAKES } from "@/lib/intake-schemas";
 import {
   formatPropertyAddress,
@@ -60,6 +65,24 @@ export default function IntakeScreen() {
     address: PropertyAddress | null;
   } | null>(null);
   const draftKey = `${userId}:${modeId}`;
+  const [entryDraft, setEntryDraft] = useState<{
+    key: string;
+    value: EntryDraft | null;
+  } | null>(null);
+  useEffect(() => {
+    if (!userId || !modeId) return;
+    let cancelled = false;
+    loadEntryDraft(userId, modeId)
+      .then((value) => {
+        if (!cancelled) setEntryDraft({ key: draftKey, value });
+      })
+      .catch(() => {
+        if (!cancelled) setEntryDraft({ key: draftKey, value: null });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, modeId, draftKey]);
   useEffect(() => {
     if (kind !== "home" || !userId || !modeId) return;
     let cancelled = false;
@@ -97,9 +120,9 @@ export default function IntakeScreen() {
   const startOver = useCallback(async () => {
     if (!modeId) return;
     const ok = await confirm({
-      title: "Start over — pick a different hat?",
+      title: "Start over — choose a different space?",
       message:
-        "Anything you've typed here will be discarded and this avatar will be removed.",
+        "Anything you've typed here will be discarded and this unfinished profile will be removed.",
       confirmLabel: "Start over",
       cancelLabel: "Cancel",
       destructive: true,
@@ -115,7 +138,7 @@ export default function IntakeScreen() {
       return;
     }
     await Promise.all([refetchModes(), refetchProfile()]);
-    router.replace("/(onboarding)/mode-picker");
+    router.replace("/(onboarding)/entry");
   }, [modeId, discardMode, refetchModes, refetchProfile, router]);
 
   useFocusEffect(
@@ -139,12 +162,29 @@ export default function IntakeScreen() {
 
   const fallbackIntake = MODE_INTAKES.home;
   const baseIntake = (kind && MODE_INTAKES[kind]) ?? fallbackIntake;
-  const intake = useResolvedIntake(baseIntake);
+  const resolvedIntake = useResolvedIntake(baseIntake);
+  const savedEntry = entryDraft?.key === draftKey ? entryDraft.value : null;
+  const intake =
+    savedEntry?.selection.entity === "property"
+      ? {
+          ...resolvedIntake,
+          title: "Property details",
+          intro: `${savedEntry.selection.propertyType === "commercial" ? "Commercial" : "Residential"} property · Owner`,
+          // Address was completed on its own preceding screen. Back returns to it.
+          fields: resolvedIntake.fields.filter(
+            (field) => field.key !== "placeAddress",
+          ),
+        }
+      : resolvedIntake;
 
   if (!modeId || !kind || !MODE_INTAKES[kind]) {
     return <View style={{ flex: 1, backgroundColor: colors.background }} />;
   }
-  if (kind === "home" && userId && draft?.key !== draftKey) {
+  if (
+    userId &&
+    (entryDraft?.key !== draftKey ||
+      (kind === "home" && draft?.key !== draftKey))
+  ) {
     return (
       <View style={{ flex: 1, justifyContent: "center" }}>
         <ActivityIndicator accessibilityLabel="Loading address" />
@@ -156,7 +196,10 @@ export default function IntakeScreen() {
   // returning user can edit their contact details inline.
   const initialModeData =
     (targetMode?.intakeData as Record<string, unknown>) ?? {};
-  const initialData: Record<string, unknown> = { ...initialModeData };
+  const initialData: Record<string, unknown> = {
+    ...initialModeData,
+    ...savedEntry?.data,
+  };
   if (kind === "home" && draft?.address && !initialData.propertyAddress) {
     const address = draft.address;
     initialData.propertyAddress = address;
@@ -184,7 +227,10 @@ export default function IntakeScreen() {
         onSubmit={async (data) => {
           // Split user-scoped fields from mode-scoped intake data.
           const userUpdates: UpdateUserBody = {};
-          const modeData: Record<string, unknown> = {};
+          const modeData: Record<string, unknown> = {
+            ...savedEntry?.data,
+            ...(savedEntry ? { entrySelection: savedEntry.selection } : {}),
+          };
           for (const f of intake.fields) {
             if (f.scope === "user" && f.userField) {
               // Only emit a write when the form actually carried this field,
@@ -198,8 +244,10 @@ export default function IntakeScreen() {
               modeData[f.key] = data[f.key];
             }
           }
-          if (kind === "home") {
-            const address = readPropertyAddress(data.propertyAddress);
+          if (kind === "home" || savedEntry?.selection.entity === "property") {
+            const address = readPropertyAddress(
+              data.propertyAddress ?? initialData.propertyAddress,
+            );
             modeData.propertyAddress = address;
             modeData.placeAddress = formatPropertyAddress(address);
           }
@@ -234,6 +282,7 @@ export default function IntakeScreen() {
           if (kind === "home" && userId) {
             await clearPropertyAddressDraft(userId, modeId).catch(() => {});
           }
+          if (userId) await clearEntryDraft(userId, modeId).catch(() => {});
           await Promise.all([refetchModes(), refetchProfile()]);
           // If this user landed via a "Share Round House" SMS invite, mark
           // it accepted now that they've completed intake. Failures are
@@ -266,7 +315,7 @@ export default function IntakeScreen() {
             onPress={startOver}
             disabled={discardMode.isPending}
             accessibilityRole="button"
-            accessibilityLabel="Start over and pick a different hat"
+            accessibilityLabel="Start over and choose a different space"
             style={({ pressed }) => [
               styles.startOverBtn,
               { opacity: pressed || discardMode.isPending ? 0.6 : 1 },
@@ -278,7 +327,7 @@ export default function IntakeScreen() {
             >
               {discardMode.isPending
                 ? "Starting over…"
-                : "Start over — pick a different hat"}
+                : "Start over — choose a different space"}
             </Text>
           </Pressable>
         </View>
