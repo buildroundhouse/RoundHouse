@@ -1,3 +1,4 @@
+import { ResolutionToggleArtwork, resolutionAppearance } from "@/components/ResolutionToggleArtwork";
 import { BlurView } from "expo-blur";
 import { Tabs, Redirect } from "expo-router";
 import { SymbolView, type SFSymbol } from "expo-symbols";
@@ -55,43 +56,8 @@ const TABS: Record<
 };
 
 function ResolutionToggleIcon({ signal }: { signal: ResolutionSignal }) {
-  const needsYou = signal.responsibility === "you";
-  const isUrgent = needsYou && signal.unansweredPrompts >= 4;
-  const rim =
-    needsYou && signal.unansweredPrompts === 2
-      ? "#FACC15"
-      : needsYou && signal.unansweredPrompts >= 3
-        ? "#DC2626"
-        : "#6B7280";
-  const face =
-    signal.responsibility === "empty"
-      ? "#9CA3AF"
-      : needsYou
-        ? "#DC2626"
-        : "#16A34A";
-  const leanRight = needsYou;
-  return (
-    <View style={styles.resolutionIconFrame}>
-      {isUrgent ? (
-        <View style={styles.fireRim} pointerEvents="none">
-          <View style={[styles.flame, styles.flameOne]} />
-          <View style={[styles.flame, styles.flameTwo]} />
-          <View style={[styles.flame, styles.flameThree]} />
-        </View>
-      ) : null}
-      <View style={[styles.resolutionPlacard, { borderColor: rim }]}>
-        <View style={styles.resolutionPivot} />
-        <View
-          style={[
-            styles.resolutionLever,
-            { transform: [{ rotate: leanRight ? "34deg" : "-34deg" }] },
-          ]}
-        >
-          <View style={[styles.resolutionSignal, { backgroundColor: face }]} />
-        </View>
-      </View>
-    </View>
-  );
+  const status = signal.responsibility === "you" ? "attention" : signal.responsibility === "them" ? "waiting" : "resolved";
+  return <ResolutionToggleArtwork width={54} appearance={resolutionAppearance(status, Math.max(0, signal.unansweredPrompts - 1))} />;
 }
 
 function CommandCenterTabs() {
@@ -219,57 +185,3 @@ export default function TabLayout() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  resolutionIconFrame: {
-    width: 38,
-    height: 28,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  resolutionPlacard: {
-    width: 34,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    backgroundColor: "#D1D5DB",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  resolutionPivot: {
-    position: "absolute",
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: "#4B5563",
-    zIndex: 2,
-  },
-  resolutionLever: {
-    width: 23,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: "#4B5563",
-    alignItems: "flex-end",
-    justifyContent: "center",
-  },
-  resolutionSignal: {
-    width: 11,
-    height: 11,
-    borderRadius: 6,
-    borderWidth: 1.5,
-    borderColor: "#F9FAFB",
-  },
-  fireRim: { ...StyleSheet.absoluteFillObject },
-  flame: {
-    position: "absolute",
-    width: 7,
-    height: 11,
-    borderTopLeftRadius: 7,
-    borderBottomRightRadius: 7,
-    backgroundColor: "#F97316",
-    transform: [{ rotate: "45deg" }],
-  },
-  flameOne: { left: 4, top: -1 },
-  flameTwo: { left: 15, top: -4, backgroundColor: "#DC2626" },
-  flameThree: { right: 3, top: 0, backgroundColor: "#F59E0B" },
-});
