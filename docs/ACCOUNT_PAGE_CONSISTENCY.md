@@ -47,3 +47,14 @@ against an isolated in-memory database, API mutation authorization and shared to
 state); Expo production web export and API bundle pass. No new type errors in changed
 files; unrelated pre-existing app and API test type errors still block whole-project
 typecheck. No signed-in handset verification was available in this session.
+
+## Former participants across all account roles
+
+Follow the governing [Unaffiliated Viewer lifecycle](UNAFFILIATED_VIEWER_LOGIC.md). When the last
+approved Entity affiliation ends, every former role defaults to Viewer. Show
+**Unaffiliated** on the Entity/name line and **Viewer** immediately underneath;
+replace stale Entity identity and former authority consistently across Command
+Center, Profile, and View Profile. Preserve the personal account and its own work
+history, including work performed through a former business, without restoring
+former Entity access. New users do not qualify for this intake exception.
+The linked document distinguishes required behavior from implementation status.
