@@ -38,6 +38,7 @@ import {
   NotificationBellButton,
 } from "@/components/TopBarAvatar";
 import { resolveStorageUrl } from "@/lib/uploads";
+import { AnalyticsRewardsModal } from "@/components/AnalyticsRewardsModal";
 import { tierForScore } from "@/components/BadgeTier";
 import { getModeAccent } from "@/lib/modeAccent";
 import { ModeSwitcher } from "@/components/ModeSwitcher";
@@ -54,12 +55,14 @@ import RemindersScreen from "@/app/reminders";
 function TimelineHeader({
   avatarUrl,
   onOpenProfile,
+  onOpenRewards,
   accountName,
   roleLabel,
   points,
 }: {
   avatarUrl: string | null;
   onOpenProfile: () => void;
+  onOpenRewards: () => void;
   accountName: string;
   roleLabel: string;
   points: number;
@@ -103,9 +106,9 @@ function TimelineHeader({
       </View>
       </View>
       <Pressable
-        onPress={onOpenProfile}
+        onPress={onOpenRewards}
         accessibilityRole="button"
-        accessibilityLabel={`${tierForScore(points).label} status, ${points} points`}
+        accessibilityLabel={`Open Reward Center, ${tierForScore(points).label} status, ${points} points`}
         style={[
           styles.pointsTicker,
           { borderColor: colors.border, backgroundColor: colors.card },
@@ -450,6 +453,7 @@ export default function TimelineScreen() {
 
   const goPeople = () => router.push("/(tabs)/clients" as never);
   const goProperty = (id: number) => router.push(`/property/${id}` as never);
+  const [rewardsVisible, setRewardsVisible] = useState(false);
   const goProfile = () => router.push("/(tabs)/profile" as never);
 
   // Active side panel state — replaces the previous router.push for the
@@ -557,6 +561,7 @@ export default function TimelineScreen() {
         <TimelineHeader
           avatarUrl={headerAvatarUrl}
           onOpenProfile={goProfile}
+          onOpenRewards={() => setRewardsVisible(true)}
           accountName={activeAccountName}
           roleLabel={headerRoleLabel}
           points={points}
@@ -681,6 +686,7 @@ export default function TimelineScreen() {
           <PropertiesScreen embedded />
         ) : null}
       </HomeSidePanelOverlay>
+      {rewardsVisible ? <AnalyticsRewardsModal visible onClose={() => setRewardsVisible(false)} /> : null}
       <TimelineMotionDebugPanel />
     </View>
   );
