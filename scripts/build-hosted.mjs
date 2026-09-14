@@ -3,6 +3,7 @@ import { access } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { firebaseKeys } from './vercel-config.mjs';
+import { addWebAppMetadata } from './web-app-meta.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const missing = firebaseKeys.filter(key => !process.env[key]?.trim());
@@ -23,5 +24,6 @@ function run(args, cwd) {
 }
 run(['exec', 'expo', 'export', '--platform', 'web', '--max-workers', '2', '--output-dir', output], path.join(root, 'artifacts/round-house'));
 await access(path.join(output, 'index.html'));
+await addWebAppMetadata(output);
 run(['--filter', '@workspace/api-server', 'build'], root);
 console.log('Web and API builds are ready for a single hosted service.');
