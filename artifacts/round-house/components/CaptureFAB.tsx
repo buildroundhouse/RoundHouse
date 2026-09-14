@@ -780,7 +780,7 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: "center",
   },
-  assistantHint: { position: "absolute", top: 68, width: 120, textAlign: "center", color: "#1677FF", fontSize: 10, lineHeight: 13, fontFamily: "Inter_500Medium" },
+  assistantHint: { position: "absolute", top: 72, width: 120, textAlign: "center", color: "#1677FF", fontSize: 10, lineHeight: 13, fontFamily: "Inter_500Medium" },
   fab: {
     width: 64,
     height: 64,

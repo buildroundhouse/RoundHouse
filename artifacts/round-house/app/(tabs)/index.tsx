@@ -125,14 +125,15 @@ function TimelineHeader({
           </Text>
         </View>
       </Pressable>
-      <View style={{ flex: 1, alignItems: "flex-end" }}><NotificationBellButton /></View>
+      <NotificationBellButton />
+      <MailboxButton />
     </View>
   );
 }
 
 // Bookmark-style side tabs that protrude from the right edge, matching the
 // curved 3D look of the iOS Photos app side tabs. Each tab renders a single
-// horizontal label beneath its icon inside a card with a left-rounded silhouette and a
+// vertical label and upright icon inside a card with a left-rounded silhouette and a
 // soft shadow. Tabs stack vertically and are vertically centered as a group
 // so the screen feels balanced regardless of timeline length.
 type SideTabSpec = {
@@ -171,7 +172,9 @@ function SideTab({
       ]}
     >
       <View style={styles.sideTabInner}>
-        <Feather name={spec.icon} size={15} color={SIDE_TAB_FG} />
+        <View style={{ transform: [{ rotate: "-90deg" }] }}>
+          <Feather name={spec.icon} size={15} color={SIDE_TAB_FG} />
+        </View>
         <Text style={styles.sideTabText} numberOfLines={1}>
           {spec.label}
         </Text>
@@ -635,9 +638,6 @@ export default function TimelineScreen() {
           });
         }}
       />
-      <View style={[styles.sideMailbox, { top: rightStackTop - 48 }]}>
-        <MailboxButton />
-      </View>
       <SideTabStack
         topOffset={rightStackTop}
         tabs={SIDE_TABS}
@@ -709,7 +709,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
-  headerAccountGroup: { width: "42%", flexDirection: "row", alignItems: "center", gap: 7 },
+  headerAccountGroup: { flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: 7 },
   headerAvatar: {
     width: 36,
     height: 36,
@@ -727,7 +727,6 @@ const styles = StyleSheet.create({
   },
   headerIdentity: { flex: 1, minWidth: 0, justifyContent: "center", alignItems: "flex-start", gap: 2 },
   headerRole: { fontSize: 12, lineHeight: 16, fontFamily: "Inter_500Medium" },
-  sideMailbox: { position: "absolute", right: 8, width: 44, height: 44, alignItems: "center", justifyContent: "center" },
   pointsTicker: {
     minWidth: 68,
     height: 40,
@@ -774,7 +773,7 @@ const styles = StyleSheet.create({
   sideTabStack: {
     position: "absolute",
     right: 0,
-    gap: 10,
+    gap: 16,
   },
 
   // Slim tapered bookmark silhouette — quiet/ambient so the tabs whisper
@@ -782,8 +781,8 @@ const styles = StyleSheet.create({
   // give the pronounced curve of the iOS Photos reference; smaller radii on
   // the RIGHT pull the edges inward toward the screen edge for a soft taper.
   sideTab: {
-    width: 68,
-    height: 60,
+    width: 22,
+    height: 74,
     backgroundColor: SIDE_TAB_BG,
     borderTopLeftRadius: 14,
     borderBottomLeftRadius: 14,
@@ -798,12 +797,13 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
 
-  // Icons stack down the right edge; each description stays horizontal.
+  // Rotate the label row along the narrow tab; counter-rotate only the icon.
   sideTabInner: {
-    flexDirection: "column",
+    flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    width: 64,
+    width: 70,
+    transform: [{ rotate: "90deg" }],
     justifyContent: "center",
   },
   sideTabText: {
