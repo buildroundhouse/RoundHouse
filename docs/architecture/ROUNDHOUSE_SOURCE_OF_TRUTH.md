@@ -1,5 +1,15 @@
 # ROUNDHOUSE — SOURCE OF TRUTH
 
+Round House transforms the way work is documented, making it effortless, engaging, and fun.
+
+Built for those who Build- Contractors, homeowners, and businesses track, showcase and record projects in real-time, turning progress into a living history.
+
+Designed to strengthen the relationship between the client and provider by gamifying professionalism and accountability, ensuring every milestone is captured and rewarded.
+
+More than a tool, it creates a lasting, transferable record of work that evolves with every inspiration, every contribution- Round House carefully pieces together the larger narrative.
+
+*original website copy*
+
 ## Purpose
 
 This document defines the fundamental architecture, language, and core value of Roundhouse. It is the governing reference for what Roundhouse is and how its primary objects relate.
