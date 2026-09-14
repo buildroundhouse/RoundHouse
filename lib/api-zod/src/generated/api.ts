@@ -13313,6 +13313,7 @@ export const DeleteReminderParams = zod.object({
 /**
  * @summary List Q&A items for the signed-in user (both directions)
  */
+
 export const ListQuestionsResponse = zod.object({
   questions: zod.array(
     zod.object({
@@ -13335,6 +13336,12 @@ export const ListQuestionsResponse = zod.object({
         .nullish()
         .describe(
           'For \"ask_pro\" after the client confirms. One of appointment, list, curious.',
+        ),
+      unansweredPromptCount: zod
+        .number()
+        .min(1)
+        .describe(
+          "Number of unanswered prompts in this specific Resolution thread.",
         ),
       confirmedAt: zod.coerce.date().nullish(),
       createdAt: zod.coerce.date(),
@@ -13374,6 +13381,12 @@ export const UpdateQuestionBody = zod.object({
     .boolean()
     .optional()
     .describe("Client marking a What-I-Need-From-You request done."),
+  followUp: zod
+    .boolean()
+    .optional()
+    .describe(
+      "Creator sends another prompt on the same unanswered Resolution.",
+    ),
 });
 
 export const UpdateQuestionResponse = zod.object({
@@ -13394,6 +13407,12 @@ export const UpdateQuestionResponse = zod.object({
     .nullish()
     .describe(
       'For \"ask_pro\" after the client confirms. One of appointment, list, curious.',
+    ),
+  unansweredPromptCount: zod
+    .number()
+    .min(1)
+    .describe(
+      "Number of unanswered prompts in this specific Resolution thread.",
     ),
   confirmedAt: zod.coerce.date().nullish(),
   createdAt: zod.coerce.date(),
