@@ -69,8 +69,8 @@ export default function ResolutionCenter() {
     style={[s.button, { borderColor: c.border, backgroundColor: filled ? c.text : c.card, opacity: disabled ? 0.4 : 1 }]}>
     <Text style={[s.buttonText, { color: filled ? c.card : c.text }]}>{label}</Text>
   </Pressable>;
-  const back = <Pressable accessibilityRole="button" accessibilityLabel="Back to Control Center" onPress={home} style={s.back}>
-    <Feather name="arrow-left" size={22} color={c.text} /><Text style={[s.backText, { color: c.text }]}>Control Center</Text>
+  const back = <Pressable accessibilityRole="button" accessibilityLabel="Back to Command Center" onPress={home} style={s.back}>
+    <Feather name="arrow-left" size={22} color={c.text} /><Text style={[s.backText, { color: c.text }]}>Command Center</Text>
   </Pressable>;
 
   return <View style={[s.screen, { backgroundColor: c.background, paddingTop: insets.top }]}>
@@ -126,7 +126,7 @@ export default function ResolutionCenter() {
 
     <Modal visible={selectedId !== null} animationType="slide" onRequestClose={() => setSelectedId(null)}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={[s.screen, { backgroundColor: c.background, paddingTop: insets.top }]}>
-        <View style={[s.content, s.detailNav]}><Pressable accessibilityRole="button" onPress={() => setSelectedId(null)} style={s.back} accessibilityLabel="Back to Resolution Center"><Feather name="arrow-left" size={22} color={c.text} /><Text style={[s.backText, { color: c.text }]}>Resolutions</Text></Pressable>{button("Control Center", home)}</View>
+        <View style={[s.content, s.detailNav]}><Pressable accessibilityRole="button" onPress={() => setSelectedId(null)} style={s.back} accessibilityLabel="Back to Resolution Center"><Feather name="arrow-left" size={22} color={c.text} /><Text style={[s.backText, { color: c.text }]}>Resolutions</Text></Pressable>{button("Command Center", home)}</View>
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={[s.content, { paddingBottom: Math.max(insets.bottom, 24) + 20 }]}>
           {selected ? <>
             <Text style={[s.context, { color: c.mutedForeground }]}>{selected.context || "Property / business context not recorded"}</Text>
