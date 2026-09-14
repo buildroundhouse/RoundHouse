@@ -1,5 +1,13 @@
 import React, { useMemo } from "react";
-import { Image, Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
@@ -8,7 +16,10 @@ import { resolveStorageUrl } from "@/lib/uploads";
 import { MODE_LABELS } from "@/lib/intake-schemas";
 import { OutwardAccountSwitcher } from "@/components/OutwardAccountSwitcher";
 import { DemoBadge } from "@/components/DemoBadge";
-import { useListNotifications } from "@workspace/api-client-react";
+import {
+  useGetUnansweredMessagesCount,
+  useListNotifications,
+} from "@workspace/api-client-react";
 
 export function useActiveAccountAvatarUrl(): string | null {
   const { profile, activeOutwardAccount } = useProfile();
@@ -126,6 +137,106 @@ export function InboxButton({ style }: { style?: StyleProp<ViewStyle> }) {
   );
 }
 
+export function NotificationBellButton({
+  style,
+}: {
+  style?: StyleProp<ViewStyle>;
+}) {
+  const colors = useColors();
+  const router = useRouter();
+  const { data: notifications } = useListNotifications(undefined, {
+    query: {
+      queryKey: ["/api/notifications"],
+      refetchInterval: 60_000,
+      refetchOnWindowFocus: true,
+    },
+  });
+  const unread = notifications?.unreadCount ?? 0;
+  return (
+    <HeaderIconButton
+      icon="bell"
+      label={unread > 0 ? `Notifications, ${unread} unread` : "Notifications"}
+      count={unread}
+      onPress={() => router.push("/(tabs)/notifications" as never)}
+      style={style}
+      foreground={colors.foreground}
+      border={colors.border}
+      background={colors.card}
+    />
+  );
+}
+
+export function MailboxButton({ style }: { style?: StyleProp<ViewStyle> }) {
+  const colors = useColors();
+  const router = useRouter();
+  const { data } = useGetUnansweredMessagesCount({
+    query: {
+      queryKey: ["/api/messages/unanswered-count"],
+      refetchInterval: 60_000,
+      refetchOnWindowFocus: true,
+    },
+  });
+  const unread = data?.count ?? 0;
+  return (
+    <HeaderIconButton
+      icon="mail"
+      label={
+        unread > 0 ? `Mailbox, ${unread} conversations need a reply` : "Mailbox"
+      }
+      count={unread}
+      onPress={() => router.push("/inbox" as never)}
+      style={style}
+      foreground={colors.foreground}
+      border={colors.border}
+      background={colors.card}
+    />
+  );
+}
+
+function HeaderIconButton({
+  icon,
+  label,
+  count,
+  onPress,
+  style,
+  foreground,
+  border,
+  background,
+}: {
+  icon: React.ComponentProps<typeof Feather>["name"];
+  label: string;
+  count: number;
+  onPress: () => void;
+  style?: StyleProp<ViewStyle>;
+  foreground: string;
+  border: string;
+  background: string;
+}) {
+  const badgeText = count > 99 ? "99+" : String(count);
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      hitSlop={6}
+      style={[
+        inboxStyles.btn,
+        { borderColor: border, backgroundColor: background },
+        style,
+      ]}
+    >
+      <Feather name={icon} size={16} color={foreground} />
+      {count > 0 ? (
+        <View style={inboxStyles.badge}>
+          <Text style={inboxStyles.badgeText} numberOfLines={1}>
+            {badgeText}
+          </Text>
+        </View>
+      ) : null}
+    </Pressable>
+  );
+}
+
 const inboxStyles = StyleSheet.create({
   btn: {
     width: 36,
@@ -191,7 +302,8 @@ export function TopBarAvatar({
   const colors = useColors();
   const router = useRouter();
   const avatarUrl = useActiveAccountAvatarUrl();
-  const handlePress = onPress ?? (() => router.push("/(tabs)/profile" as never));
+  const handlePress =
+    onPress ?? (() => router.push("/(tabs)/profile" as never));
 
   const containerStyle = [
     styles.avatar,
