@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   OutwardAccountEditorModal,
@@ -54,6 +55,7 @@ export function OutwardAccountSwitcher({
   variant?: "default" | "headerButton";
 } = {}) {
   const colors = useColors();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const {
     outwardAccounts,
@@ -61,6 +63,7 @@ export function OutwardAccountSwitcher({
     activeOutwardAccountId,
     refetchOutwardAccounts,
     refetchProfile,
+    refetchModes,
   } = useProfile();
   const switchMutation = useSwitchActiveOutwardAccount();
   const archiveMutation = useArchiveOutwardAccount();
@@ -106,7 +109,7 @@ export function OutwardAccountSwitcher({
       // synchronously so the refetches kicked off by
       // invalidateQueries() below already carry the new header.
       await switchMutation.mutateAsync({ id: a.id });
-      await Promise.all([refetchOutwardAccounts(), refetchProfile()]);
+      await Promise.all([refetchOutwardAccounts(), refetchProfile(), refetchModes()]);
       // Other server reads were partitioned by the previous active id;
       // refresh them so the UI matches the new identity.
       await queryClient.invalidateQueries();
@@ -137,7 +140,7 @@ export function OutwardAccountSwitcher({
         await switchMutation.mutateAsync({ id: fallback.id });
       }
       await archiveMutation.mutateAsync({ id: a.id });
-      await Promise.all([refetchOutwardAccounts(), refetchProfile()]);
+      await Promise.all([refetchOutwardAccounts(), refetchProfile(), refetchModes()]);
       // Account-scoped reads need to refresh under the new active id.
       await queryClient.invalidateQueries();
     } catch (e) {
@@ -177,15 +180,15 @@ export function OutwardAccountSwitcher({
       <Pressable
         onPress={() => setOverlayOpen(true)}
         accessibilityRole="button"
-        accessibilityLabel="Switch or add account"
+        accessibilityLabel="Switch account"
         hitSlop={8}
         style={styles.headerTriggerBtn}
       >
         <Text
-          style={[styles.headerTriggerText, { color: colors.primary }]}
+          style={[styles.headerTriggerText, { color: "#1677FF" }]}
           numberOfLines={1}
         >
-          Switch / Add Account
+          Switch account
         </Text>
       </Pressable>
     ) : (
@@ -555,11 +558,11 @@ const styles = StyleSheet.create({
   pillMeta: { fontSize: 12, fontFamily: "Inter_400Regular", marginTop: 2 },
   pillAction: { fontSize: 14, fontFamily: "Inter_600SemiBold" },
   headerTriggerBtn: {
-    paddingHorizontal: 6,
-    paddingVertical: 4,
+    paddingHorizontal: 0,
+    paddingVertical: 3,
   },
   headerTriggerText: {
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: "Inter_600SemiBold",
   },
 

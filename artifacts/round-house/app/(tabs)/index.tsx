@@ -1,3 +1,5 @@
+import { commandCenterIdentity } from "@/lib/command-center-identity";
+import { OutwardAccountSwitcher } from "@/components/OutwardAccountSwitcher";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   Image,
@@ -51,11 +53,13 @@ function TimelineHeader({
   avatarUrl,
   onOpenProfile,
   accountName,
+  roleLabel,
   points,
 }: {
   avatarUrl: string | null;
   onOpenProfile: () => void;
   accountName: string;
+  roleLabel: string;
   points: number;
 }) {
   const colors = useColors();
@@ -68,7 +72,8 @@ function TimelineHeader({
         { paddingTop: topPad, borderBottomColor: colors.border },
       ]}
     >
-      {/* LEFT: profile/company photo + company name */}
+      {/* The photo identifies the person; the name identifies the space. */}
+      <View style={styles.headerAccountGroup}>
       <Pressable
         onPress={onOpenProfile}
         accessibilityLabel="Open profile"
@@ -83,13 +88,17 @@ function TimelineHeader({
         ) : null}
       </Pressable>
       <View style={styles.headerIdentity}>
+        {accountName ? (
         <Text
           style={[styles.headerCompany, { color: colors.foreground }]}
           numberOfLines={1}
           ellipsizeMode="tail"
         >
           {accountName}
-        </Text>
+        </Text>) : null}
+        <Text style={[styles.headerRole, { color: colors.mutedForeground }]} numberOfLines={1}>{roleLabel}</Text>
+        <OutwardAccountSwitcher variant="headerButton" />
+      </View>
       </View>
       <Pressable
         onPress={onOpenProfile}
@@ -116,15 +125,14 @@ function TimelineHeader({
           </Text>
         </View>
       </Pressable>
-      <NotificationBellButton />
-      <MailboxButton />
+      <View style={{ flex: 1, alignItems: "flex-end" }}><NotificationBellButton /></View>
     </View>
   );
 }
 
 // Bookmark-style side tabs that protrude from the right edge, matching the
 // curved 3D look of the iOS Photos app side tabs. Each tab renders a single
-// rotated text label (90°) inside a card with a left-rounded silhouette and a
+// horizontal label beneath its icon inside a card with a left-rounded silhouette and a
 // soft shadow. Tabs stack vertically and are vertically centered as a group
 // so the screen feels balanced regardless of timeline length.
 type SideTabSpec = {
@@ -333,7 +341,7 @@ export default function TimelineScreen() {
   // timeline thread (spine) begins on screen. The capture button and the
   // right-side bookmark stack are aligned to that exact y so they read as
   // a single horizontal "start line" together with the spine.
-  const HEADER_AREA = 46; // TimelineHeader rendered height (paddingTop + content)
+  const HEADER_AREA = 78; // TimelineHeader rendered height (paddingTop + content)
   const PEOPLE_STRIP_BLOCK = 12 + 36; // marginTop + avatar row height
   const TIMELINE_PAD_TOP = 6; // ProjectTimeline root paddingTop
   const {
@@ -364,16 +372,8 @@ export default function TimelineScreen() {
 
   const headerAvatarUrl = resolveStorageUrl(profile?.avatarUrl);
 
-  const activeAccountName = useMemo(() => {
-    const a = activeOutwardAccount;
-    if (!a) return "Account";
-    return (
-      a.title?.trim() ||
-      a.displayName?.trim() ||
-      a.companyName?.trim() ||
-      ((MODE_LABELS as Record<string, string>)[a.kind] ?? "Account")
-    );
-  }, [activeOutwardAccount]);
+  const headerMode = modes.find(m => m.id === activeOutwardAccount?.sourceUserModeId) ?? activeMode;
+  const { entityName: activeAccountName, roleLabel: headerRoleLabel } = commandCenterIdentity(activeOutwardAccount, headerMode);
 
   const feedQuery = useGetFeed();
   const peopleQuery = useGetMyRelationships();
@@ -550,6 +550,7 @@ export default function TimelineScreen() {
           avatarUrl={headerAvatarUrl}
           onOpenProfile={goProfile}
           accountName={activeAccountName}
+          roleLabel={headerRoleLabel}
           points={points}
         />
 
@@ -634,6 +635,9 @@ export default function TimelineScreen() {
           });
         }}
       />
+      <View style={[styles.sideMailbox, { top: rightStackTop - 48 }]}>
+        <MailboxButton />
+      </View>
       <SideTabStack
         topOffset={rightStackTop}
         tabs={SIDE_TABS}
@@ -705,6 +709,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
+  headerAccountGroup: { width: "42%", flexDirection: "row", alignItems: "center", gap: 7 },
   headerAvatar: {
     width: 36,
     height: 36,
@@ -720,10 +725,12 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_700Bold",
     flexShrink: 1,
   },
-  headerIdentity: { flex: 1, minWidth: 64, justifyContent: "center" },
+  headerIdentity: { flex: 1, minWidth: 0, justifyContent: "center", alignItems: "flex-start", gap: 2 },
+  headerRole: { fontSize: 12, lineHeight: 16, fontFamily: "Inter_500Medium" },
+  sideMailbox: { position: "absolute", right: 8, width: 44, height: 44, alignItems: "center", justifyContent: "center" },
   pointsTicker: {
-    minWidth: 58,
-    height: 36,
+    minWidth: 68,
+    height: 40,
     borderRadius: 18,
     borderWidth: 1,
     paddingHorizontal: 7,
@@ -767,7 +774,7 @@ const styles = StyleSheet.create({
   sideTabStack: {
     position: "absolute",
     right: 0,
-    gap: 16,
+    gap: 10,
   },
 
   // Slim tapered bookmark silhouette — quiet/ambient so the tabs whisper
@@ -775,8 +782,8 @@ const styles = StyleSheet.create({
   // give the pronounced curve of the iOS Photos reference; smaller radii on
   // the RIGHT pull the edges inward toward the screen edge for a soft taper.
   sideTab: {
-    width: 22,
-    height: 74,
+    width: 68,
+    height: 60,
     backgroundColor: SIDE_TAB_BG,
     borderTopLeftRadius: 14,
     borderBottomLeftRadius: 14,
@@ -791,14 +798,12 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
 
-  // Rotate the inner row 90° so icon + label read top-to-bottom along the
-  // tab's spine. Rotating the View (not each glyph) preserves kerning.
+  // Icons stack down the right edge; each description stays horizontal.
   sideTabInner: {
-    flexDirection: "row",
+    flexDirection: "column",
     alignItems: "center",
     gap: 5,
-    transform: [{ rotate: "90deg" }],
-    width: 70,
+    width: 64,
     justifyContent: "center",
   },
   sideTabText: {
