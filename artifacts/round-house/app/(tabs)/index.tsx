@@ -39,7 +39,7 @@ import {
 } from "@/components/TopBarAvatar";
 import { resolveStorageUrl } from "@/lib/uploads";
 import { AnalyticsRewardsModal } from "@/components/AnalyticsRewardsModal";
-import { tierForScore } from "@/components/BadgeTier";
+import { WoodRewardsButton } from "@/components/WoodRewardsButton";
 import { getModeAccent } from "@/lib/modeAccent";
 import { ModeSwitcher } from "@/components/ModeSwitcher";
 import {
@@ -105,31 +105,7 @@ function TimelineHeader({
         <OutwardAccountSwitcher variant="headerButton" />
       </View>
       </View>
-      <Pressable
-        onPress={onOpenRewards}
-        accessibilityRole="button"
-        accessibilityLabel={`Open Reward Center, ${tierForScore(points).label} status, ${points} points`}
-        style={[
-          styles.pointsTicker,
-          { borderColor: colors.border, backgroundColor: colors.card },
-        ]}
-      >
-        <Feather name="award" size={13} color={tierForScore(points).fg} />
-        <View>
-          <Text
-            style={[styles.pointsStatus, { color: tierForScore(points).fg }]}
-            numberOfLines={1}
-          >
-            {tierForScore(points).label}
-          </Text>
-          <Text
-            style={[styles.pointsValue, { color: colors.mutedForeground }]}
-            numberOfLines={1}
-          >
-            {points} pts
-          </Text>
-        </View>
-      </Pressable>
+      <WoodRewardsButton onPress={onOpenRewards} points={points} />
       <NotificationBellButton />
       <MailboxButton />
     </View>
@@ -738,19 +714,6 @@ const styles = StyleSheet.create({
   },
   headerIdentity: { flex: 1, minWidth: 0, justifyContent: "center", alignItems: "flex-start", gap: 2 },
   headerRole: { fontSize: 12, lineHeight: 16, fontFamily: "Inter_500Medium" },
-  pointsTicker: {
-    minWidth: 68,
-    height: 40,
-    borderRadius: 18,
-    borderWidth: 1,
-    paddingHorizontal: 7,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 4,
-  },
-  pointsStatus: { fontSize: 9, lineHeight: 11, fontFamily: "Inter_700Bold" },
-  pointsValue: { fontSize: 9, lineHeight: 11, fontFamily: "Inter_600SemiBold" },
 
   peopleRow: { flexDirection: "row", alignItems: "center" },
   avatar: {
