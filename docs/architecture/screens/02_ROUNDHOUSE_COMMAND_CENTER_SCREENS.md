@@ -390,3 +390,23 @@ The Business Entity receives only information and controls that genuinely belong
 19. **The Command Center never owns profile switching. Its Profile photo opens the active Profile Page.**
 20. **The Profile Page is the sole switching location. After a switch, Back returns to the selected Profile's Command Center.**
 21. **The switcher never creates, claims, adds, archives, edits, or configures a Profile. Those actions remain in their proper workflows.**
+
+
+## Unaffiliated Viewer — September 14, 2026 governing update
+
+Follow the [Unaffiliated Viewer lifecycle](../../UNAFFILIATED_VIEWER_LOGIC.md). This supersedes older
+wording that excludes automatic fallback after the last affiliation ends. A former
+Viewer, homeowner who sells the house, Trade Pro owner who sells the business,
+or teammate whose employment ends defaults to Viewer once no approved Entity
+affiliation remains. The same rule applies to all other former roles.
+
+Keep the same personal account and its own work history, including work performed
+through a former business. End former Entity access without deleting historical
+authorship or the Entity's original records. Independently authorized affiliations
+remain in effect; a sale that retains membership is not yet a departure.
+
+Command Center, Profile, and View Profile show **Unaffiliated** on the Entity/name
+line, with **Viewer** immediately underneath, replacing stale Entity names and
+former roles. This retained account is not a new-user onboarding choice. A later
+approved affiliation supplies its assigned role. See the governing lifecycle for
+acceptance checks and the implementation work still pending.

@@ -29,7 +29,7 @@ Viewer is the neutral view-only Role. A person may have a neutral Viewer-facing 
 
 A Viewer invitation always names the Property / Facility and the scope the Viewer may see.
 
-A Home Team Member who is removed from the Home Team may remain as a Viewer where continued visibility is appropriate, but only through a deliberate current authorization. Viewer is not an automatic fallback for every former participant.
+A Home Team Member who is removed from the Home Team may remain as a Viewer where continued visibility is appropriate, but only through a deliberate current authorization. This is continued Entity access, which requires authorization. Separately, when the last approved Entity affiliation ends, a former participant of any role automatically defaults to Unaffiliated / Viewer, retaining personal history without former Entity access.
 
 ### Trade Professional
 A person providing professional trade or service work. Access to one Property or Job does not automatically provide access to another.
@@ -348,3 +348,23 @@ Current access and historical record are separate.
 ## Governing Rule
 
 **Role identifies how someone is participating. Authority determines what they can control. Permissions determine what they can see and do. Viewer is the neutral view-only Role and only participates through a legitimate Residential Property or Commercial Facility. A Business may bring its own subcontractors forward, and a Property Manager with explicitly delegated participant-management authority may approve them on the Owner's behalf. Every permission retains its source: Business-derived access ends automatically when the governing Business relationship ends, while independently authorized access survives. Active roles and authority can end without erasing historical participation.**
+
+
+## Unaffiliated Viewer — September 14, 2026 governing update
+
+Follow the [Unaffiliated Viewer lifecycle](../UNAFFILIATED_VIEWER_LOGIC.md). This supersedes older
+wording that excludes automatic fallback after the last affiliation ends. A former
+Viewer, homeowner who sells the house, Trade Pro owner who sells the business,
+or teammate whose employment ends defaults to Viewer once no approved Entity
+affiliation remains. The same rule applies to all other former roles.
+
+Keep the same personal account and its own work history, including work performed
+through a former business. End former Entity access without deleting historical
+authorship or the Entity's original records. Independently authorized affiliations
+remain in effect; a sale that retains membership is not yet a departure.
+
+Command Center, Profile, and View Profile show **Unaffiliated** on the Entity/name
+line, with **Viewer** immediately underneath, replacing stale Entity names and
+former roles. This retained account is not a new-user onboarding choice. A later
+approved affiliation supplies its assigned role. See the governing lifecycle for
+acceptance checks and the implementation work still pending.

@@ -6,7 +6,7 @@ Intake establishes the person's permanent Identity and the Entity / Role context
 
 A Role is not created as a free-floating social profile.
 
-**Viewer is the neutral view-only Role, but Viewer must always be attached to a legitimate Residential Property or Commercial Facility.**
+**New Viewer participation must attach to a legitimate Residential Property or Commercial Facility. The sole Entity-free exception is an existing participant whose last approved affiliation has ended: that account defaults to Unaffiliated / Viewer and retains its own history.**
 
 A person arriving through an Invitation should resume the invitation context after sign-in / account creation rather than starting a disconnected intake path.
 
@@ -265,3 +265,23 @@ The invitation flow is governed by **`33_INVITATIONS.md`**.
 ---
 
 Every pathway displays **current screen / total screens**, adjusted when screens are skipped.
+
+
+## Unaffiliated Viewer — September 14, 2026 governing update
+
+Follow the [Unaffiliated Viewer lifecycle](../../UNAFFILIATED_VIEWER_LOGIC.md). This supersedes older
+wording that excludes automatic fallback after the last affiliation ends. A former
+Viewer, homeowner who sells the house, Trade Pro owner who sells the business,
+or teammate whose employment ends defaults to Viewer once no approved Entity
+affiliation remains. The same rule applies to all other former roles.
+
+Keep the same personal account and its own work history, including work performed
+through a former business. End former Entity access without deleting historical
+authorship or the Entity's original records. Independently authorized affiliations
+remain in effect; a sale that retains membership is not yet a departure.
+
+Command Center, Profile, and View Profile show **Unaffiliated** on the Entity/name
+line, with **Viewer** immediately underneath, replacing stale Entity names and
+former roles. This retained account is not a new-user onboarding choice. A later
+approved affiliation supplies its assigned role. See the governing lifecycle for
+acceptance checks and the implementation work still pending.
