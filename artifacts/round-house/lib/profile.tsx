@@ -10,6 +10,7 @@ import {
   type OutwardAccount,
 } from "@workspace/api-client-react";
 import { useAuth } from "./auth";
+import { hasSavedIdentity } from "./identity-progress";
 
 export type OnboardingStatus =
   | { kind: "loading" }
@@ -40,13 +41,13 @@ interface ProfileContextValue {
 const ProfileContext = createContext<ProfileContextValue | null>(null);
 
 export function ProfileProvider({ children }: { children: React.ReactNode }) {
-  const { isSignedIn, isLoaded } = useAuth();
+  const { isSignedIn, isLoaded, userId } = useAuth();
 
   const enabled = isLoaded && isSignedIn;
-  const meQuery = useGetMe({ query: { enabled, queryKey: ["/api/users/me"] } });
-  const modesQuery = useListMyModes({ query: { enabled, queryKey: ["/api/users/me/modes"] } });
+  const meQuery = useGetMe({ query: { enabled, queryKey: ["/api/users/me", userId] } });
+  const modesQuery = useListMyModes({ query: { enabled, queryKey: ["/api/users/me/modes", userId] } });
   const outwardQuery = useListMyOutwardAccounts({
-    query: { enabled, queryKey: ["/api/outward-accounts"] },
+    query: { enabled, queryKey: ["/api/outward-accounts", userId] },
   });
 
   const value = useMemo<ProfileContextValue>(() => {
@@ -80,7 +81,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       status = { kind: "loading" };
     } else if (profileLoading || modesLoading || !profile) {
       status = { kind: "loading" };
-    } else if (!profile.identityCompletedAt || !profile.avatarUrl) {
+    } else if (!hasSavedIdentity(profile)) {
       status = { kind: "needs-identity" };
     } else if (profile.isAdmin && modes.length === 0) {
       // Admin operators don't have to wear a real skin to use the app —
