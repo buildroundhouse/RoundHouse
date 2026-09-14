@@ -1,3 +1,4 @@
+import { ShareRoundHouseModal } from "@/components/ShareRoundHouseModal";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -10,7 +11,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
@@ -36,6 +37,8 @@ import {
 } from "@/lib/connectionTags";
 
 export default function InvitesScreen() {
+  const params = useLocalSearchParams<{ from?: string; focus?: string }>();
+  const [shareOpen, setShareOpen] = useState(false);
   const colors = useColors();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -238,19 +241,27 @@ export default function InvitesScreen() {
         ]}
       >
         <Pressable
-          onPress={() => router.back()}
-          accessibilityLabel="Back"
+          onPress={() => params.from === "profile" ? router.replace("/(tabs)/profile") : router.canGoBack() ? router.back() : router.replace("/(tabs)/profile")}
+          accessibilityLabel="Back to Profile"
           hitSlop={12}
           style={styles.iconBtn}
         >
           <Feather name="chevron-left" size={22} color={colors.foreground} />
         </Pressable>
         <Text style={[styles.title, { color: colors.foreground }]}>
-          My invites
+          Invitation Center
         </Text>
         <View style={{ width: 36 }} />
       </View>
 
+      <View style={{ padding: 16, gap: 10 }}>
+        <Text style={{ color: colors.mutedForeground }}>Invite people, review requests and track invitations in one place.</Text>
+        <Pressable accessibilityRole="button" accessibilityLabel="Share Roundhouse" onPress={() => setShareOpen(true)} style={{ minHeight: 48, padding: 14, borderRadius: 12, backgroundColor: colors.primary }}>
+          <Text style={{ color: "#fff", fontWeight: "700" }}>Share Roundhouse</Text>
+        </Pressable>
+        <Pressable accessibilityRole="button" onPress={() => router.push("/people-i-invited")} style={{ minHeight: 44, justifyContent: "center" }}><Text style={{ color: colors.primary }}>Invitations You Sent →</Text></Pressable>
+      </View>
+      <ShareRoundHouseModal visible={shareOpen} onClose={() => setShareOpen(false)} onSent={() => setShareOpen(false)} onEditProfile={() => { setShareOpen(false); router.replace("/(tabs)/profile"); }}/>
       {banner ? (
         <View
           style={[
