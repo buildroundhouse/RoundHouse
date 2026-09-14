@@ -787,7 +787,7 @@ const styles = StyleSheet.create({
   // the RIGHT pull the edges inward toward the screen edge for a soft taper.
   sideTab: {
     width: 22,
-    height: 74,
+    height: 94,
     backgroundColor: SIDE_TAB_BG,
     borderTopLeftRadius: 14,
     borderBottomLeftRadius: 14,
@@ -807,7 +807,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    width: 70,
+    width: 90,
     transform: [{ rotate: "90deg" }],
     justifyContent: "center",
   },
