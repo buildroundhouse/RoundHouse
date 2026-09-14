@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { firebaseKeys } from './vercel-config.mjs';
 import { addWebAppMetadata } from './web-app-meta.mjs';
+import { checkHostedStorage } from './check-hosted-storage.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const missing = firebaseKeys.filter(key => !process.env[key]?.trim());
@@ -13,6 +14,7 @@ if (process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_PROJECT_ID !== proce
 }
 
 const output = path.join(root, 'dist/web');
+await checkHostedStorage();
 function run(args, cwd) {
   const result = spawnSync('pnpm', args, {
     cwd,
