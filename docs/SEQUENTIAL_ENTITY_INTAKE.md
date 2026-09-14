@@ -13,4 +13,26 @@ Residential and commercial owner paths use the existing home and facilities runt
 
 Joining a space is different from creating an owner's workspace. Manager, Team Member, and Viewer selections show the existing invitation flow. Selecting one never creates an owner account or grants permissions. Invitations retain the server-authorized access; this change does not migrate historical membership roles or redefine authorization. Without an invitation, the user can refresh or continue without joining a space.
 
-Validation: entity/type/relationship routing tests and an Expo web export. Build credentials used for local export are synthetic, so compilation is not proof of live authentication or deployment.
+## Why the old flow survived
+
+Git history shows commit `771737fe21949cddd311c3641b96b40c420fd288` (September 8, 2026) added an entry screen driven by `ENTRY_CHOICES`. Before the correction, that list in `lib/entry-intake.ts` still exposed Property Owner, Trade Pro, trade/commercial team roles, Commercial Supplier, and Collaborator as the initial choices. `HANDOFF.md` also continued to describe mode-picker as the setup entry. The implementation and documentation therefore retained conflicting legacy instructions; this is evidence of an incomplete transition, not evidence that hosting rolled back the app.
+
+PR #10 replaced that flow and merged into `fix/permanent-phone-hosting` as `3533f060c4a50919c0e5ffd4b1cc56ed2af5c4d8`. These references record the correction, not a requirement to deploy an old commit forever.
+
+## Implementation and regression requirements
+
+- Start: `app/(onboarding)/entry.tsx`.
+- Type screens: `entry-property-type.tsx` and `entry-business-type.tsx`.
+- Relationship screen: `entry-role.tsx`.
+- Details/connection: `entry-entity.tsx`, `entry-business.tsx`, `entry-access.tsx`, then `intake.tsx` as applicable.
+- Choice definitions and validation: `lib/entry-intake.ts`; saved setup data: `lib/entry-draft.ts`.
+- Never flatten these choices into one screen, reintroduce role-first entry, or infer ownership from a joining relationship.
+- Back navigation and selected entity/type must survive the transitions. Invalid legacy links must return to the new entry sequence.
+- Retain the existing `entry-intake.test.ts` and `entry-navigation.test.ts` checks when changing setup. Add coverage for changed behavior, including the exact displayed role vocabulary.
+- Historical `_collab` keys and membership fields are compatibility details, not user-facing labels. Renaming a label is not a database or authorization migration.
+
+## Verification recorded September 14, 2026
+
+Five flow tests and six actual screen-navigation/draft tests passed. Expo web export succeeded. Render reported the merged correction live, `/api/health` returned 200 with successful migrations, the deployed JavaScript included the new intake labels, and the sign-in page loaded in a browser. Full signed-in intake submission was not verified. The full frontend typecheck still reported ten existing errors outside the changed screens.
+
+The local export used synthetic build credentials and was not deployed. Render rebuilt the source with the service configuration. This verification record must not be presented as proof of every account's completed intake or native-app behavior.

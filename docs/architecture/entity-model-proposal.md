@@ -1,5 +1,8 @@
 # Entity Model — Architecture Proposal
 
+> **Intake update — September 14, 2026:** The approved intake sequence is documented in [Sequential entity intake](../SEQUENTIAL_ENTITY_INTAKE.md). Its screen order and Viewer terminology supersede any conflicting intake interpretation of this older proposal. Other proposal sections retain their stated status.
+
+
 > Status: **Proposal for review.** No code changes have been made.
 > Audience: the project owner. Read top-to-bottom, then react.
 > The proposal is forward-looking. It does not catalogue or judge any in-flight task; the user is clearing those separately.

@@ -1,6 +1,8 @@
 # Roundhouse — Handoff Spec (verified against code)
 
-**Status:** Frozen. This document describes what is **actually built** in the current shell, verified by against the source. Where intent and reality diverge, reality wins and the gap is called out. Do not assume anything in this doc that is not explicitly labeled "wired" or "persisted".
+**Status:** Historical implementation snapshot. It is not a current product specification or a fresh verification of the deployed app. Labels such as "wired" below refer to the snapshot, not to a new end-to-end test.
+
+**Current intake correction — September 14, 2026:** [Sequential entity intake](docs/SEQUENTIAL_ENTITY_INTAKE.md) supersedes all role-first/mode-picker instructions below. The required sequence is separate screens for Property/Business → property or business type → relationship → details/connection. Property relationships are Owner, Manager, Home Team Member, Viewer; Business uses Business Team Member. Collaborator is not an intake role. Legacy database names in this document do not authorize restoring that label or granting access from a selected relationship.
 
 **Stack of the current shell:**
 - Mobile / web client: Expo (React Native + Expo Router).
@@ -20,7 +22,7 @@
 - `app/index.tsx` reads Firebase auth + `useProfile()` and redirects:
   - Not signed in → `/(auth)/sign-in`.
   - Signed in but `identityCompletedAt` is null **or** `avatarUrl` is null → `/(onboarding)/identity`.
-  - Signed in, identity done, no modes exist or no active mode → `/(onboarding)/mode-picker`.
+  - Signed in, identity done, no modes exist or no active mode → `/(onboarding)/entry` (see the current sequential intake contract).
   - Signed in, active mode exists but `intakeCompletedAt` is null → `/(onboarding)/intake`.
   - Otherwise → `/(tabs)`.
 - The same gate is duplicated in `(tabs)/_layout.tsx`, so deep links to tabs also enforce onboarding.
@@ -91,7 +93,8 @@ See §6 for the verified matrix from the routes.
 | `(auth)/sign-in.tsx` | Email/password sign-in via Firebase; Google button works on web only. | Wired (web Google) / Partial (native Google: errors out) |
 | `(auth)/sign-up.tsx` | Email/password account creation. Same Google caveat. | Wired (web Google) / Partial (native Google) |
 | `(onboarding)/identity.tsx` | Pick username (live availability check) + upload avatar. Both required to proceed. | Wired |
-| `(onboarding)/mode-picker.tsx` | Choose primary mode and create the user_mode row server-side. | Wired |
+| `(onboarding)/entry.tsx` | Start separate entity, type, and relationship screens; see the current intake contract. | Updated September 14, 2026 |
+| `(onboarding)/mode-picker.tsx` | Compatibility redirect to entry; no selectable legacy role list. | Retired picker |
 | `(onboarding)/intake.tsx` | Mode-specific intake form. Writes `intakeData` jsonb on the active user_mode and stamps `intakeCompletedAt`. For trade pros, also writes `companyName`, contact fields onto the user. | Wired |
 
 ### Tabs (`app/(tabs)`)
@@ -163,7 +166,7 @@ All of these exist and render. State labeled where it is not fully wired.
 ### Default landing
 - Signed-out → `/(auth)/sign-in`.
 - Signed-in, `identityCompletedAt == null || avatarUrl == null` → `/(onboarding)/identity`.
-- Signed-in, no modes or no active mode → `/(onboarding)/mode-picker`.
+- Signed-in, no modes or no active mode → `/(onboarding)/entry` (see the current sequential intake contract).
 - Signed-in, active mode but `intakeCompletedAt == null` → `/(onboarding)/intake`.
 - Otherwise → `/(tabs)` (Home).
 
