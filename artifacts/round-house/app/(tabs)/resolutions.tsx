@@ -31,6 +31,7 @@ function ResolutionWorkspace() {
   const [text, setText] = useState(""); const [verified, setVerified] = useState(false);
   const [error, setError] = useState("");
   const [creating, setCreating] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [contextId, setContextId] = useState<number | null>(null);
   const [recipientId, setRecipientId] = useState("");
   const [question, setQuestion] = useState("");
@@ -87,6 +88,18 @@ function ResolutionWorkspace() {
       {back}
       <View style={s.heading}><Text style={[s.title, { color: c.text }]}>Resolution Center</Text>
         <Text style={[s.subtitle, { color: c.mutedForeground }]}>Keep the conversation moving. Verify the outcome.</Text>
+        <View style={{ marginTop: 14, alignSelf: "stretch" }}>
+          <Pressable accessibilityRole="button" accessibilityState={{ expanded: helpOpen }} onPress={() => setHelpOpen(true)} style={[s.helpButton, { borderColor: c.border, backgroundColor: c.card }]}>
+            <Text style={[s.helpButtonText, { color: c.text }]}>How things get resolved?</Text>
+            <Feather name="chevron-down" size={17} color={c.mutedForeground} />
+          </Pressable>
+          {helpOpen && <View style={[s.helpPanel, { borderColor: c.border, backgroundColor: c.card }]}>
+            <Pressable accessibilityRole="button" accessibilityLabel="Close how things get resolved" onPress={() => setHelpOpen(false)} hitSlop={10} style={s.helpClose}>
+              <Feather name="x" size={18} color={c.text} />
+            </Pressable>
+            <Text style={[s.helpText, { color: c.text }]}>Red — ball’s in your court. Green — volley’s back to them. Unanswered follow-ups escalate yellow → red → fire. Only the originator decides when the matter is resolved.</Text>
+          </View>}
+        </View>
         {!viewer && !!contexts.data?.contexts.length && <View style={{ marginTop: 16, alignSelf: "flex-start" }}>{button("New resolution", () => { setError(""); setQuestion(""); setContextId(null); setRecipientId(""); setCreating(true); }, false, true)}</View>}
         {viewer && <Text style={[s.subtitle, { color: c.mutedForeground }]}>Viewer · Read-only history</Text>}
         {!viewer && contexts.isError && button("Retry loading resolution permissions", () => void contexts.refetch())}</View>
@@ -178,6 +191,11 @@ const s = StyleSheet.create({
   screen: { flex: 1 }, content: { width: "100%", maxWidth: 760, alignSelf: "center", paddingHorizontal: 20 },
   back: { minHeight: 48, flexDirection: "row", alignItems: "center", gap: 9, paddingVertical: 10 }, backText: { fontSize: 15, fontWeight: "600" },
   heading: { paddingTop: 12, paddingBottom: 24 }, title: { fontSize: 29, fontWeight: "700", letterSpacing: -0.7 }, subtitle: { fontSize: 14, lineHeight: 21, marginTop: 8 },
+  helpButton: { minHeight: 44, borderWidth: 1, borderRadius: 10, paddingHorizontal: 14, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  helpButtonText: { fontSize: 14, fontWeight: "600" },
+  helpPanel: { marginTop: 8, borderWidth: 1, borderRadius: 12, padding: 14, paddingRight: 42, position: "relative" },
+  helpClose: { position: "absolute", right: 10, top: 10, width: 28, height: 28, alignItems: "center", justifyContent: "center" },
+  helpText: { fontSize: 14, lineHeight: 21 },
   loading: { padding: 45 }, group: { marginBottom: 28 }, groupHeading: { flexDirection: "row", alignItems: "center", gap: 8 },
   dot: { width: 8, height: 8, borderRadius: 4 }, groupTitle: { fontSize: 19, fontWeight: "700", flex: 1 }, count: { fontSize: 16, fontWeight: "600" }, groupDescription: { fontSize: 13, marginTop: 6, marginBottom: 12 },
   empty: { gap: 16, paddingVertical: 25 }, emptyText: { fontSize: 14, paddingVertical: 14, lineHeight: 21 },
