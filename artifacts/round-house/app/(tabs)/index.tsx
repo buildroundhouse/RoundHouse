@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
   type LayoutChangeEvent,
 } from "react-native";
@@ -27,12 +28,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { MODE_LABELS } from "@/lib/intake-schemas";
 import { ProjectTimeline, workLogToEvent } from "@/components/ProjectTimeline";
 import { TimelineMotionDebugPanel } from "@/lib/timelineMotionDebug";
-import { ConciergeSheet } from "@/components/ConciergeSheet";
 import { useProfile } from "@/lib/profile";
 import { useActiveAccountAvatarUrl, InboxButton } from "@/components/TopBarAvatar";
 import { getModeAccent } from "@/lib/modeAccent";
 import { ModeSwitcher } from "@/components/ModeSwitcher";
-import { openCapturePhoto } from "@/components/CaptureFAB";
 import { OutwardAccountSwitcher } from "@/components/OutwardAccountSwitcher";
 import {
   HomeSidePanelOverlay,
@@ -178,44 +177,34 @@ function SideTabStack({
 // blue used by the bottom-tab active state and "Switch / Add Account"
 // link) — explicitly NOT the mode accent, so the icon reads blue even
 // when a non-homeowner mode (e.g. trade/amber) is active.
-function CameraIconButton({
+function TimelineSearchButton({
   topOffset,
   color,
+  open,
+  onPress,
 }: {
   topOffset: number;
   color: string;
+  open: boolean;
+  onPress: () => void;
 }) {
-  const handlePress = () => {
-    // CaptureFAB handles the web fallback (file input with capture
-    // attribute → system camera UI on mobile Safari), so we delegate
-    // unconditionally instead of bailing on web.
-    openCapturePhoto();
-  };
   return (
     <View
       pointerEvents="box-none"
       style={[styles.cameraIconHost, { top: topOffset }]}
     >
       <Pressable
-        onPress={handlePress}
+        onPress={onPress}
         accessibilityRole="button"
-        accessibilityLabel="Capture a photo"
+        accessibilityLabel={open ? "Close Timeline search" : "Search Timeline"}
+        accessibilityState={{ expanded: open }}
         hitSlop={16}
         style={({ pressed }) => [
           styles.cameraIconBtn,
           { opacity: pressed ? 0.6 : 1 },
         ]}
       >
-        {/* Compose the camera by layering: Feather "camera" gives the
-            outlined camera body (matches the reference's frame), and
-            Feather "aperture" sits on top to replace the body's plain
-            lens circle with the multi-blade aperture/shutter. The
-            aperture is sized smaller and offset slightly downward so it
-            lands inside the body's lens cutout. */}
-        <Feather name="camera" size={32} color={color} />
-        <View pointerEvents="none" style={styles.cameraIconAperture}>
-          <Feather name="aperture" size={16} color={color} />
-        </View>
+        <Feather name={open ? "x" : "search"} size={27} color={color} />
       </Pressable>
     </View>
   );
@@ -305,11 +294,8 @@ export default function TimelineScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
-  // The right-side bookmark stack now anchors near the TOP of the screen
-  // (just below the avatar/account-name header) instead of being centered
-  // vertically. Putting them up high frees the lower 2/3 of the right edge
-  // so the timeline can breathe and the eye is drawn to the messy camera
-  // button on the opposite top corner.
+  // The right-side working tabs anchor just below the account header. The
+  // Timeline search control shares that starting line on the left.
   // Header / strip / timeline padding constants used to compute where the
   // timeline thread (spine) begins on screen. The capture button and the
   // right-side bookmark stack are aligned to that exact y so they read as
@@ -411,7 +397,8 @@ export default function TimelineScreen() {
   // new screen. Tapping the same tab again toggles it closed; tapping a
   // different tab swaps content without flicker.
   const [activeSidePanel, setActiveSidePanel] = useState<HomeSidePanelKey | null>(null);
-  const [conciergeOpen, setConciergeOpen] = useState(false);
+  const [timelineSearchOpen, setTimelineSearchOpen] = useState(false);
+  const [timelineQuery, setTimelineQuery] = useState("");
   const [tabOriginYs, setTabOriginYs] = useState<Record<string, number>>({});
   const handleTabLayout = useCallback((key: string, y: number) => {
     setTabOriginYs((prev) => (prev[key] === y ? prev : { ...prev, [key]: y }));
@@ -431,22 +418,30 @@ export default function TimelineScreen() {
 
   const feedLoaded = !feedQuery.isLoading;
   const timelineEvents = useMemo(() => logs.map(workLogToEvent), [logs]);
+  const visibleTimelineEvents = useMemo(() => {
+    const needle = timelineQuery.trim().toLocaleLowerCase();
+    if (!needle) return timelineEvents;
+    return timelineEvents.filter((event) =>
+      [event.title, event.note, event.propertyName, event.authorName, event.kind]
+        .filter(Boolean)
+        .some((value) => String(value).toLocaleLowerCase().includes(needle)),
+    );
+  }, [timelineEvents, timelineQuery]);
 
   const SIDE_TABS: SideTabSpec[] = useMemo(
     () => [
-      { key: "logs", label: "Logs", icon: "file-text", onPress: () => toggleSidePanel("logs") },
-      { key: "jobs", label: "Jobs", icon: "briefcase", onPress: () => toggleSidePanel("jobs") },
+      {
+        key: "reminders",
+        label: "Daily Grind",
+        icon: "sunrise",
+        onPress: () => toggleSidePanel("reminders"),
+      },
+      { key: "jobs", label: "Tasks / Lists", icon: "check-square", onPress: () => toggleSidePanel("jobs") },
       {
         key: "receipts",
         label: "Receipts",
         icon: "credit-card",
         onPress: () => toggleSidePanel("receipts"),
-      },
-      {
-        key: "reminders",
-        label: "Reminders",
-        icon: "bell",
-        onPress: () => toggleSidePanel("reminders"),
       },
       {
         key: "properties",
@@ -460,9 +455,9 @@ export default function TimelineScreen() {
 
   const PANEL_TITLES: Record<HomeSidePanelKey, string> = {
     logs: "Logs",
-    jobs: "My Jobs",
+    jobs: "Tasks / Lists",
     receipts: "Receipts",
-    reminders: "Reminders",
+    reminders: "Daily Grind",
     properties: "Properties",
   };
 
@@ -503,6 +498,32 @@ export default function TimelineScreen() {
           </View>
         ) : null}
 
+        {timelineSearchOpen ? (
+          <View style={[styles.timelineSearchWrap, { borderColor: colors.border, backgroundColor: colors.card }]}>
+            <Feather name="search" size={18} color={colors.mutedForeground} />
+            <TextInput
+              value={timelineQuery}
+              onChangeText={setTimelineQuery}
+              placeholder="Search your Timeline…"
+              placeholderTextColor={colors.mutedForeground}
+              autoFocus
+              returnKeyType="search"
+              accessibilityLabel="Search your Timeline"
+              style={[styles.timelineSearchInput, { color: colors.foreground }]}
+            />
+            {timelineQuery ? (
+              <Pressable
+                onPress={() => setTimelineQuery("")}
+                accessibilityRole="button"
+                accessibilityLabel="Clear Timeline search"
+                hitSlop={10}
+              >
+                <Feather name="x-circle" size={18} color={colors.mutedForeground} />
+              </Pressable>
+            ) : null}
+          </View>
+        ) : null}
+
         {/* The timeline is the centerpiece of the Timeline tab. We always render it so the
             spine runs continuously down the middle even with zero events.
             The timelineWrap's onLayout is what the camera button +
@@ -513,10 +534,20 @@ export default function TimelineScreen() {
           onLayout={handleTimelineWrapLayout}
           collapsable={false}
         >
-          <ProjectTimeline events={timelineEvents} onOpenProperty={goProperty} />
+          <ProjectTimeline events={visibleTimelineEvents} onOpenProperty={goProperty} />
         </View>
       </ScrollView>
-      <CameraIconButton topOffset={rightStackTop} color={colors.primary} />
+      <TimelineSearchButton
+        topOffset={rightStackTop}
+        color={colors.primary}
+        open={timelineSearchOpen}
+        onPress={() => {
+          setTimelineSearchOpen((current) => {
+            if (current) setTimelineQuery("");
+            return !current;
+          });
+        }}
+      />
       <SideTabStack
         topOffset={rightStackTop}
         tabs={SIDE_TABS}
@@ -550,29 +581,6 @@ export default function TimelineScreen() {
         ) : null}
         {activeSidePanel === "properties" ? <PropertiesScreen embedded /> : null}
       </HomeSidePanelOverlay>
-      {/* Floating concierge entry point. The 402 paywall is enforced
-          server-side: tapping while on the free tier triggers the
-          existing global paywall sheet via maybeShowPaywallFromError
-          inside the streaming helper. */}
-      <Pressable
-        onPress={() => setConciergeOpen(true)}
-        accessibilityRole="button"
-        accessibilityLabel="Open AI concierge"
-        style={({ pressed }) => [
-          styles.conciergeFab,
-          {
-            bottom: insets.bottom + 92,
-            backgroundColor: colors.primary,
-            opacity: pressed ? 0.85 : 1,
-          },
-        ]}
-      >
-        <Feather name="message-circle" size={22} color="#fff" />
-      </Pressable>
-      <ConciergeSheet
-        visible={conciergeOpen}
-        onClose={() => setConciergeOpen(false)}
-      />
       <TimelineMotionDebugPanel />
     </View>
   );
@@ -580,19 +588,22 @@ export default function TimelineScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  conciergeFab: {
-    position: "absolute",
-    right: 18,
-    width: 54,
-    height: 54,
-    borderRadius: 27,
+  timelineSearchWrap: {
+    minHeight: 48,
+    marginHorizontal: 56,
+    marginTop: 8,
+    paddingHorizontal: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 24,
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.18,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 6,
+    gap: 10,
+  },
+  timelineSearchInput: {
+    flex: 1,
+    minHeight: 46,
+    fontSize: 16,
+    fontFamily: "Inter_400Regular",
   },
 
   homeHeader: {
@@ -676,11 +687,8 @@ const styles = StyleSheet.create({
     color: SIDE_TAB_FG,
   },
 
-  // Lean camera-icon button at the top-LEFT of the Timeline screen.
-  // The host is absolutely positioned over the scroll content; the icon
-  // itself sits inside a small Pressable with no tile, no ghost shadow,
-  // and no shutter-dot — just the glyph. hitSlop on the Pressable keeps
-  // the tap target generous despite the lighter visual footprint.
+  // Timeline Search sits at the upper-left edge of the Timeline. The host is
+  // intentionally compact, while hitSlop preserves a 44pt+ target.
   cameraIconHost: {
     position: "absolute",
     left: 14,

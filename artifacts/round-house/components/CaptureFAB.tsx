@@ -29,6 +29,7 @@ import {
 import { uploadAsset } from "@/lib/uploads";
 import { AttachmentList, type AttachmentItem } from "@/components/AttachmentList";
 import { DueDatePickerModal } from "@/components/DueDatePickerModal";
+import { ConciergeSheet } from "@/components/ConciergeSheet";
 
 let externalOpenLog: (() => void) | null = null;
 export function openCaptureLog() {
@@ -101,6 +102,7 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
   const queryClient = useQueryClient();
 
   const [chooserOpen, setChooserOpen] = useState(false);
+  const [conciergeOpen, setConciergeOpen] = useState(false);
   const [mode, setMode] = useState<Mode | null>(null);
 
   const [note, setNote] = useState("");
@@ -348,13 +350,16 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
           <Pressable
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              setMode("log");
+              openMode("photo");
             }}
             onLongPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              setChooserOpen(true);
+              setConciergeOpen(true);
             }}
             delayLongPress={350}
+            accessibilityRole="button"
+            accessibilityLabel="Capture"
+            accessibilityHint="Tap to open the camera. Press and hold to open Concierge."
             style={({ pressed }) => [
               styles.fab,
               {
@@ -364,10 +369,15 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
               },
             ]}
           >
-            <Feather name="edit-3" size={18} color={colors.primaryForeground ?? "#fff"} />
+            <Feather name="camera" size={20} color={colors.primaryForeground ?? "#fff"} />
           </Pressable>
         </View>
       )}
+
+      <ConciergeSheet
+        visible={conciergeOpen}
+        onClose={() => setConciergeOpen(false)}
+      />
 
       {/* Quick action chooser */}
       <Modal visible={chooserOpen} transparent animationType="fade" onRequestClose={() => setChooserOpen(false)}>
