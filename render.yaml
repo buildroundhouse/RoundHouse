@@ -11,7 +11,7 @@ services:
     plan: 0.5c-512mb
     region: ohio
     numInstances: 1
-    autoDeployTrigger: off
+    autoDeployTrigger: "off"
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
