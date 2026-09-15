@@ -757,7 +757,7 @@ Search aliases should ultimately live with the Admin-managed Service Catalog so 
 
 The original Label Room explicitly contains **Tokens** as a managed concept, but the current preset backend does not expose a live `tokens` set. Valuable token-like vocabularies still exist elsewhere in the repo and should be consolidated here before cleanup.
 
-These values are **descriptive vocabulary**, not necessarily current current Roles.
+These values are **descriptive vocabulary**, not necessarily current Roles.
 
 ## Classification
 
@@ -1270,7 +1270,7 @@ This list can shrink only after the preserved behavior/data is safely represente
 7. **Label Room** becomes the central controlled-vocabulary registry for Trades, Services, Titles, Strengths, Tokens, aliases and other reusable option sets.
 8. Existing curated lists are preserved before cleanup even when their old screen/Role model is obsolete.
 9. **Avatar Wardrobe** creates isolated demo identities and allows true first-person testing through real onboarding and product flows.
-10. Current Roles govern new Wardrobe scenarios; legacy Collaborator/Friend roles do not return as current Roles.
+10. Wardrobe scenarios use the role categories and exact sub-role titles in Roles & Authority.
 11. Demo identities/data remain isolated and visibly identifiable where needed.
 12. The administrator always has a persistent, direct path back to the Admin Hub.
 13. **Mailroom** receives user Help/Support reports as structured Support Cases and allows Admin response, private notes, assignment and problem clustering.

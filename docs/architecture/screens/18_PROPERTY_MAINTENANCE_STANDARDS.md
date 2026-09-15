@@ -340,7 +340,7 @@ Maintenance is Property-scoped and permission-aware.
 
 A Homeowner / authorized Property authority may create and manage routines and Standards.
 
-Home Pro (Teammate) participants, Trade Professionals, and Trade participants may see, fulfill, document, or manage particular Maintenance items according to their Role and permissions.
+Home Pro (Teammate) participants and Trade participants may see, fulfill, document, or manage particular Maintenance items according to their Role and permissions.
 
 A person does not gain access to unrelated Property information merely because they are assigned one maintenance item.
 
