@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Linking,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
@@ -20,11 +21,20 @@ import { confirm } from "@/lib/confirm";
 import { messageHrefFor } from "@/lib/messageTarget";
 import {
   calendarStatus,
+  calendarMonthDays,
+  dayKey,
   localInput,
+  monthTitle,
   parseCalendarTime,
+  sameLocalDay,
+  timeRange,
+  type AvailabilitySlot,
   type CalendarAppointment,
   type CalendarContexts,
 } from "@/lib/calendar";
+const EMPTY_APPOINTMENTS: CalendarAppointment[] = [];
+const EMPTY_SLOTS: AvailabilitySlot[] = [];
+
 export default function CalendarScreen() {
   const { activeOutwardAccountId } = useProfile();
   return <CalendarWorkspace key={activeOutwardAccountId} />;
@@ -34,6 +44,7 @@ function CalendarWorkspace() {
     router = useRouter(),
     insets = useSafeAreaInsets(),
     cache = useQueryClient();
+  const { width } = useWindowDimensions();
   const { activeOutwardAccountId: accountId, profile } = useProfile();
   const params = useLocalSearchParams<{
     propertyEntityId?: string;
@@ -58,19 +69,18 @@ function CalendarWorkspace() {
     queryFn: () =>
       customFetch<CalendarContexts>("/api/calendar/contexts", { headers }),
   });
-  const blocks = useQuery({
-    queryKey: ["calendar-unavailable", profile?.clerkId],
+  const availability = useQuery({
+    queryKey: ["calendar-availability", profile?.clerkId],
     enabled: !!profile?.clerkId,
     queryFn: () =>
       customFetch<{
-        blocks: { id: number; startsAt: string; endsAt: string }[];
-      }>("/api/calendar-unavailable", { headers }),
+        slots: AvailabilitySlot[];
+      }>("/api/calendar-availability", { headers }),
   });
-  const [filter, setFilter] = useState("upcoming"),
-    [selected, setSelected] = useState<number | null>(
+  const [selected, setSelected] = useState<number | null>(
       Number(params.appointmentId) || null,
     ),
-    [form, setForm] = useState<"create" | "reschedule" | "unavailable" | null>(
+    [form, setForm] = useState<"create" | "reschedule" | "availability" | null>(
       null,
     );
   const [businessId, setBusinessId] = useState<number | null>(null),
@@ -84,6 +94,10 @@ function CalendarWorkspace() {
     [message, setMessage] = useState(""),
     [error, setError] = useState("");
   const [showPrivate, setShowPrivate] = useState(false);
+  const [selectedDay, setSelectedDay] = useState(() => new Date());
+  const [visibleMonth, setVisibleMonth] = useState(
+    () => new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+  );
   const doc = q.data?.appointments.find((d) => d.id === selected),
     property = contexts.data?.properties.find((p) => p.id === propertyId);
   const mutation = useMutation({
@@ -98,7 +112,7 @@ function CalendarWorkspace() {
       setError("");
       setMessage("");
       await Promise.all(
-        ["calendar", "calendar-daily", "calendar-unavailable"].map((key) =>
+        ["calendar", "calendar-daily", "calendar-availability"].map((key) =>
           cache.invalidateQueries({ queryKey: [key] }),
         ),
       );
@@ -170,9 +184,12 @@ function CalendarWorkspace() {
   const begin = (kind: typeof form) => {
     setForm(kind);
     setError("");
+    const selectedStart = new Date(selectedDay);
+    if (selectedStart.getHours() === 0 && selectedStart.getMinutes() === 0)
+      selectedStart.setHours(9, 0, 0, 0);
     setTime(
       localInput(
-        kind === "reschedule" && doc ? new Date(doc.startsAt) : new Date(),
+        kind === "reschedule" && doc ? new Date(doc.startsAt) : selectedStart,
       ),
     );
     setDuration(String(kind === "reschedule" && doc ? doc.duration : 60));
@@ -227,8 +244,8 @@ function CalendarWorkspace() {
         return;
       mutation.mutate({
         path:
-          form === "unavailable"
-            ? "/api/calendar-unavailable"
+          form === "availability"
+            ? "/api/calendar-availability"
             : form === "reschedule"
               ? `/api/calendar/${doc!.id}/actions`
               : "/api/calendar",
@@ -247,14 +264,50 @@ function CalendarWorkspace() {
       setError((e as Error).message);
     }
   };
-  const rows = (q.data?.appointments ?? []).filter(
-    (d) =>
-      filter === "all" ||
-      (filter === "pending"
-        ? d.status === "pending"
-        : d.status !== "cancelled" &&
-          new Date(d.startsAt).getTime() + d.duration * 60000 >= Date.now()),
+  const appointments = q.data?.appointments ?? EMPTY_APPOINTMENTS;
+  const slots = availability.data?.slots ?? EMPTY_SLOTS;
+  const monthDays = useMemo(
+    () => calendarMonthDays(visibleMonth),
+    [visibleMonth],
   );
+  const appointmentsByDay = useMemo(() => {
+    const result = new Map<string, CalendarAppointment[]>();
+    for (const appointment of appointments) {
+      if (appointment.status === "cancelled") continue;
+      const key = dayKey(appointment.startsAt);
+      result.set(key, [...(result.get(key) ?? []), appointment]);
+    }
+    return result;
+  }, [appointments]);
+  const slotsByDay = useMemo(() => {
+    const result = new Map<string, AvailabilitySlot[]>();
+    for (const slot of slots) {
+      const key = dayKey(slot.startsAt);
+      result.set(key, [...(result.get(key) ?? []), slot]);
+    }
+    return result;
+  }, [slots]);
+  const dayAppointments = appointments
+    .filter(
+      (appointment) =>
+        appointment.status !== "cancelled" &&
+        sameLocalDay(appointment.startsAt, selectedDay),
+    )
+    .sort(
+      (a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime(),
+    );
+  const daySlots = slots
+    .filter((slot) => sameLocalDay(slot.startsAt, selectedDay))
+    .sort(
+      (a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime(),
+    );
+  const calendarName = contexts.data?.businesses.length
+    ? "Scheduling Calendar"
+    : contexts.data?.properties.some((property) => property.canScheduleOwn)
+      ? "Property Calendar"
+      : appointments.some((appointment) => appointment.myAssignment)
+        ? "My Work Calendar"
+        : "My Calendar";
   const text = { color: c.foreground },
     muted = { color: c.mutedForeground };
   return (
@@ -262,7 +315,7 @@ function CalendarWorkspace() {
       style={{ flex: 1, backgroundColor: c.background }}
       contentContainerStyle={[
         s.page,
-        { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 36 },
+        { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 120 },
       ]}
     >
       <Pressable
@@ -275,7 +328,7 @@ function CalendarWorkspace() {
           Back to Command Center
         </Text>
       </Pressable>
-      <Text style={[s.heading, text]}>Calendar</Text>
+      <Text style={[s.heading, text]}>{calendarName}</Text>
       <Text style={muted}>Schedule the work. Run your day in Daily Grind.</Text>
       {error ? (
         <Text accessibilityRole="alert" style={{ color: c.destructive }}>
@@ -290,7 +343,7 @@ function CalendarWorkspace() {
               ? "Propose an appointment"
               : form === "reschedule"
                 ? "Reschedule appointment"
-                : "Mark yourself Unavailable"}
+                : "Add Open Time"}
           </Text>
           {form === "create" && (
             <>
@@ -358,10 +411,10 @@ function CalendarWorkspace() {
               </Text>
             </>
           )}
-          {form === "unavailable" && (
+          {form === "availability" && (
             <Text style={muted}>
-              Only Unavailable is shared with scheduling. Your private
-              commitment details stay private.
+              This time will appear as an open slot on your calendar. Your
+              private commitments remain private.
             </Text>
           )}
           {input("Local date and time · YYYY-MM-DD HH:MM", time, setTime)}
@@ -490,43 +543,206 @@ function CalendarWorkspace() {
           </View>
           {showPrivate && (
             <View style={s.section}>
-              <Text style={[s.title, text]}>My Unavailable Times</Text>
-              {button("Add Unavailable Time", () => begin("unavailable"))}
-              {blocks.isError
-                ? button("Retry Availability", () => void blocks.refetch())
-                : blocks.data?.blocks.map((b) => (
-                    <View key={b.id}>
+              <Text style={[s.title, text]}>My Availability</Text>
+              <Text style={muted}>
+                Add the times you are open. They appear directly on the calendar
+                in green.
+              </Text>
+              {button("Add Open Time", () => begin("availability"), true)}
+              {availability.isError
+                ? button(
+                    "Retry Availability",
+                    () => void availability.refetch(),
+                  )
+                : slots.map((slot) => (
+                    <View key={slot.id} style={s.availabilityRow}>
                       <Text style={text}>
-                        {new Date(b.startsAt).toLocaleString()} –{" "}
-                        {new Date(b.endsAt).toLocaleString()}
+                        {new Date(slot.startsAt).toLocaleDateString()} ·{" "}
+                        {timeRange(slot.startsAt, slot.endsAt)}
                       </Text>
-                      {button("Remove Unavailable Time", () =>
+                      {button("Remove Open Time", () =>
                         mutation.mutate({
-                          path: "/api/calendar-unavailable",
-                          body: { removeId: b.id },
+                          path: "/api/calendar-availability",
+                          body: { removeId: slot.id },
                         }),
                       )}
                     </View>
                   ))}
             </View>
           )}
-          <View style={s.row}>
-            {[
-              ["upcoming", "Upcoming"],
-              ["pending", "Pending Confirmation"],
-              ["all", "All Appointments"],
-            ].map(([id, label]) => (
-              <View key={id}>
-                {button(label, () => setFilter(id), filter === id)}
-              </View>
-            ))}
+          <View
+            style={[
+              s.calendar,
+              { borderColor: c.border, backgroundColor: c.card },
+            ]}
+          >
+            <View style={s.monthHeader}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Previous month"
+                onPress={() =>
+                  setVisibleMonth(
+                    new Date(
+                      visibleMonth.getFullYear(),
+                      visibleMonth.getMonth() - 1,
+                      1,
+                    ),
+                  )
+                }
+                style={s.monthButton}
+              >
+                <Feather name="chevron-left" size={24} color={c.foreground} />
+              </Pressable>
+              <Text style={[s.title, text]}>{monthTitle(visibleMonth)}</Text>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Next month"
+                onPress={() =>
+                  setVisibleMonth(
+                    new Date(
+                      visibleMonth.getFullYear(),
+                      visibleMonth.getMonth() + 1,
+                      1,
+                    ),
+                  )
+                }
+                style={s.monthButton}
+              >
+                <Feather name="chevron-right" size={24} color={c.foreground} />
+              </Pressable>
+            </View>
+            <View style={s.weekRow}>
+              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+                <Text key={day} style={[s.weekday, muted]}>
+                  {width < 430 ? day.slice(0, 1) : day}
+                </Text>
+              ))}
+            </View>
+            <View style={s.monthGrid}>
+              {monthDays.map((day) => {
+                const dateAppointments =
+                  appointmentsByDay.get(dayKey(day)) ?? EMPTY_APPOINTMENTS;
+                const dateSlots = slotsByDay.get(dayKey(day)) ?? EMPTY_SLOTS;
+                const selectedDate = sameLocalDay(day, selectedDay);
+                const inMonth = day.getMonth() === visibleMonth.getMonth();
+                return (
+                  <Pressable
+                    key={dayKey(day)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${day.toLocaleDateString()}, ${dateSlots.length} open slots, ${dateAppointments.length} appointments`}
+                    accessibilityState={{ selected: selectedDate }}
+                    onPress={() => setSelectedDay(day)}
+                    style={[
+                      s.dayCell,
+                      {
+                        minHeight: width < 430 ? 68 : 92,
+                        borderColor: selectedDate ? c.primary : c.border,
+                        borderWidth: selectedDate
+                          ? 2
+                          : StyleSheet.hairlineWidth,
+                        opacity: inMonth ? 1 : 0.42,
+                      },
+                    ]}
+                  >
+                    <Text style={[s.dayNumber, text]}>{day.getDate()}</Text>
+                    {dateSlots.length > 0 ? (
+                      <View
+                        style={[s.calendarMark, { backgroundColor: "#2E7D32" }]}
+                      >
+                        <Text numberOfLines={1} style={s.calendarMarkText}>
+                          {width < 430 ? "Open" : `${dateSlots.length} open`}
+                        </Text>
+                      </View>
+                    ) : null}
+                    {dateAppointments
+                      .slice(0, width < 430 ? 2 : 3)
+                      .map((appointment) => (
+                        <View
+                          key={appointment.id}
+                          style={[
+                            s.calendarMark,
+                            {
+                              backgroundColor:
+                                appointment.status === "confirmed"
+                                  ? "#1976D2"
+                                  : appointment.status === "pending"
+                                    ? "#C47B12"
+                                    : "#6B7280",
+                            },
+                          ]}
+                        >
+                          <Text numberOfLines={1} style={s.calendarMarkText}>
+                            {width < 430
+                              ? appointment.status === "confirmed"
+                                ? "Set"
+                                : appointment.status === "pending"
+                                  ? "Wait"
+                                  : "Draft"
+                              : appointment.title}
+                          </Text>
+                        </View>
+                      ))}
+                  </Pressable>
+                );
+              })}
+            </View>
           </View>
-          {q.isPending ? (
+          <View style={s.legend}>
+            <Text style={muted}>
+              ● <Text style={{ color: "#2E7D32" }}>Open</Text>
+            </Text>
+            <Text style={muted}>
+              ● <Text style={{ color: "#C47B12" }}>Pending</Text>
+            </Text>
+            <Text style={muted}>
+              ● <Text style={{ color: "#1976D2" }}>Confirmed</Text>
+            </Text>
+            <Text style={muted}>
+              ● <Text style={{ color: "#6B7280" }}>Proposed</Text>
+            </Text>
+          </View>
+          <View style={s.dayHeader}>
+            <View>
+              <Text style={[s.title, text]}>
+                {selectedDay.toLocaleDateString(undefined, {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </Text>
+              <Text style={muted}>Open times and scheduled work</Text>
+            </View>
+            {button("Today", () => {
+              const today = new Date();
+              setSelectedDay(today);
+              setVisibleMonth(
+                new Date(today.getFullYear(), today.getMonth(), 1),
+              );
+            })}
+          </View>
+          {daySlots.map((slot) => (
+            <View
+              key={`slot-${slot.id}`}
+              style={[
+                s.agendaCard,
+                { borderColor: "#2E7D32", backgroundColor: c.card },
+              ]}
+            >
+              <View style={[s.statusRail, { backgroundColor: "#2E7D32" }]} />
+              <View style={s.agendaContent}>
+                <Text style={[s.title, { color: "#2E7D32" }]}>Open</Text>
+                <Text style={text}>
+                  {timeRange(slot.startsAt, slot.endsAt)}
+                </Text>
+              </View>
+            </View>
+          ))}
+          {q.isPending || availability.isPending ? (
             <ActivityIndicator />
           ) : q.isError ? (
             button("Retry Calendar", () => void q.refetch())
-          ) : rows.length ? (
-            rows.map((d) => (
+          ) : dayAppointments.length ? (
+            dayAppointments.map((d) => (
               <Pressable
                 key={d.id}
                 accessibilityRole="button"
@@ -535,25 +751,45 @@ function CalendarWorkspace() {
                   setTime(localInput(new Date(d.startsAt)));
                 }}
                 style={[
-                  s.card,
-                  { backgroundColor: c.card, borderColor: c.border },
+                  s.agendaCard,
+                  {
+                    backgroundColor: c.card,
+                    borderColor:
+                      d.status === "confirmed"
+                        ? "#1976D2"
+                        : d.status === "pending"
+                          ? "#C47B12"
+                          : "#6B7280",
+                  },
                 ]}
               >
-                <View style={s.row}>
-                  <Feather name="calendar" size={20} color={c.primary} />
+                <View
+                  style={[
+                    s.statusRail,
+                    {
+                      backgroundColor:
+                        d.status === "confirmed"
+                          ? "#1976D2"
+                          : d.status === "pending"
+                            ? "#C47B12"
+                            : "#6B7280",
+                    },
+                  ]}
+                />
+                <View style={s.agendaContent}>
                   <Text style={[s.title, text]}>{d.title}</Text>
+                  <Text style={text}>
+                    {timeRange(d.startsAt, undefined, d.duration)} ·{" "}
+                    {d.propertyName}
+                  </Text>
+                  <Text style={muted}>{calendarStatus(d.status)}</Text>
                 </View>
-                <Text style={text}>{d.propertyName}</Text>
-                <Text style={muted}>
-                  {new Date(d.startsAt).toLocaleString()} · {d.duration} min
-                </Text>
-                <Text style={{ color: c.primary }}>
-                  {calendarStatus(d.status)}
-                </Text>
               </Pressable>
             ))
-          ) : (
-            <Text style={muted}>No appointments in this view.</Text>
+          ) : daySlots.length ? null : (
+            <Text style={muted}>
+              No open times or appointments on this date.
+            </Text>
           )}
           {contexts.isError &&
             button("Retry Scheduling Options", () => void contexts.refetch())}
@@ -569,6 +805,7 @@ const s = StyleSheet.create({
     width: "100%",
     maxWidth: 900,
     alignSelf: "center",
+    paddingBottom: 130,
   },
   row: {
     flexDirection: "row",
@@ -580,6 +817,45 @@ const s = StyleSheet.create({
   title: { fontSize: 18, fontWeight: "600" },
   section: { gap: 14 },
   card: { padding: 20, borderRadius: 16, borderWidth: 1, gap: 10 },
+  calendar: { borderWidth: 1, borderRadius: 18, overflow: "hidden" },
+  monthHeader: {
+    minHeight: 58,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+  },
+  monthButton: { padding: 12 },
+  weekRow: { flexDirection: "row" },
+  weekday: {
+    width: "14.2857%",
+    textAlign: "center",
+    paddingVertical: 8,
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  monthGrid: { flexDirection: "row", flexWrap: "wrap" },
+  dayCell: { width: "14.2857%", padding: 4, gap: 3 },
+  dayNumber: { fontSize: 13, fontWeight: "600" },
+  calendarMark: { borderRadius: 4, paddingHorizontal: 3, paddingVertical: 2 },
+  calendarMarkText: { color: "white", fontSize: 9, fontWeight: "700" },
+  legend: { flexDirection: "row", flexWrap: "wrap", gap: 14 },
+  dayHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 12,
+  },
+  agendaCard: {
+    minHeight: 72,
+    borderWidth: 1,
+    borderRadius: 14,
+    overflow: "hidden",
+    flexDirection: "row",
+  },
+  statusRail: { width: 7 },
+  agendaContent: { flex: 1, padding: 14, gap: 5 },
+  availabilityRow: { gap: 8, paddingVertical: 4 },
   button: {
     paddingHorizontal: 15,
     paddingVertical: 12,

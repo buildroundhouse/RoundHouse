@@ -50,3 +50,9 @@ export const calendarUnavailableTable = pgTable("calendar_unavailable", {
   startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
   endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),
 });
+export const calendarAvailabilityTable = pgTable("calendar_availability", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
+  endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),
+});

@@ -39,6 +39,42 @@ export type CalendarContexts = {
     people: { accountId: number; name: string; homeowner: boolean }[];
   }[];
 };
+export type AvailabilitySlot = {
+  id: number;
+  startsAt: string;
+  endsAt: string;
+};
+export const dayKey = (value: Date | string) => {
+  const date = value instanceof Date ? value : new Date(value);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+};
+export const sameLocalDay = (a: Date | string, b: Date | string) =>
+  dayKey(a) === dayKey(b);
+export function calendarMonthDays(month: Date) {
+  const first = new Date(month.getFullYear(), month.getMonth(), 1);
+  const start = new Date(first);
+  start.setDate(first.getDate() - first.getDay());
+  return Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(start);
+    date.setDate(start.getDate() + index);
+    return date;
+  });
+}
+export const monthTitle = (month: Date) =>
+  month.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+export const timeRange = (
+  startsAt: string,
+  endsAt?: string,
+  duration?: number,
+) => {
+  const start = new Date(startsAt);
+  const end = endsAt
+    ? new Date(endsAt)
+    : new Date(start.getTime() + (duration ?? 0) * 60_000);
+  const format = (date: Date) =>
+    date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  return `${format(start)}–${format(end)}`;
+};
 export const calendarStatus = (status: string) =>
   ({
     proposed: "Proposed",

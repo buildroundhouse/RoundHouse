@@ -206,6 +206,35 @@ describe.sequential(
       );
       expect(rows.rows[0].revision).toBe(revision);
     });
+    it("stores personal open availability across account views without exposing it to others", async () => {
+      const created = await client("post", "/calendar-availability")
+        .send({
+          startsAt: "2026-10-05T09:00:00Z",
+          duration: 180,
+        })
+        .expect(201);
+      const personal = await client(
+        "get",
+        "/calendar-availability",
+        "trade",
+        50,
+      ).expect(200);
+      expect(personal.body.slots).toHaveLength(1);
+      expect(personal.body.slots[0].id).toBe(created.body.id);
+      expect(
+        (await client("get", "/calendar-availability", "client", 20)).body
+          .slots,
+      ).toEqual([]);
+      await client("post", "/calendar-availability")
+        .send({ startsAt: "2026-10-05T10:00:00Z", duration: 30 })
+        .expect(409);
+      await client("post", "/calendar-availability")
+        .send({ removeId: created.body.id })
+        .expect(200);
+      expect(
+        (await client("get", "/calendar-availability")).body.slots,
+      ).toEqual([]);
+    });
     it("denies removed participants and unauthenticated access", async () => {
       await pg.exec(
         "UPDATE entity_members SET status='removed' WHERE user_clerk_id='sub'",

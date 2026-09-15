@@ -18,7 +18,7 @@ The Command Center Calendar route now opens a dedicated scheduling screen instea
 4. Rescheduling preserves earlier times and responses in history, resets required approvals, and notifies affected recipients. Concurrent stale responses are rejected.
 5. Property and navigation links reuse the legacy Property mapping; business managers can message the selected client. Notification taps open Calendar.
 
-Private availability stores only an Unavailable interval. Another user's private commitments are never returned. Publishing/rescheduling cannot overlap a selected participant's Unavailable time.
+My Availability stores the person's deliberately shared open slots and renders them directly on the month and selected-day calendar. Open slots belong to the underlying person, so they remain consistent when that person switches account views. Private Unavailable intervals remain separate and are never returned to another person; publishing/rescheduling cannot overlap a selected participant's private Unavailable time.
 
 ## Integration boundaries
 
