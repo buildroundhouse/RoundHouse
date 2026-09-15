@@ -39,6 +39,10 @@ export function DailyGrind() {
     enabled: !!userId,
     staleTime: 0,
   });
+  const appointments = useQuery({
+    queryKey: ["calendar-daily", userId], enabled: !!userId,
+    queryFn: () => customFetch<{ appointments: { id: number; title: string; propertyName: string; startsAt: string; duration: number }[] }>("/api/calendar/daily"),
+  });
   const reminders = useQuery({
     queryKey: ["daily-grind-reminders", userId],
     queryFn: () => customFetch<ListRemindersResponse>("/api/reminders"),
@@ -249,6 +253,10 @@ export function DailyGrind() {
       {button("Manage lists & reminders", () =>
         router.push("/reminders" as never),
       )}
+      <Text style={[styles.heading, text]}>Confirmed appointments</Text>
+      {appointments.isPending ? <ActivityIndicator /> : appointments.isError ? button("Retry appointments", () => void appointments.refetch()) :
+        appointments.data?.appointments.filter(a => localDay(new Date(a.startsAt)) === day).length ? appointments.data.appointments.filter(a => localDay(new Date(a.startsAt)) === day).map(a => <View key={a.id} style={styles.section}><Text style={text}>{a.title} · {a.propertyName}</Text><Text style={muted}>{new Date(a.startsAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} · {a.duration} minutes</Text></View>) : <Text style={muted}>No confirmed appointments for this day.</Text>}
+      {button("Open Calendar", () => router.push("/(tabs)/calendar" as never))}
       <Text style={[styles.heading, text]}>Due & unfinished</Text>
       {reminders.isPending ? (
         <ActivityIndicator />

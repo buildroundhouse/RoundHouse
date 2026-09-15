@@ -43,6 +43,7 @@ function iconForType(type: string): keyof typeof Feather.glyphMap {
   if (type.startsWith("due_date_request")) return "calendar";
   if (type === "question_asked" || type === "question_answered") return "help-circle";
   if (type === "request_received") return "send";
+  if (type === "calendar") return "calendar";
   if (type === "due_date_changed") return "calendar";
   if (type === "rating") return "star";
   if (type === "log") return "clipboard";
@@ -279,10 +280,14 @@ export default function NotificationsScreen() {
           { onSettled: refreshAll },
         );
       }
+      if (n.type === "calendar") {
+        router.push({ pathname: "/(tabs)/calendar", params: { appointmentId: n.relatedId } } as never);
+        return;
+      }
       const link = deepLinkFromNotification(n);
       if (link) navigateToPushTarget(link);
     },
-    [markOne, optimisticMarkRead, refreshAll, respondToMembership],
+    [markOne, optimisticMarkRead, refreshAll, respondToMembership, router],
   );
 
   const handleMarkAll = useCallback(() => {
