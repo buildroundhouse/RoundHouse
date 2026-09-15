@@ -18,6 +18,8 @@ A Property appears here because the Business has a legitimate current Property r
 
 Participant-establishment and delegated approval rules are governed by **`33_INVITATIONS.md`**.
 
+Role titles, authority, and subscription eligibility follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Each action remains limited to the current authorized scope; historical records keep their original attribution.
+
 ---
 
 # 1. Position Inside the Business Entity
@@ -174,7 +176,7 @@ Useful permission-source categories include:
 - delegated Property Manager authorization;
 - Business-derived assignment;
 - direct independent Property authorization;
-- Commercial Management authorization;
+- authorized Facility management;
 - another explicit governing path.
 
 Roundhouse must be able to answer:
@@ -360,7 +362,7 @@ Ending current authorization does not erase legitimate historical Business recor
 Business Properties is permission-aware.
 
 - Business Owners / authorized Managers may see the Business's legitimate Property relationships according to authority;
-- Trade Team Members see only Properties relevant to their permitted participation;
+- Trade participants see only Properties relevant to their permitted participation;
 - Outside Trade Professionals see only Properties actually authorized / assigned to them;
 - a Business relationship to one Property does not imply access to another;
 - a person's membership in the Business does not automatically grant Property access;

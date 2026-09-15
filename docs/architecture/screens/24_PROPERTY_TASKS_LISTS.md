@@ -16,6 +16,8 @@ Tasks / Lists is intentionally lighter than Property Work.
 
 It is for simple organization that does not need the full responsibility, execution, CAPTURE, verification, and lifecycle structure of a Work item.
 
+Role titles, authority, and subscription eligibility follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Each action remains limited to the current authorized scope; historical records keep their original attribution.
+
 ---
 
 # 1. Position Inside the Property Entity
@@ -444,7 +446,7 @@ Tasks / Lists follows Property and Record permissions.
 Examples:
 
 - Homeowners may create and manage appropriate Property-owned lists;
-- Trade Professionals and Trade Team Members may create private/internal lists associated with the Property;
+- Trade participants may create private/internal lists associated with the Property;
 - authorized Business participants may see Business-internal lists according to authority;
 - shared lists are visible only to the intended authorized participants;
 - Viewers remain view-only where visibility is granted.

@@ -169,3 +169,5 @@ The **Green → Yellow → Red → 🔥** escalation belongs only to the Resolut
 Entity ownership or management does not automatically provide access to private conversations.
 
 When **Create Action** converts part of a conversation into a Resolution, appointment, Note, or other Roundhouse Record, **the new Record follows its own Entity permissions without exposing the surrounding private conversation.**
+
+Messaging uses an authorized Property or Business context and the paid-party rule in **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. A Property Viewer may message within the granted scope. History Viewer reviews retained messages but creates no new messages in History. Sharing RoundHouse and connection/setup use their dedicated pathways.

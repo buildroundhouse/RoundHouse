@@ -14,11 +14,13 @@ The governing distinction is:
 
 **Calendar schedules the work. Daily Grind runs the day.**
 
+Role titles and scheduling authority follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Shared scheduling requires at least one paid party and the applicable permission. Property viewing and History Viewer provide no appointment-creation or team-scheduling authority; retained appointment records remain viewable through History.
+
 ---
 
 ## Manager Scheduling Board
 
-For a Trade Professional Owner or Manager, Calendar shows the business schedule across the Properties they legitimately manage.
+For **Trade Pro (Owner)**, **Trade Pro (Manager)**, **Trade Pro (Owner – Lead)**, **Trade Pro (Manager – Lead)**, or **Trade Admin** with scheduling authority, Calendar shows the Business schedule across the Properties they legitimately manage. Authorized Property and Supplier managers use the corresponding scheduling scope.
 
 Each appointment shows:
 
@@ -40,7 +42,7 @@ This is the place where the Manager thinks ahead across the week.
 
 ## Workers See the Day, Not the Company Calendar
 
-Employees and ordinary Trade Team Members should **not see the entire company scheduling board**.
+Employees and ordinary Trade participants should **not see the entire company scheduling board**.
 
 Seeing a full week of jobs can distract or overwhelm someone whose immediate responsibility is today’s work.
 
@@ -153,7 +155,7 @@ This applies to:
 
 - Owner / Manager
 - Employees
-- Trade Team Members
+- Trade participants
 - Independent Trade Professionals
 - Subcontractors
 

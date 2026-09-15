@@ -14,6 +14,8 @@ The goal is simple:
 
 **The toggle stays alive until the creator is satisfied that the matter has actually been resolved.**
 
+Role titles and action scope follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Creating or responding to Resolutions requires the relevant authorized Property or Business relationship and paid-party eligibility. A Viewer receives only the permitted historical or shared view, not Resolution composition or management controls.
+
 ---
 
 # Position in the Command Center

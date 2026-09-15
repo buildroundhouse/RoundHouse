@@ -16,6 +16,8 @@ Business Vault is the durable home for Business-owned physical assets and perman
 
 The current-possession system for shared assets is a first-class part of the architecture and should remain highly visible rather than being reduced to a hidden metadata field.
 
+Role titles, authority, and subscription eligibility follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Each action remains limited to the current authorized scope; historical records keep their original attribution.
+
 ---
 
 # 1. Position Inside the Business Entity
@@ -502,7 +504,7 @@ Business Vault is permission-aware.
 Examples:
 
 - Owners / Managers may manage broad Business Assets and Records according to authority;
-- Trade Team Members may see shared equipment location / possession information needed to operate effectively;
+- Trade participants may see shared equipment location / possession information needed to operate effectively;
 - workers may transfer possession when authorized;
 - sensitive Business Records may be restricted more tightly than ordinary Asset availability;
 - outside Trade Partners see only Business Vault information legitimately shared with them;

@@ -12,6 +12,8 @@ Vault is not a second Work screen, not a second Maintenance screen, and not a ge
 
 Active work stays in **Work**. Recurring care and condition monitoring stay in **Maintenance**. Real-time work evidence stays in **CAPTURE**. Vault preserves the durable Property truth those systems create.
 
+Role titles, authority, and subscription eligibility follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Each action remains limited to the current authorized scope; historical records keep their original attribution.
+
 ---
 
 # 1. Vault Position Inside the Property Entity

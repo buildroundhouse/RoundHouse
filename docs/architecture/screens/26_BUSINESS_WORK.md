@@ -18,6 +18,8 @@ The visual direction uses a **lean tiered Work Flow Rail** inspired by a timelin
 
 **Business Work organizes responsibility and execution across the Business. Property Work narrows that same reality to one place. CAPTURE proves what actually happened during the work session.**
 
+Role titles, authority, and subscription eligibility follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Each action remains limited to the current authorized scope; historical records keep their original attribution.
+
 ---
 
 # 1. Position Inside the Business Entity
@@ -293,7 +295,7 @@ No duplicate Work item is created.
 
 # 13. Assignment
 
-Authorized Owners / Managers can assign or reassign Work to appropriate Trade Team Members or approved outside trade partners.
+Authorized Owners / Managers can assign or reassign Work to appropriate Trade participants or approved outside trade partners.
 
 Assignment moves the same Work Record into the **Assigned** stage of the Flow Rail.
 
@@ -420,7 +422,7 @@ Business Work is permission-aware.
 Examples:
 
 - Owners / Managers may see Business-wide Work according to authority;
-- Trade Team Members see only Work legitimately available to them;
+- Trade participants see only Work legitimately available to them;
 - outside trade partners see Work deliberately shared / assigned to them;
 - Property participants do not gain Business-wide visibility merely because one Work item concerns their Property;
 - Viewers remain view-only where permitted.

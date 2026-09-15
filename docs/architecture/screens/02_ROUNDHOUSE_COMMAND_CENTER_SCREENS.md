@@ -2,22 +2,34 @@
 
 ## Purpose
 
-The Command Center is the personal working screen for the currently active Roundhouse Profile.
+The Command Center is the working screen for the person's currently selected Entity relationship and Profile.
 
-It is not the Property or Business Entity page. The Command Center is where the person works. Entity pages are where the shared history of a Property or Business is viewed and, according to Role and permission, worked within.
+Property and Business pages show the shared history of the selected Property or Business and the controls available through the person's Role. A Profile Timeline assembles that person's attributed participation while retaining the Property or Business context of each record.
 
 **Profile Timeline = what I am doing.**  
 **Entity Timeline = what is happening here.**
 
 The Timeline is the architectural and visual center of the Command Center.
 
+## Role and entry rules
+
+Use the exact Role titles and permissions in **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. The top-level categories are Property, Trade, Supplier, and History Viewer. Paid Trade and Supplier titles include their position in parentheses; combined positions use **Owner – Lead** or **Manager – Lead**. Admin titles require paid access and retain their approved names.
+
+Shared people-to-people features require both authorized scope and at least one paid party: the participant or the person who owns or controls the Property or Business. A paid subscription does not grant a Viewer management authority.
+
+A new account enters Command Center only after its first legitimate Property or Business connection is complete. Incomplete first-time accounts return to the intake screens with their saved information. History is created after that first completed relationship.
+
+Every new operational record is associated with the Property or Business in which the person is authorized to act. Viewing an aggregate Timeline does not change the source of a record.
+
 ---
 
-# 1. Trade Professional Command Center
+# 1. Trade Command Center
 
-Upon completing Intake or signing in, the Trade Professional lands on their personal Command Center, operating through their currently selected Business Entity, such as DMT DESIGN BUILD.
+Upon completing Intake or signing in, the Trade participant lands on their Command Center, operating through their currently selected Business Entity, such as DMT DESIGN BUILD.
 
-The main Timeline shows the Trade Professional's own attributed activity: work, photographs, lists, client interactions, accomplishments, Resolutions, and other participation. Coworker activity does not automatically stream into the personal Timeline.
+The identity area uses the person's exact current title, such as **Trade Professional**, **Trade Admin**, **Trade Pro (Owner)**, **Trade Pro (Manager)**, **Trade Pro (Lead)**, **Trade Pro (Owner – Lead)**, or **Trade Pro (Manager – Lead)**.
+
+The main Timeline shows the person's own attributed activity: work, photographs, lists, client interactions, accomplishments, Resolutions, and other participation. Coworker activity does not automatically stream into the personal Timeline.
 
 ## Top Bar — Four Areas
 
@@ -43,7 +55,7 @@ A clear Back arrow returns the person to their personal Command Center and worki
 
 ### 3. Badge + Points — toward the right
 
-Shows the Avatar's current Roundhouse status and points.
+Shows the Avatar's current Roundhouse status and points where the selected Role is eligible.
 
 Tap to open Rewards, progress, available rewards, and points history.
 
@@ -75,7 +87,7 @@ Tap a day to expand that day's activity. Tap an event to open its photographs an
 
 A small magnifying-glass icon sits in the **upper-left corner of the Timeline**.
 
-Tap it and a search field expands across/over the Timeline. On the personal Trade Professional Timeline the placeholder is:
+Tap it and a search field expands across/over the Timeline. On the personal Trade Timeline the placeholder is:
 
 **Search your Timeline…**
 
@@ -83,7 +95,7 @@ Search filters the Timeline itself. It does not open a conventional results page
 
 Examples include `drywall`, `Johnson`, `electrical`, or `cabinet install`.
 
-A Trade Professional searching their personal Timeline searches their own attributed history across Entities. If they no longer have permission to enter a particular Property Entity, they may still see their own historical participation there, but Search does not grant access to other people's activity or to the underlying Entity.
+Search follows the Timeline context currently being viewed. The person's private History provides the combined search across their past and present participation. If a person no longer has access to a Property or Business, their own retained contributions remain searchable in History without reopening that workspace or other participants' records.
 
 Clear or close Search to restore the full Timeline.
 
@@ -101,7 +113,7 @@ Opens today's working plan: scheduled work, assignments, carryovers, personal it
 
 Daily Grind automatically opens as a near-full-screen overlay over the Timeline on login and can be dismissed back to its right-edge tab.
 
-Daily Grind belongs to the person. For Owners or Managers it may also surface the Daily Grinds of people they manage according to authority and privacy rules. Private calendar details remain private; management may see only that the person is blocked or unavailable where appropriate.
+Daily Grind belongs to the person. For authorized Owners, Managers, or Admins it may also surface the Daily Grinds of people they manage according to authority and privacy rules. Private calendar details remain private; management may see only that the person is blocked or unavailable where appropriate.
 
 ### 2. Tasks / Lists
 
@@ -133,11 +145,11 @@ The full Resolution system is governed separately and is not defined on this scr
 
 Opens people legitimately known through Roundhouse participation.
 
-For an Owner or Manager, this is also the deliberate path to a Team Member's personal work history:
+For authorized management, this is also the deliberate path to a participant's permitted work history:
 
-**People → Team Member → Team Member Timeline**
+**People → Participant → Participant Timeline**
 
-Subordinate activity is not dumped into the Owner's or Manager's personal Timeline.
+Other participants' activity is not dumped into the Owner's, Manager's, or Admin's personal Timeline. This doorway does not expose another person's private History Entity.
 
 ### 3. CAPTURE — center
 
@@ -161,9 +173,9 @@ Personal calendar information can contribute availability to Roundhouse without 
 
 ---
 
-# 2. Trade Team Member Command Center
+# 2. Trade Participant Scope
 
-The Trade Team Member uses the same basic Command Center structure as the Trade Professional:
+Trade participants use the same basic Command Center structure:
 
 - four-area top bar;
 - personal visual Timeline and Timeline Search;
@@ -172,19 +184,23 @@ The Trade Team Member uses the same basic Command Center structure as the Trade 
 
 Their Timeline is their own attributed participation. Other workers do not crowd it.
 
-The current Business logo/name opens the Business Entity page according to the Team Member's permissions. Property access and working controls are likewise determined by Role, assignment, management authority, and permission.
+The current Business logo/name opens the Business Entity page according to the participant's permissions. Property access and working controls are determined by the current sub-role, assignment, authority, subscription eligibility, and permission source.
 
-A Trade Team Member can use their personal Timeline to search their own historical work across Properties without receiving broader access to those Properties or other workers' records.
+The standard unpaid **Trade Professional** title does not confer ownership, team management, or broader company access. Paid positions and **Trade Admin** receive the functions legitimately assigned to them. Owner, Manager, and Lead are distinct positions even where one person holds a combined title.
 
 ---
 
 # 3. Homeowner Command Center
 
+The homeowner experience supports **Homeowner** and **Home Pro (Owner)**, with the exact current title shown in the identity area.
+
 Upon completing Intake or signing in, the Homeowner lands on **one personal Command Center**. Roundhouse does not create a separate personal Command Center for every Property the Homeowner owns.
 
 The Homeowner Command Center is the working view across the Homeowner's relevant residential Properties. It is not itself the permanent Property record.
 
-The Timeline can assemble the Homeowner's attributable and relevant activity across those Properties. Home Team Members, family members, and Trade Professionals do not automatically flood the Homeowner's personal Timeline merely because they participate in the same Property.
+The Timeline can assemble the Homeowner's attributable and relevant activity across those Properties. Home Pro (Teammate) participants, family members, and Trade participants do not automatically flood the Homeowner's personal Timeline merely because they participate in the same Property.
+
+The free **Homeowner** account uses its permitted individual functions. Team organization follows the paid-party and authority rules; **Home Pro (Owner)** provides the paid Owner functions.
 
 ## Single-Property Homeowner
 
@@ -197,7 +213,7 @@ The architectural distinction still remains:
 **Homeowner Command Center = the Homeowner's working view.**  
 **Property Entity = the permanent record of the Home.**
 
-If the Homeowner later adds a second Property, the same Command Center expands into the multi-Property state below.
+If the Homeowner later adds a second Property under the governing creation or access rules, the same Command Center expands into the multi-Property state below.
 
 ## Multi-Property Homeowner
 
@@ -229,7 +245,7 @@ From the multi-Property state, the Properties working tab provides the direct pa
 
 ### 3. Badge + Points — toward the right
 
-Shows the Homeowner Profile's status and points. Tap to open Rewards.
+Shows the Homeowner Profile's status and points where eligible. Tap to open Rewards.
 
 ### 4. Inbox — far right
 
@@ -239,7 +255,7 @@ Combined messages and notifications.
 
 ## Homeowner Timeline and Search
 
-The Homeowner uses the same visual Timeline model and Today-first hierarchy as the Trade Professional.
+The Homeowner uses the same visual Timeline model and Today-first hierarchy as the Trade participant.
 
 For a one-Property Homeowner, the Command Center naturally reflects activity associated with that Homeowner and Home.
 
@@ -280,19 +296,21 @@ The same five primarily icon-based controls remain across the bottom:
 4. Estimates / Invoices
 5. Calendar
 
-Controls may adapt to the Homeowner Role rather than exposing Trade-only actions that do not apply.
+Controls adapt to the current Home Role and permissions.
 
 ---
 
-# 4. Home Team Member Command Center
+# 4. Home Participation
 
-The Home Team Member uses the same basic physical Command Center layout.
+**Home Pro (Teammate)** uses the same basic physical Command Center layout.
 
-Their Timeline remains personal: their own chores, projects, photographs, lists, accomplishments, assignments, points, and other participation. It is not the entire Property Timeline.
+Their Timeline remains personal: their own chores, projects, photographs, lists, accomplishments, assignments, points where eligible, and other participation. It is not the entire Property Timeline.
 
 The Property image/name opens the Property Entity according to permission. The Property Entity shows the shared history of what is happening at the home.
 
-Home Team Members can earn points for legitimate household contribution and participation without turning the Property Timeline into their personal scoreboard.
+Eligible teammates can earn points for legitimate household contribution and participation without turning the Property Timeline into their personal scoreboard.
+
+**Home Pro (Manager)** and **Home Admin** use the same layout with management controls limited to their authorized scope. Their titles do not imply ownership of the Property.
 
 ---
 
@@ -339,13 +357,13 @@ It can contain items such as:
 
 Documents remain connected to the underlying Record, work, equipment, condition, or event that produced them where applicable. Property Documents provides a predictable retrieval point without duplicating the information into permanent Command Center controls.
 
-Accepted Disclaimers are persistent Property Records. When a Disclaimer remains materially relevant to authorized work, it cannot simply be hidden from an authorized Trade Professional whose work may be affected by it. A later Record may resolve or supersede the condition without erasing the historical Disclaimer.
+Accepted Disclaimers are persistent Property Records. When a Disclaimer remains materially relevant to authorized work, it cannot simply be hidden from an authorized Trade participant whose work may be affected by it. A later Record may resolve or supersede the condition without erasing the historical Disclaimer.
 
-Property Documents persist with the Property Entity through changes in homeowners, Trade Professionals, and other participants, subject to the governing record, authority, privacy, and visibility rules.
+Property Documents persist with the Property Entity through changes in homeowners, Trade participants, and other participants, subject to the governing record, authority, privacy, and visibility rules.
 
 The Property Entity's Timeline remains the collective chronological history of the Property.
 
-A Homeowner primarily enters it to see and manage the shared story of the home. A Trade Professional may enter the same Property Entity to perform legitimate work and receives the working controls appropriate to their Role and permissions.
+A Homeowner primarily enters it to see and manage the shared story of the home. A Trade participant may enter the same Property Entity to perform legitimate work and receives the working controls appropriate to their Role and permissions.
 
 It is the same underlying Property Entity and the same underlying Property history.
 
@@ -363,13 +381,27 @@ The Business Timeline is collective company activity according to viewer permiss
 
 Command Center tools such as People, Properties, Estimates/Invoices, Calendar, and personal Daily Grind should not be duplicated onto the Business Entity merely because they exist in the Owner's personal Command Center.
 
-The Business Entity receives only information and controls that genuinely belong at the Business level.
+The Business Entity receives only information and controls that genuinely belong at the Business level. Supplier participation uses the corresponding Supplier sub-role titles and permissions from Roles & Authority.
+
+---
+
+# 7. Viewer Contexts
+
+A Viewer connected to a Property sees the deliberately shared Property information, with permitted Property messaging, Share RoundHouse, and search/connection paths. The paid-party rule applies to the shared relationship. Viewer access does not expose Notes creation, CAPTURE, Work, Calendar booking, or participant management.
+
+Selecting **History** from Profile opens the private combined Timeline in the **History Viewer** Role. History remains private to its associated person. The only active paths beyond viewing/searching its Timeline are Share RoundHouse and finding, connecting to, or starting setup of a Property or Business.
+
+History and Property Viewer contexts do not show points, badge progression, or gamification controls. Historical accomplishments can still appear as prior records.
+
+When the last Property or Business connection ends, the remaining context is **History**, not the former Property or Business. Its header shows **History** and the **History Viewer** Role. New accounts without a completed initial connection remain in intake.
+
+Detailed behavior follows **`../../HISTORY_ENTITY_LOGIC.md`**.
 
 ---
 
 # Governing Command Center Rules
 
-1. **Personal Command Centers belong to the currently active Profile.**
+1. **Command Centers belong to the currently active Profile and its Entity relationship.**
 2. **The Timeline is the visual and architectural centerpiece of the Command Center.**
 3. **Profile Timeline = what I am doing.**
 4. **Entity Timeline = what is happening here.**
@@ -379,34 +411,14 @@ The Business Entity receives only information and controls that genuinely belong
 8. Entering one Property narrows the scope and introduces the large Property splash/hero at the top of the Property Entity.
 9. Tapping the current Entity identity leaves the personal Command Center and opens the separate Entity page when a single Entity is represented there.
 10. Entity pages use a large representative image and a clear Back arrow so the person always understands the change in context.
-11. Coworker, subordinate, family, and Trade activity does not automatically flood another person's personal Timeline.
+11. Coworker, family, and Trade activity does not automatically flood another person's personal Timeline.
 12. Management authority grants legitimate visibility and control; it does not merge another person's Timeline into the Manager's Timeline.
 13. Search filters the Timeline currently being viewed and never grants additional permission.
 14. Working tools belong primarily in the Command Center. Durable Property information belongs primarily with the Property Entity.
 15. Property Documents belongs on the Property Entity, not as another permanent Command Center button.
 16. Notes, photographs, documents, and other records should not receive duplicate navigation merely because they can appear in Timeline history; add dedicated access only where there is a genuine retrieval or workflow need.
 17. The same underlying Record may appear in appropriate Profile and Entity Timeline views without creating duplicate records.
-18. **Entities are where interaction happens. Entity Timelines record shared history. Profile Timelines assemble each person's individual history from their attributed participation across those Entities.**
+18. **Entities are where interaction happens. Entity Timelines record shared history. Profile Timelines assemble each person's individual participation from those Entities.**
 19. **The Command Center never owns profile switching. Its Profile photo opens the active Profile Page.**
 20. **The Profile Page is the sole switching location. After a switch, Back returns to the selected Profile's Command Center.**
 21. **The switcher never creates, claims, adds, archives, edits, or configures a Profile. Those actions remain in their proper workflows.**
-
-
-## Unaffiliated Viewer — September 14, 2026 governing update
-
-Follow the [Unaffiliated Viewer lifecycle](../../UNAFFILIATED_VIEWER_LOGIC.md). This supersedes older
-wording that excludes automatic fallback after the last affiliation ends. A former
-Viewer, homeowner who sells the house, Trade Pro owner who sells the business,
-or teammate whose employment ends defaults to Viewer once no approved Entity
-affiliation remains. The same rule applies to all other former roles.
-
-Keep the same personal account and its own work history, including work performed
-through a former business. End former Entity access without deleting historical
-authorship or the Entity's original records. Independently authorized affiliations
-remain in effect; a sale that retains membership is not yet a departure.
-
-Command Center, Profile, and View Profile show **Unaffiliated** on the Entity/name
-line, with **Viewer** immediately underneath, replacing stale Entity names and
-former roles. This retained account is not a new-user onboarding choice. A later
-approved affiliation supplies its assigned role. See the governing lifecycle for
-acceptance checks and the implementation work still pending.

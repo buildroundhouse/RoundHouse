@@ -35,6 +35,8 @@ The center **CAPTURE/Concierge button continues to dip upward into the open shee
 
 This makes the interaction feel like opening a working pad over the Command Center rather than opening another screen.
 
+Current role titles and action permissions follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. New Notes, Tasks, Lists, and documentation retain their authorized Property or Business context. History presents retained contributions; its Viewer has no creation or editing controls. Shared organization follows the paid-party rule.
+
 ---
 
 # Tasks / Lists

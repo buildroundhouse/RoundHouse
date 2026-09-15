@@ -1,6 +1,8 @@
 # Roundhouse — Profile Page
 
-The **Profile Page** is a long, vertically scrollable page with a definite bottom. It is the visual and management hub for the currently active Profile. The **Command Center remains the landing page** and primary operating screen.
+The **Profile Page** is a long, vertically scrollable page with a definite bottom. It is the visual and management hub for the currently active Profile. The **Command Center remains the landing page** after a new account has completed its first legitimate Property or Business connection.
+
+Role titles and authority follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Display the exact approved title, including parentheses and the en dash in combined Trade or Supplier positions. Available controls follow the current Role, permission source, and paid-party requirement.
 
 ## 1. Top Navigation
 
@@ -18,13 +20,15 @@ The Profile Page is the **only** place where a person can change the active Prof
 
 The Command Center contains no profile switcher. Its Profile photo only opens the active Profile Page.
 
-When more than one Profile is available, tapping the centered **Switch profile** control opens a simple selection sheet. The sheet shows the active Profile and **Other profiles** using recognizable names and images, such as **JD Design Studio**, **DMT DESIGN BUILD**, or **Tierney Home**.
+When more than one Profile is available, tapping the centered **Switch profile** control opens a simple selection sheet. The sheet shows the active Profile and **Other profiles** using recognizable names and images, such as **JD Design Studio**, **DMT DESIGN BUILD**, **Tierney Home**, or **History**.
 
 The switcher contains no Role labels, account terminology, settings, editing, archive controls, or add/create/claim actions. Those actions remain in their appropriate workflows.
 
-Selecting another Profile updates the active context and immediately redraws the entire Profile Page: splash image, logo, name, View Profile destination, information, permissions, and management doorways. The switcher then closes, leaving the newly selected Profile Page visible. Back returns to that Profile's Command Center.
+Selecting another Profile updates the active context and immediately redraws the entire Profile Page: splash image, logo, name, View Profile destination where available, information, permissions, and management doorways. The switcher then closes, leaving the newly selected Profile Page visible. Back returns to that Profile's Command Center.
 
 When only one Profile is available, the switch control is absent. Tapping the Profile photo from the Command Center still opens the Profile Page directly.
+
+The private **History** context is created after the first legitimate Property or Business connection. It remains in the switcher alongside current connections and remains available if those connections end.
 
 ---
 
@@ -36,7 +40,7 @@ The banner belongs to the active Profile and is a dramatic visual confirmation o
 
 Changing Profiles must visibly replace the banner and associated identity so the person cannot mistake which Profile is active.
 
-The banner is edited from its own granular media control, not from a global page-level Edit button.
+The banner is edited from its own granular media control where editing is available, not from a global page-level Edit button.
 
 ---
 
@@ -46,7 +50,7 @@ The **large circular Profile Photo** sits toward the lower-left of the banner an
 
 The Profile's logo or identifying image appears with the Profile name beneath the splash. A Business can present its company logo; a Home can present its recognizable Home identity.
 
-The splash and identity area must make the selected Profile visually unmistakable. Internal Entity and Role concepts may govern access, but the switcher and splash use the Profile's real customer-facing name.
+The splash and identity area make the selected Profile visually unmistakable. The switcher and splash use the Property or Business name, or **History** for the private History context. The current Role title is displayed in the identity area according to Roles & Authority.
 
 ---
 
@@ -58,7 +62,7 @@ There is no global page-level Edit or Settings control. Editing begins at the gr
 
 ### Editable / Private Profile
 
-The Profile owner sees **View Profile** and **Share Roundhouse**.
+Where the current Role permits an outward-facing view, the person sees **View Profile** and **Share Roundhouse**.
 
 ### View Profile
 
@@ -66,19 +70,19 @@ The Profile owner sees **View Profile** and **Share Roundhouse**.
 
 ### Share Roundhouse
 
-**Share Roundhouse** sits beside View Profile and can display the **point value earned for a qualifying successful share / activation**.
+**Share Roundhouse** sits beside View Profile and can display the **point value earned for a qualifying successful share / activation** when the active Role is eligible for gamification.
 
 Share Roundhouse is not a separate invitation system. Tapping it opens the same **Invitation Center** governed by **`33_INVITATIONS.md`**, focused on the Share Roundhouse action.
 
-The Invitation Center can carry the intended Entity, Role, Business relationship, pending Property approval, or setup context so the recipient does not arrive as a context-free new user.
+The Invitation Center can carry the intended Property or Business, Role, Business relationship, pending Property approval, or setup context so the recipient resumes the appropriate path.
 
-Points are tied to a qualifying successful activation rather than simply sending large numbers of invitations.
+Points are tied to a qualifying successful activation rather than simply sending large numbers of invitations. Viewer roles can use Share Roundhouse without earning points, badges, or status progression. Sharing Roundhouse does not publicly publish the underlying Property, Business, or History records.
 
 ### Outward-Facing Profile
 
 When another person views the outward-facing Profile, **View Profile** and **Share Roundhouse** are not shown.
 
-Where legitimate shared Entity context exists, the action area may expose **Message** and other permitted actions. Roundhouse does not create a context-free social connection merely because one person can see another person's Profile.
+Where legitimate shared Property or Business context exists, the action area may expose **Message** and other permitted actions, subject to the paid-party rule and authorization. Viewing a person's Profile does not create a separate person-to-person relationship.
 
 ---
 
@@ -96,29 +100,24 @@ Tapping it opens the dedicated Invitation Center governed by:
 
 The Invitation Center contains the person's invitation and access activity, including:
 
-- **Invite / Add Someone**;
+- **Invite / Add Someone**, where authority permits;
 - **Requests to You**;
 - **Invitations You Sent**;
 - **Pending Property / Facility approvals**;
 - **Share Roundhouse**;
 - accepted / declined / cancelled / expired / setup-required states;
 - resend / cancel where appropriate;
-- Entity, Role, inviter / requester, Business source, authority source, and permission scope where relevant.
+- Property or Business, Role, inviter / requester, Business source, authority source, and permission scope where relevant.
 
 The prominent Share Roundhouse control near the Profile identity area and this Profile row are two doorways into the **same system**.
 
 ### Viewer Invitations
 
-**Viewer** is the neutral view-only Role.
+A Viewer invitation creates a real, limited connection to the named Residential Property or Commercial Facility. It identifies the Property, the information shared, and the authorized messaging scope.
 
-A person may have a neutral Viewer-facing identity, but Viewer participation is not a free-floating social relationship. A Viewer must be added to a legitimate:
+For a Residential Property, the title is **Home (Viewer)**. The Viewer or the Property's Owner/controlling side must have a paid subscription for the shared relationship. The invitation requires the intended person's consent and the Property's authorization.
 
-- Residential Property; or
-- Commercial Facility.
-
-A Viewer invitation always identifies the Property / Facility and the view-only scope being granted.
-
-There is no Trade Viewer Role.
+The private History Entity is accessed only by the person tied to it in the **History Viewer** Role. Other people are not invited into that History.
 
 ---
 
@@ -136,36 +135,36 @@ These are direct lookup tools beyond the user's current People relationships.
 
 ### Find a Trade Professional
 
-Searches Trade Professionals and Trade Businesses using appropriate public search information such as:
+Searches Trade participants and Trade Businesses using appropriate public search information such as:
 
 - professional / owner name;
 - Business name;
 - trade / category;
 - service area / ZIP where appropriate.
 
-A found professional can be brought into the appropriate Entity through the Invitation Center / Add-to-Entity flow rather than creating a person-to-person connection.
+Results display each person's approved Role title rather than assigning one generic paid title to every professional. A found professional can be brought into the appropriate Property or Business through the Invitation Center and the governing authorization path.
 
 ### Residential Home Search
 
-Searches deliberately searchable residential Property Entities under Roundhouse privacy rules.
+Searches deliberately searchable residential Properties under Roundhouse privacy rules.
 
 It is not a way to browse private homes indiscriminately.
 
 ### Commercial Facility Search
 
-Searches deliberately searchable Commercial Facility / commercial Property Entities under governing visibility rules.
+Searches deliberately searchable Commercial Facilities under governing visibility rules.
 
-### When Search Does Not Find the Entity
+### When Search Does Not Find the Property or Business
 
-If the intended person or Entity is genuinely missing, the relevant search can offer a legitimate next step such as:
+A search with no matching Property or Business offers the appropriate **+ Add Property** or **+ Add Business** action. A missing person may be invited through Share Roundhouse.
 
-- **Invite Trade Professional / Business**;
-- **Share Roundhouse**;
-- **Create Residential Home / Property**;
-- **Create Commercial Facility / Property**;
-- an appropriate **claim / setup** path.
+Creation enters the intake flow after personal Identity. It preserves existing Identity information and provides Back and Review/Edit navigation as defined in **`01_ROUNDHOUSE_INTAKE_SCREENS.md`**.
 
-Search never allows someone to manufacture ownership, authority, or private access merely because an Entity did not appear.
+A free account may create one Property and one Business. Attempting another of that type shows **Add Pro to create another Property** or **Add Pro to create another Business** before creation begins. Existing-record search and authorized connection remain available.
+
+For an existing record, ownership begins with the legitimate claimant finding it and requesting ownership transfer. A free creator cannot proactively offer ownership transfer as a setup service.
+
+Search and subscription status do not by themselves grant ownership, authority, or private access.
 
 **People = relationships I already have.**  
 **Find = direct lookup beyond my existing relationship directory.**  
@@ -198,7 +197,7 @@ During MVP, Discover prominently says **Coming Soon** and visually previews futu
 - Roundhouse Spotlight / hero stories;
 - clearly labeled sponsored content.
 
-The full Discover ecosystem remains post-MVP.
+The full Discover ecosystem remains post-MVP. Public publishing follows the current Role and subscription authority.
 
 ---
 
@@ -208,9 +207,9 @@ Below Invite / Find / Discover begins the main vertically scrolling Profile info
 
 Each section owns its own edit doorway. The page never enters a single global editing mode.
 
-These are **personal / Role fields**, not Business Entity information.
+These are **personal Identity and Role-specific fields**, not duplicated Business information. Qualifications, experience, and role descriptions belong to the person's relevant Property or Business relationship.
 
-Each appropriate editable field has its **Public / Private control positioned on the far-right side** of that field or section.
+Each appropriate editable field has its **Public / Private control positioned on the far-right side** of that field or section where publication is authorized.
 
 The Profile information can include:
 
@@ -221,7 +220,7 @@ The Profile information can include:
 **Strengths / Specialties**  
 **Certifications / Licenses**
 
-Additional information can be added provided it describes the **person** rather than duplicating information belonging to an Entity.
+Additional information can be added provided it describes the person in the relevant context rather than duplicating information belonging to the Property or Business.
 
 ---
 
@@ -233,13 +232,13 @@ Farther down the Profile is:
 
 This opens a separate page.
 
-It shows the person's authority in the current Entity and the permissions associated with that authority. Where permitted, it also allows an authorized person to grant, delegate, change, or take back authority and permissions for other participants.
+It shows the person's authority in the current Property or Business and the permissions associated with that authority. Where permitted, it allows an authorized person to grant, delegate, change, or take back authority and permissions for other participants.
 
 This includes governing controls such as **Manager authority to manage Property participants**.
 
-Where a Homeowner delegates participant-management authority to a Trade Professional / Business Manager, that authority can allow the Manager to approve appropriate Business participants into the Property without a redundant second Owner approval. The action remains permanently attributable and the Homeowner receives an informational Notification.
+Where a Property Owner delegates participant-management authority to an authorized Trade or Property Manager, that authority can allow the Manager to approve appropriate Business participants into the Property without a redundant second Owner approval. The action remains permanently attributable and the Owner receives an informational Notification.
 
-Role, authority, and permission source remain separate.
+Shared functions require at least one paid party and the relevant authorization. A Role or authority change affects current and future access, preserving previous contributions and the titles under which they were made.
 
 ---
 
@@ -267,6 +266,16 @@ This contains remaining personal application settings such as notification prefe
 
 ---
 
+## History Context
+
+Selecting **History** shows the person's private combined Timeline in the **History Viewer** Role. There is no outward-facing History view or invitation into another person's History.
+
+Share Roundhouse and Find/connect/setup remain available. History does not expose composition, CAPTURE, Work, booking, participant-management, or gamification controls. Starting a new Property or Business setup uses the destination's intake and authority rules.
+
+If all current Property or Business relationships end, History remains available. Brand-new accounts have no History until the first legitimate relationship is complete and remain in intake until then.
+
+See **`../../HISTORY_ENTITY_LOGIC.md`**.
+
 ## Overall Page Structure
 
 Visually, from top to bottom:
@@ -287,7 +296,7 @@ Visually, from top to bottom:
 **Discover**  
 **Find pros and success stories in your area. · Q&A · Message Board**  
 ↓  
-**Editable personal information with Public / Private controls**  
+**Editable personal information with Public / Private controls where permitted**  
 ↓  
 **Authority & Permissions →**  
 **Subscription & Account →**  
@@ -295,34 +304,14 @@ Visually, from top to bottom:
 ↓  
 **Definite bottom of Profile**
 
-For the Profile owner, the Profile Action Area directly beneath the splash contains **View Profile → Share Roundhouse + Points**. Share Roundhouse and the dedicated Invite row both enter the same Invitation Center.
+For eligible active Profiles, the Profile Action Area directly beneath the splash contains **View Profile → Share Roundhouse + Points**. Viewer roles retain Share Roundhouse without points. Share Roundhouse and the dedicated Invite row both enter the same Invitation Center.
 
-The important visual hierarchy is that the active Home or Business Profile is unmistakable. Switching Profiles causes a dramatic splash and identity change before Back returns to the selected Profile's Command Center.
+The important visual hierarchy is that the active Property, Business, or History context is unmistakable. Switching Profiles causes a dramatic splash and identity change before Back returns to the selected Profile's Command Center.
 
 ## Governing Rule
 
-**Profile places Invite / Share Roundhouse before Find a Trade Professional. All Share Roundhouse doorways enter the same Invitation Center. Viewer is the neutral view-only Role and only becomes an active participation relationship when attached to a legitimate Residential Property or Commercial Facility. The Profile Page is the sole owner of profile switching; the Command Center never switches Profiles.**
+**Profile places Invite / Share Roundhouse before Find a Trade Professional. All Share Roundhouse doorways enter the same Invitation Center. Role titles, permissions, and paid eligibility follow Roles & Authority. Property Viewer access is authorized for a specific Property; History Viewer is private to the person tied to History. Profile is the sole switching location, and Back returns to the selected context's Command Center.**
 
 ## Profile Wireframe
 
 ![Roundhouse Profile wireframe](./03_ROUNDHOUSE_PROFILE_WIREFRAME.jpg)
-
-
-## Unaffiliated Viewer — September 14, 2026 governing update
-
-Follow the [Unaffiliated Viewer lifecycle](../../UNAFFILIATED_VIEWER_LOGIC.md). This supersedes older
-wording that excludes automatic fallback after the last affiliation ends. A former
-Viewer, homeowner who sells the house, Trade Pro owner who sells the business,
-or teammate whose employment ends defaults to Viewer once no approved Entity
-affiliation remains. The same rule applies to all other former roles.
-
-Keep the same personal account and its own work history, including work performed
-through a former business. End former Entity access without deleting historical
-authorship or the Entity's original records. Independently authorized affiliations
-remain in effect; a sale that retains membership is not yet a departure.
-
-Command Center, Profile, and View Profile show **Unaffiliated** on the Entity/name
-line, with **Viewer** immediately underneath, replacing stale Entity names and
-former roles. This retained account is not a new-user onboarding choice. A later
-approved affiliation supplies its assigned role. See the governing lifecycle for
-acceptance checks and the implementation work still pending.

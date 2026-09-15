@@ -146,7 +146,7 @@ A person may have more than one legitimate Roundhouse acting context.
 
 For example, the same person might own two residential Properties and also have management authority over a commercial Property.
 
-The commercial Property remains its own Property Entity with its own authority structure. If entering or acting within it requires a Commercial Management / Facility Management context, Roundhouse should make that acting-context change explicit rather than silently treating Homeowner authority as commercial management authority.
+A Commercial Property retains its own authorized Property relationship. Entering it makes the current Role and granted authority explicit; a Residential Property role does not automatically authorize action at a Facility.
 
 The person's identity remains the same. Their acting Role/authority determines how they participate in that Entity.
 
@@ -229,3 +229,5 @@ When the person deliberately leaves the Command Center working sheet and enters 
 16. Different authority contexts, including commercial/facility management, must remain explicit rather than silently inheriting Homeowner authority.
 17. Property context does not automatically make internal Business information homeowner-visible.
 18. **Avatar Timeline = what I am doing across my contexts. Property Timeline = what is happening at this Property.**
+
+Role titles, authorization, and creation limits follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. **+ Add Property** enters **`01_ROUNDHOUSE_INTAKE_SCREENS.md`** after personal Identity, retaining Back and Review/Edit behavior. A free account that has created one Property sees **Add Pro to create another Property**. Search and authorized connection remain available. A Property may be created for administration without being described as the creator's home.

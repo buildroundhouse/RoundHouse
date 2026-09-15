@@ -16,6 +16,8 @@ Property History is not a second Timeline and it is not a duplicate archive of W
 
 It is a retrieval view over the same underlying Records those systems create.
 
+Role titles, authority, and subscription eligibility follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Each action remains limited to the current authorized scope; historical records keep their original attribution.
+
 ---
 
 # 1. Timeline vs Property History
@@ -400,7 +402,7 @@ Changing:
 
 - Homeowner
 - Trade Professional
-- Trade Team Member
+- Trade participant
 - Business relationship
 - service provider
 - other participant
@@ -423,7 +425,7 @@ Examples:
 
 - Homeowners may see broad Property history according to authority and visibility.
 - Trade Professionals may need relevant past work, Asset, inspection, Standard, and service information necessary for authorized work.
-- Trade Team Members receive only history appropriate to their legitimate work and permissions.
+- Trade participants receive only history appropriate to their legitimate work and permissions.
 - Viewers remain view-only.
 - private Business/internal records remain private unless deliberately shared.
 

@@ -18,6 +18,8 @@ Work is not a second Daily Grind, not a second Calendar, and not a replacement f
 
 **Work organizes responsibility and execution. CAPTURE documents the real work session.**
 
+Role titles, authority, and subscription eligibility follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Each action remains limited to the current authorized scope; historical records keep their original attribution.
+
 ---
 
 # 1. Position Inside the Property Entity
@@ -419,7 +421,7 @@ Examples:
 
 - Homeowners / authorized Property authorities can see and create legitimate Property work according to authority.
 - Trade Professionals see Work they are permitted to access through the Property / Business relationship.
-- Trade Team Members see assigned or otherwise permitted Work.
+- Trade participants see assigned or otherwise permitted Work.
 - Managers can see and assign Work according to governing Business authority.
 - outside trade partners see only Work legitimately shared / assigned to them.
 - Viewers remain view-only where Work visibility is permitted.

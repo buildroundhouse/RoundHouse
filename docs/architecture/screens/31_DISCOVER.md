@@ -8,6 +8,8 @@ Roundhouse should ship the **Discover** destination as a visible, intentional pr
 
 The MVP version should make the future direction obvious without forcing the core product to carry message-board, public-feed, advertising, or reputation complexity before the private Roundhouse workflow is finished.
 
+Displayed role titles and publishing eligibility follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Pro indicates paid status, while Owner, Manager, and Lead positions retain their approved parentheses. Share RoundHouse is distinct from publishing Property or Business records. Viewer access does not authorize public publishing; private History remains private. Shared interactions retain the required Property or Business context, paid-party eligibility, and visibility permissions.
+
 ---
 
 ## Purpose

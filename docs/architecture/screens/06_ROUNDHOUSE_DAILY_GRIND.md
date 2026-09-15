@@ -25,3 +25,5 @@ The **right-side tabs and bottom buttons remain exposed**, making it obvious the
 Inside is a clean day-oriented layout with **Today dominant** and a small **Yesterday | Today | Tomorrow** strip for context.
 
 **Calendar schedules time. Daily Grind runs the day.**
+
+Role-dependent actions follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Shared organization requires the applicable permission and at least one paid party. History Viewer retains past records without opening an active Daily Grind or creating new work from History.

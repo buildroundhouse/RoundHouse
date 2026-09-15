@@ -18,6 +18,8 @@ A legitimate Work Request enters the shared Work architecture at **Requested** a
 
 There is no separate Client Requests system and no duplicate Work Order.
 
+Role titles, authority, and subscription eligibility follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Each action remains limited to the current authorized scope; historical records keep their original attribution.
+
 ---
 
 # 1. Governing Boundary
@@ -312,9 +314,9 @@ Property Work Requests are permission-aware.
 Examples:
 
 - a Homeowner / authorized Property authority may request legitimate work;
-- a Home Team Member may request work only when permitted;
+- a Home Pro (Teammate) may request work only when permitted;
 - a Business receives only requests legitimately addressed to it through the Property relationship;
-- Trade Team Members see Requests according to Business authority / assignment;
+- Trade participants see Requests according to Business authority / assignment;
 - outside Trade Partners see only Work deliberately shared / assigned to them;
 - Viewers remain view-only where Work visibility is permitted.
 

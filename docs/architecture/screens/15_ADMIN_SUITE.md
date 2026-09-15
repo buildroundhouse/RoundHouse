@@ -4,7 +4,7 @@
 
 The Admin Suite is Roundhouse's hidden operator, testing, configuration, support, and product-administration workspace.
 
-It is **not** part of normal Homeowner, Trade Professional, Team Member, Commercial, Supplier, Property, or Command Center navigation. It exists so authorized Roundhouse administrators can safely operate and test the product without exposing administrative controls to ordinary users.
+The Admin Suite is restricted to authorized RoundHouse platform administrators. Home Admin, Trade Admin, and Supplier Admin are customer roles; their paid access does not grant platform-administration privileges.
 
 This document is also a **preservation document ahead of repository cleanup**. It consolidates valuable behavior, vocabulary, datasets, visual language, and operator functions that currently exist across the Replit-era implementation and the newer Roundhouse architecture.
 
@@ -16,24 +16,13 @@ The Admin Suite must not be rebuilt as a generic corporate dashboard.
 
 ---
 
-# 1. Source Priority
+# 1. Governing Sources
 
-The Admin Suite consolidates information from two different eras of Roundhouse.
+**`../ROUNDHOUSE_ENTITY_MODEL.md`** defines Property, Business, and History. **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`** defines the current role categories, exact titles, authority, and subscription eligibility. **`01_ROUNDHOUSE_INTAKE_SCREENS.md`** defines intake and Back/Edit behavior.
 
-When they conflict, use this order:
+The suite uses those sources for role selection, scenarios, and permission tests. Pro is paid status; earned Points and Status are a separate reward system. Owner, Manager, Lead, Admin, and combined positions use their approved titles.
 
-1. **Current governing architecture documents** define current Roles, Entity structure, screens, permissions, Points/Status direction, and product behavior.
-2. **This Admin Suite document** preserves and organizes administrative capabilities and curated data that remain useful.
-3. **Existing implementation code** is a behavioral and visual reference, but old Role names or product assumptions do not override current architecture.
-
-Examples:
-
-- **Viewer** is current architecture; old **Collaborator/Friend** language is not a current base Role.
-- **Pro** is a membership designation, not a base Role.
-- Owner, Co-Owner, Lead, and Manager are authority designations rather than separate base Roles.
-- Legacy Bronze / Silver / Gold / Platinum reward tiers are implementation history; the new Reward Center uses configurable Roundhouse Status concepts such as **Wood** and **Iron**.
-
-Legacy vocabulary can still be preserved as descriptive labels, test fixtures, migration data, or search aliases without reinstating obsolete architecture.
+Preserved datasets and visual assets remain available for their documented purposes.
 
 ---
 
@@ -768,7 +757,7 @@ Search aliases should ultimately live with the Admin-managed Service Catalog so 
 
 The original Label Room explicitly contains **Tokens** as a managed concept, but the current preset backend does not expose a live `tokens` set. Valuable token-like vocabularies still exist elsewhere in the repo and should be consolidated here before cleanup.
 
-These values are **descriptive vocabulary**, not necessarily current base Roles.
+These values are **descriptive vocabulary**, not necessarily current Roles.
 
 ## Classification
 
@@ -804,7 +793,7 @@ These values are **descriptive vocabulary**, not necessarily current base Roles.
 - Designer
 - Other
 
-**Important:** Roundhouse no longer has Friend or Collaborator as governing People categories/base Roles. These labels may still be useful as optional relationship descriptions for a Home Team Member, Viewer, or other authorized relationship, but they must not recreate the old Role architecture.
+Personal relationship chips add optional description to an authorized relationship. They do not alter its approved Role, authority, permissions, or paid eligibility.
 
 ## Trade Team Functional Chips
 
@@ -836,9 +825,11 @@ A good governing use is:
 
 Examples:
 
-**Trade Team Member · Electrical**  
-**Home Team Member · House Manager**  
-**Trade Professional · Recurring · HVAC**
+**Trade Professional · Electrical**
+
+**Home Pro (Manager) · House Manager**
+
+**Trade Pro (Lead) · Recurring · HVAC**
 
 Tokens must never silently grant access or authority.
 
@@ -960,25 +951,11 @@ This is not merely fixture generation. It is **first-person Role testing**.
 
 ### Current Governing Demo Roles
 
-The Wardrobe should ultimately support the current base Role architecture:
+The Wardrobe uses four categories: **Property**, **Trade**, **Supplier**, and **History Viewer**. It offers the exact sub-role titles in **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**, including parentheses and **Owner – Lead** / **Manager – Lead** combinations.
 
-- Homeowner
-- Home Team Member
-- Viewer
-- Trade Professional
-- Trade Team Member
-- Commercial Management
-- Commercial Team Member
-- Supplier
+Demo setup records current subscription eligibility, granted authority, and the permission source separately from historical activity. Home Admin, Trade Admin, and Supplier Admin require paid access and do not receive an additional Pro label.
 
-Authority can then be layered where applicable:
-
-- Owner
-- Co-Owner
-- Lead
-- Manager
-
-Legacy demo kinds such as `collab` or old Collaborator variants are migration/testing artifacts only.
+History Viewer is created with private History after the first completed Property or Business connection, rather than selected to bypass intake.
 
 ### Demo Isolation
 
@@ -996,20 +973,18 @@ Wardrobe testing uses controlled demo identities. The Admin Suite should **not**
 
 The Wardrobe should evolve into a repeatable testing tool.
 
-In addition to **Create new avatar**, support optional scenario templates such as:
+In addition to **Create new avatar**, support scenarios for:
 
-- New Homeowner with no Property yet
-- Homeowner with one Property
-- Homeowner with multiple Properties
-- Home Team Member
-- Viewer
-- Trade Professional Owner
-- Trade Professional Manager
-- Trade Team Member
-- Independent Trade Professional / subcontractor relationship
-- Commercial Management
-- Commercial Team Member
-- Supplier
+- a new account completing its first Property or Business connection;
+- Homeowner and each Home Pro position, Home Admin, and Home (Viewer);
+- Trade Professional, Trade Admin, and each Trade Pro position;
+- Supplier, Supplier Admin, and each Supplier Pro position;
+- authorized participation in a Commercial Property;
+- History Viewer with past and present contributions;
+- either side supplying the paid subscription, and both sides free;
+- the one-Property and one-Business free creation limits;
+- Role changes and loss of the final working relationship while History remains;
+- independent and Business-derived access with different permission sources.
 
 Templates should still use the real app architecture after provisioning; they are shortcuts for controlled test setup, not fake alternate UI.
 
@@ -1105,7 +1080,7 @@ The Mailroom should answer questions such as:
 
 - Which screen is generating the most reports?
 - Which build/version introduced a cluster?
-- Are Trade Team Members having a different problem from Homeowners?
+- Are Trade participants having a different problem from Homeowners?
 - Are multiple reports describing the same broken button?
 - What remains unresolved?
 
@@ -1295,7 +1270,7 @@ This list can shrink only after the preserved behavior/data is safely represente
 7. **Label Room** becomes the central controlled-vocabulary registry for Trades, Services, Titles, Strengths, Tokens, aliases and other reusable option sets.
 8. Existing curated lists are preserved before cleanup even when their old screen/Role model is obsolete.
 9. **Avatar Wardrobe** creates isolated demo identities and allows true first-person testing through real onboarding and product flows.
-10. Current Roles govern new Wardrobe scenarios; legacy Collaborator/Friend roles do not return as base Roles.
+10. Wardrobe scenarios use the role categories and exact sub-role titles in Roles & Authority.
 11. Demo identities/data remain isolated and visibly identifiable where needed.
 12. The administrator always has a persistent, direct path back to the Admin Hub.
 13. **Mailroom** receives user Help/Support reports as structured Support Cases and allows Admin response, private notes, assignment and problem clustering.

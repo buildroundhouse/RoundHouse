@@ -19,6 +19,8 @@ It does not replace the systems that actually own the work, communication, respo
 **Calendar = time.**  
 **Invitation Center = participation / access setup.**
 
+Notifications use the exact approved role title from **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. A notification reports the underlying relationship or record; it does not grant access or change historical attribution.
+
 ---
 
 # 1. Global Placement
@@ -127,7 +129,7 @@ Tapping **Review** opens the approval item showing:
 
 - Business;
 - participant;
-- base Role / Business relationship;
+- current Role / Business relationship;
 - Property;
 - Work context;
 - requested permission scope;
@@ -156,19 +158,13 @@ The notification should not imply the Homeowner personally performed the approva
 
 # 7. Viewer Notifications
 
-Viewer is the neutral view-only Role and is always attached to a legitimate Residential Property or Commercial Facility.
+A Property Viewer notification names the Property and exact current role title, for example:
 
-A Viewer notification should therefore always name the Entity.
+**Sarah Miller invited you to Spring Lake Residence as Home (Viewer).**
 
-Good:
+The invitation identifies the shared information and messaging scope. Activation follows the paid-party and authorization rules in **`33_INVITATIONS.md`**.
 
-**Sarah Miller invited you to Spring Lake Residence as a Viewer.**
-
-Not good:
-
-**Sarah added you as a Viewer.**
-
-The second version hides the only context that makes the Viewer relationship legitimate.
+History Viewer receives notices relevant to the person's own account, retained history, or connection requests. A notification does not invite another person into private History or reopen a former Property or Business.
 
 ---
 

@@ -16,6 +16,8 @@ Documents is not a separate top-level Property destination, not a Command Center
 
 The underlying document remains one durable Property record even when it is discoverable from several legitimate contexts.
 
+Role titles, authority, and subscription eligibility follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Each action remains limited to the current authorized scope; historical records keep their original attribution.
+
 ---
 
 # 1. Location Inside Vault
@@ -374,7 +376,7 @@ Examples:
 
 - Homeowners / authorized Property authorities may manage broad Property documentation.
 - Trade Professionals should receive documents materially necessary for authorized work when permitted.
-- Trade Team Members see what their legitimate work and permissions require.
+- Trade participants see what their legitimate work and permissions require.
 - Viewers remain view-only and see only permitted records.
 - sensitive legal, access, or private information may require narrower permission.
 - private internal Business records do not become homeowner-visible merely because they concern the same Property.
@@ -404,7 +406,7 @@ Durable Property Documents remain with the Property record through legitimate ch
 
 - Homeowner
 - Trade Professional
-- Trade Team Member
+- Trade participant
 - service provider
 - other participants
 
