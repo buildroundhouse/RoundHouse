@@ -37,6 +37,7 @@
  * is safe to run on a fresh database, on the current dev DB, and on the
  * production DB (whichever generation it is on).
  */
+import { CALENDAR_STEPS } from "../src/calendar-schema";
 import { FINANCIAL_DOCUMENT_STEPS } from "../src/financial-document-schema";
 import { pool } from "../src";
 import { migrateOutwardAccounts } from "./migrateOutwardAccounts";
@@ -47,6 +48,7 @@ type Step = { name: string; sql: string };
 
 export const SCHEMA_STEPS: Step[] = [
   ...FINANCIAL_DOCUMENT_STEPS,
+  ...CALENDAR_STEPS,
   // --- users -------------------------------------------------------------
   {
     name: "users.active_outward_account_id",
