@@ -49,7 +49,7 @@ import {
 import LogsScreen from "@/app/(tabs)/logs";
 import { ReceiptsPanel } from "@/components/ReceiptsPanel";
 import PropertiesScreen from "@/app/(tabs)/properties";
-import MyJobsScreen from "@/app/my-jobs";
+import { TasksListsSheet } from "@/components/TasksListsSheet";
 import { DailyGrind } from "@/components/DailyGrind";
 import { useDailyGrindOpening } from "@/lib/useDailyGrindOpening";
 
@@ -471,6 +471,9 @@ export default function TimelineScreen() {
     );
   }, [timelineEvents, timelineQuery]);
 
+  const [tasksCanAdd, setTasksCanAdd] = useState(false);
+  const tasksAddRef = useRef<(() => void) | null>(null);
+  const setTasksAdd = useCallback((fn: (() => void) | null) => { tasksAddRef.current = fn; setTasksCanAdd(!!fn); }, []);
   const SIDE_TABS: SideTabSpec[] = useMemo(
     () => [
       {
@@ -629,13 +632,14 @@ export default function TimelineScreen() {
       <HomeSidePanelOverlay
         panelKey={activeSidePanel}
         originY={overlayOriginY}
-        topOffset={activeSidePanel === "reminders" ? (Platform.OS === "web" ? 8 : insets.top + 4) : rightStackTop}
+        topOffset={(activeSidePanel === "reminders" || activeSidePanel === "jobs") ? (Platform.OS === "web" ? 8 : insets.top + 4) : rightStackTop}
         title={activeSidePanel ? PANEL_TITLES[activeSidePanel] : ""}
         onClose={closeSidePanel}
+        headerRight={activeSidePanel === "jobs" && tasksCanAdd ? <Pressable accessibilityRole="button" accessibilityLabel="Create task or list" onPress={() => tasksAddRef.current?.()} style={{padding: 8}}><Feather name="plus" size={22} color="#f1f2f4" /></Pressable> : undefined}
 
       >
         {activeSidePanel === "logs" ? <LogsScreen embedded /> : null}
-        {activeSidePanel === "jobs" ? <MyJobsScreen embedded /> : null}
+        {activeSidePanel === "jobs" ? <TasksListsSheet key={`${profile?.clerkId}:${activeOutwardAccount?.id}`} onRequestAdd={setTasksAdd} /> : null}
         {activeSidePanel === "receipts" ? <ReceiptsPanel /> : null}
         {activeSidePanel === "reminders" ? (
           <DailyGrind />

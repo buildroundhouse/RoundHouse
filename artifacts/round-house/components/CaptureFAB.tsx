@@ -1,3 +1,5 @@
+import { useAuth } from "@/lib/auth";
+import { getTaskCaptureTarget, type CaptureTarget } from "@/lib/taskLists";
 import { useProfile } from "@/lib/profile";
 import { isViewerKind } from "@/lib/personal-profile";
 import React, { useEffect, useState } from "react";
@@ -99,7 +101,9 @@ function isoFromDays(days: number | null): string | null {
 }
 
 export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = {}) {
-  const { activeOutwardAccount, activeMode } = useProfile();
+  const { activeOutwardAccount, activeMode, activeOutwardAccountId } = useProfile();
+  const { userId } = useAuth();
+  const [taskTarget, setTaskTarget] = useState<CaptureTarget | null>(null);
   const readOnly = isViewerKind(activeOutwardAccount?.kind ?? activeMode?.kind);
   const explainReadOnly = () => Alert.alert("Viewer account", "Viewer access is read-only. Switch to an account with contribution permission to capture work.");
   const colors = useColors();
@@ -139,7 +143,7 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
     externalOpenLog = () => {
       if (readOnly) { explainReadOnly(); return; }
       setChooserOpen(false);
-      setMode("log");
+      openMode("log");
     };
     externalOpenPhoto = () => {
       setChooserOpen(false);
@@ -151,6 +155,7 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
       // composer mounts with "WHERE IS THIS FOR?" already filled in
       // and the upload tile points at the right property.
       setChooserOpen(false);
+      setTaskTarget(null);
       setPropertyId(pid);
       Haptics.selectionAsync();
       setMode("photo");
@@ -170,9 +175,10 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
       if (externalOpenNote) externalOpenNote = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [readOnly]);
+  }, [readOnly, userId, activeOutwardAccountId]);
 
   function reset() {
+    setTaskTarget(null);
     setNote("");
     setPhotoUri(null);
     setAttachments([]);
@@ -218,6 +224,8 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
     if (readOnly) { explainReadOnly(); return; }
     setChooserOpen(false);
     Haptics.selectionAsync();
+    const target = getTaskCaptureTarget();
+    setTaskTarget(target?.userId === userId && target.accountId === activeOutwardAccountId ? target : null);
     setMode(next);
     if (next === "photo" && Platform.OS !== "web") {
       // Try opening the camera right away on native. We deliberately
@@ -281,6 +289,14 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
     }
     setSubmitting(true);
     try {
+      if (taskTarget) {
+        if (taskTarget.userId !== userId || taskTarget.accountId !== activeOutwardAccountId) throw new Error("Switch back to the original account before saving.");
+        const captured = [...attachments];
+        if (photoUri) captured.push({ ...(await uploadAsset({ uri: photoUri })), kind: "image" });
+        await taskTarget.save(note.trim(), captured);
+        close();
+        return;
+      }
       let pid = propertyId;
       // Inline create property if user has none and entered a name.
       if (pid == null) {
@@ -460,6 +476,7 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
             keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
           >
             <ScrollView contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 32 }]}>
+              {taskTarget ? <Text style={[styles.label, { color: colors.foreground }]}>ATTACHING TO: {taskTarget.label}</Text> : <>
               {/* Property pill / picker */}
               <Text style={[styles.label, { color: colors.mutedForeground }]}>WHERE IS THIS FOR?</Text>
               {properties.length > 0 ? (
@@ -492,6 +509,7 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
                 </View>
               )}
 
+              </>}
               {/* Note */}
               <Text style={[styles.label, { color: colors.mutedForeground, marginTop: 20 }]}>
                 {mode === "note" ? "NOTE" : "WHAT HAPPENED"}
@@ -540,7 +558,7 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
               ) : null}
 
               {/* Assign + due date (owners/admins only, work-log only) */}
-              {canAssign && assignableMembers.length > 0 ? (
+              {!taskTarget && canAssign && assignableMembers.length > 0 ? (
                 <>
                   <Text style={[styles.label, { color: colors.mutedForeground, marginTop: 20 }]}>
                     ASSIGN TO
