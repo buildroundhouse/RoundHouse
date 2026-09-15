@@ -15,6 +15,7 @@ import { Feather } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import {
+  customFetch,
   useSearchUsers,
   useSearchPros,
   useSearchSuccessStories,
@@ -31,7 +32,7 @@ import {
   type UserModeKind,
   type ConnectionKind,
 } from "@workspace/api-client-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MODE_LABELS } from "@/lib/intake-schemas";
 import { kindLabelForName } from "@/lib/account-display";
 import { resolveStorageUrl } from "@/lib/uploads";
@@ -39,9 +40,18 @@ import { useProfile } from "@/lib/profile";
 import { getModeAccent } from "@/lib/modeAccent";
 import { PublicProfileModal } from "@/components/PublicProfileModal";
 import { ConnectionKindChooser } from "@/components/ConnectionKindChooser";
+import { FoundYourBusinessModal } from "@/components/FoundYourBusinessCard";
 
 type SearchKind = "friends" | "pros" | "stories";
 type RowState = "invite" | "sent" | "connected" | "pending_account";
+type BusinessEntitySearchRow = {
+  id: number;
+  kind: string;
+  displayName?: string;
+  name?: string;
+  companyName?: string | null;
+  tagline?: string | null;
+};
 
 interface Props {
   visible: boolean;
@@ -74,11 +84,8 @@ export function UserSearchModal({
   const [serviceFilter, setServiceFilter] = useState<string | null>(initialService ?? null);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [viewClerkId, setViewClerkId] = useState<string | null>(null);
-  // #645 / #656 — when the user taps Invite we open the same kind
-  // chooser sheet the inbox blocked banner uses, so they can classify
-  // the relationship (Client / Core / Collaborator) and add an
-  // optional personal note before the request goes out. Hold the
-  // target row here while the sheet is up.
+  const [businessCreateOpen, setBusinessCreateOpen] = useState(false);
+  const [businessDeb, setBusinessDeb] = useState("");
   const [chooserTarget, setChooserTarget] = useState<
     { clerkId: string; name: string } | null
   >(null);
@@ -90,6 +97,7 @@ export function UserSearchModal({
       setStoriesQ("");
       setServiceFilter(null);
       setPendingId(null);
+      setBusinessCreateOpen(false);
       return;
     }
     if (initialQuery !== undefined) setFriendsQ(initialQuery);
@@ -98,13 +106,18 @@ export function UserSearchModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
-  // Debounced friend search.
   const [friendsDeb, setFriendsDeb] = useState(friendsQ.trim());
   useEffect(() => {
     if (!visible) return;
     const t = setTimeout(() => setFriendsDeb(friendsQ.trim()), 200);
     return () => clearTimeout(t);
   }, [friendsQ, visible]);
+
+  useEffect(() => {
+    if (!visible) return;
+    const t = setTimeout(() => setBusinessDeb(prosQ.trim()), 250);
+    return () => clearTimeout(t);
+  }, [prosQ, visible]);
 
   const friendsQuery = useSearchUsers(
     {
@@ -118,9 +131,6 @@ export function UserSearchModal({
       },
     },
   );
-  // /api/users/search returns one row per user under the
-  // single-profile paradigm — the multi-skin shape is collapsed on
-  // the server, so the People list renders these rows directly.
   const friendUsers = friendsQuery.data?.users ?? [];
 
   const idsParam = useMemo(
@@ -156,11 +166,6 @@ export function UserSearchModal({
 
   function openInviteChooser(clerkId: string, name: string) {
     if (pendingId) return;
-    // #645 — Open the kind picker instead of hard-coding
-    // "collaborator" + firing immediately. The chooser is the same
-    // sheet the inbox blocked banner and public profile modal use,
-    // so the search Invite button now matches the rest of the app's
-    // connect UX.
     setChooserTarget({ clerkId, name });
   }
 
@@ -172,9 +177,6 @@ export function UserSearchModal({
     try {
       await connect.mutateAsync({
         userId: target.clerkId,
-        // #656 — forward the optional personal note from the picker
-        // sheet so the team-up request lands with the requester's
-        // context on the recipient's /invites surface.
         data: personalNote
           ? { kind, status: "pending", personalNote }
           : { kind, status: "pending" },
@@ -182,11 +184,6 @@ export function UserSearchModal({
       await queryClient.invalidateQueries({ queryKey: statusKey });
       onInviteSent?.(target.name);
     } catch (e) {
-      // #501: surface the duplicate-pending guardrail. The server
-      // returns 409 with { code: "team_up_pending" } when a request
-      // to this skin is already outstanding; let the existing "Sent"
-      // pill show by refreshing the connection-status cache instead
-      // of failing silently.
       const code =
         e && typeof e === "object" && "data" in e
           ? (e as { data?: { code?: string } }).data?.code
@@ -208,6 +205,14 @@ export function UserSearchModal({
       },
     },
   );
+  const businessEntityQuery = useQuery({
+    enabled: visible && businessDeb.length >= 2,
+    queryKey: ["/api/entity-setup/business/search", businessDeb],
+    queryFn: () =>
+      customFetch<{ entities: BusinessEntitySearchRow[] }>(
+        `/api/entity-setup/business/search?q=${encodeURIComponent(businessDeb)}`,
+      ),
+  });
   const storiesQuery = useSearchSuccessStories(
     { q: storiesQ.trim() },
     {
@@ -237,6 +242,7 @@ export function UserSearchModal({
   );
 
   const proResults = (prosQuery.data?.pros ?? []) as ProSearchResult[];
+  const businessEntityResults = businessEntityQuery.data?.entities ?? [];
   const storyResults = (storiesQuery.data?.stories ?? []) as SuccessStory[];
   const deals = (dealsQuery.data?.deals ?? []) as Deal[];
   const areaItems = (areaQuery.data?.items ?? []) as AreaFeedItem[];
@@ -307,19 +313,10 @@ export function UserSearchModal({
               emptyText="Search by name or username"
               results={
                 friendUsers.length === 0 ? (
-                  <Text style={[styles.resultsHint, { color: colors.mutedForeground }]}>
-                    No matches.
-                  </Text>
+                  <Text style={[styles.resultsHint, { color: colors.mutedForeground }]}>No matches.</Text>
                 ) : (
                   friendUsers.slice(0, 8).map((u, ix) => {
                     const avatarUri = resolveStorageUrl(u.avatarUrl ?? null);
-                    // #620: suppress the kind suffix when the user's name
-                    // already contains every word of the label (e.g. name
-                    // "My Home" + label "My Home", or name "Beach Home" +
-                    // label "Home"), so the @handle row doesn't repeat
-                    // the same words shown in the name above. Partial
-                    // overlaps (e.g. "Smith Home" vs. "My Home") still
-                    // render the label.
                     const role =
                       u.activeModeKind != null
                         ? kindLabelForName(
@@ -335,12 +332,7 @@ export function UserSearchModal({
                         onPress={() => goUser(u.clerkId)}
                         style={[styles.resultRow, { borderTopColor: colors.border }]}
                       >
-                        <View
-                          style={[
-                            styles.resultAvatar,
-                            { backgroundColor: accent.primary + "1F" },
-                          ]}
-                        >
+                        <View style={[styles.resultAvatar, { backgroundColor: accent.primary + "1F" }]}>
                           {avatarUri ? (
                             <Image source={{ uri: avatarUri }} style={styles.resultAvatarImg} />
                           ) : (
@@ -350,18 +342,11 @@ export function UserSearchModal({
                           )}
                         </View>
                         <View style={{ flex: 1 }}>
-                          <Text
-                            style={[styles.resultTitle, { color: colors.foreground }]}
-                            numberOfLines={1}
-                          >
+                          <Text style={[styles.resultTitle, { color: colors.foreground }]} numberOfLines={1}>
                             {u.name}
                           </Text>
-                          <Text
-                            style={[styles.resultSub, { color: colors.mutedForeground }]}
-                            numberOfLines={1}
-                          >
-                            @{u.username}
-                            {role ? `  ·  ${role}` : ""}
+                          <Text style={[styles.resultSub, { color: colors.mutedForeground }]} numberOfLines={1}>
+                            @{u.username}{role ? `  ·  ${role}` : ""}
                           </Text>
                         </View>
                         {state === "invite" ? (
@@ -372,59 +357,27 @@ export function UserSearchModal({
                             }}
                             disabled={isInviting}
                             hitSlop={6}
-                            style={[
-                              styles.actionBtn,
-                              { backgroundColor: accent.primary, opacity: isInviting ? 0.6 : 1 },
-                            ]}
+                            style={[styles.actionBtn, { backgroundColor: accent.primary, opacity: isInviting ? 0.6 : 1 }]}
                           >
                             {isInviting ? (
                               <ActivityIndicator size="small" color={accent.primaryForeground} />
                             ) : (
-                              <Text
-                                style={[styles.actionBtnText, { color: accent.primaryForeground }]}
-                              >
-                                Invite
-                              </Text>
+                              <Text style={[styles.actionBtnText, { color: accent.primaryForeground }]}>Invite</Text>
                             )}
                           </Pressable>
                         ) : state === "sent" ? (
-                          <View
-                            style={[
-                              styles.actionPill,
-                              { borderColor: colors.border, backgroundColor: colors.card },
-                            ]}
-                          >
+                          <View style={[styles.actionPill, { borderColor: colors.border, backgroundColor: colors.card }]}>
                             <Feather name="check" size={12} color={colors.mutedForeground} />
-                            <Text
-                              style={[styles.actionPillText, { color: colors.mutedForeground }]}
-                            >
-                              Sent
-                            </Text>
+                            <Text style={[styles.actionPillText, { color: colors.mutedForeground }]}>Sent</Text>
                           </View>
                         ) : state === "connected" ? (
-                          <View
-                            style={[
-                              styles.actionPill,
-                              { borderColor: colors.border, backgroundColor: colors.scoreBackground },
-                            ]}
-                          >
+                          <View style={[styles.actionPill, { borderColor: colors.border, backgroundColor: colors.scoreBackground }]}>
                             <Feather name="users" size={12} color={accent.primary} />
-                            <Text style={[styles.actionPillText, { color: accent.primary }]}>
-                              Connected
-                            </Text>
+                            <Text style={[styles.actionPillText, { color: accent.primary }]}>Connected</Text>
                           </View>
                         ) : (
-                          <View
-                            style={[
-                              styles.actionPill,
-                              { borderColor: colors.border, backgroundColor: colors.card },
-                            ]}
-                          >
-                            <Text
-                              style={[styles.actionPillText, { color: colors.mutedForeground }]}
-                            >
-                              Pending
-                            </Text>
+                          <View style={[styles.actionPill, { borderColor: colors.border, backgroundColor: colors.card }]}>
+                            <Text style={[styles.actionPillText, { color: colors.mutedForeground }]}>Pending</Text>
                           </View>
                         )}
                       </Pressable>
@@ -445,30 +398,26 @@ export function UserSearchModal({
               showZip
               accent={accent}
               colors={colors}
-              loading={prosQuery.isFetching}
-              emptyText={
-                accent.copyTone === "trade"
-                  ? "Find subs by trade, company, or ZIP."
-                  : "Type a trade (e.g. plumber, drywall) and your ZIP."
-              }
+              loading={prosQuery.isFetching || businessEntityQuery.isFetching}
+              emptyText={accent.copyTone === "trade" ? "Find subs by trade, company, or ZIP." : "Type a trade (e.g. plumber, drywall) and your ZIP."}
               results={
-                proResults.length === 0 ? (
-                  <Text style={[styles.resultsHint, { color: colors.mutedForeground }]}>
-                    No pros found in that area yet.
-                  </Text>
-                ) : (
-                  proResults.slice(0, 8).map((p) => (
-                    <Pressable
-                      key={p.id}
-                      onPress={() => goUser(p.clerkId)}
-                      style={[styles.resultRow, { borderTopColor: colors.border }]}
-                    >
-                      <View
-                        style={[
-                          styles.resultAvatar,
-                          { backgroundColor: accent.primary + "1F" },
-                        ]}
-                      >
+                <View>
+                  {businessEntityResults.slice(0, 6).map((entity) => (
+                    <View key={`business-${entity.id}`} style={[styles.resultRow, { borderTopColor: colors.border }]}>
+                      <View style={[styles.resultAvatar, { backgroundColor: accent.primary + "1F" }]}>
+                        <Feather name="briefcase" size={16} color={accent.primary} />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={[styles.resultTitle, { color: colors.foreground }]} numberOfLines={1}>
+                          {entity.displayName || entity.name || entity.companyName || "Business"}
+                        </Text>
+                        <Text style={[styles.resultSub, { color: colors.mutedForeground }]}>Business Entity already exists</Text>
+                      </View>
+                    </View>
+                  ))}
+                  {proResults.slice(0, 8).map((p) => (
+                    <Pressable key={p.id} onPress={() => goUser(p.clerkId)} style={[styles.resultRow, { borderTopColor: colors.border }]}>
+                      <View style={[styles.resultAvatar, { backgroundColor: accent.primary + "1F" }]}>
                         {p.avatarUrl ? (
                           <Image source={{ uri: p.avatarUrl }} style={styles.resultAvatarImg} />
                         ) : (
@@ -477,12 +426,7 @@ export function UserSearchModal({
                       </View>
                       <View style={{ flex: 1 }}>
                         <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                          <Text
-                            style={[styles.resultTitle, { color: colors.foreground }]}
-                            numberOfLines={1}
-                          >
-                            {p.companyName || p.name}
-                          </Text>
+                          <Text style={[styles.resultTitle, { color: colors.foreground }]} numberOfLines={1}>{p.companyName || p.name}</Text>
                           {p.topPro ? (
                             <View style={styles.topProPill}>
                               <Feather name="award" size={10} color="#3B4856" />
@@ -496,18 +440,30 @@ export function UserSearchModal({
                             </View>
                           ) : null}
                         </View>
-                        <Text
-                          style={[styles.resultSub, { color: colors.mutedForeground }]}
-                          numberOfLines={1}
-                        >
-                          {(p.trade ? p.trade + " · " : "") +
-                            (p.avgRating ? `★ ${p.avgRating.toFixed(1)} (${p.ratingCount})` : "New")}
+                        <Text style={[styles.resultSub, { color: colors.mutedForeground }]} numberOfLines={1}>
+                          {(p.trade ? p.trade + " · " : "") + (p.avgRating ? `★ ${p.avgRating.toFixed(1)} (${p.ratingCount})` : "New")}
                           {p.serviceZips.length > 0 ? ` · ${p.serviceZips.slice(0, 3).join(", ")}` : ""}
                         </Text>
                       </View>
                     </Pressable>
-                  ))
-                )
+                  ))}
+                  {businessEntityResults.length === 0 && businessDeb.length >= 2 && !businessEntityQuery.isFetching ? (
+                    <Pressable accessibilityRole="button" onPress={() => setBusinessCreateOpen(true)} style={[styles.addBusinessRow, { borderTopColor: colors.border }]}>
+                      <View style={[styles.addBusinessIcon, { backgroundColor: accent.primary + "1F" }]}>
+                        <Feather name="plus" size={16} color={accent.primary} />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={[styles.resultTitle, { color: accent.primary }]}>+ Add Business</Text>
+                        <Text style={[styles.resultSub, { color: colors.mutedForeground }]} numberOfLines={1}>
+                          Create “{prosQ.trim()}” as a real Business Entity
+                        </Text>
+                      </View>
+                    </Pressable>
+                  ) : null}
+                  {proResults.length === 0 && businessEntityResults.length === 0 && businessDeb.length < 2 ? (
+                    <Text style={[styles.resultsHint, { color: colors.mutedForeground }]}>No pros found in that area yet.</Text>
+                  ) : null}
+                </View>
               }
             />
 
@@ -526,36 +482,17 @@ export function UserSearchModal({
               emptyText="Find proof of completed work."
               results={
                 storyResults.length === 0 ? (
-                  <Text style={[styles.resultsHint, { color: colors.mutedForeground }]}>
-                    No stories yet.
-                  </Text>
+                  <Text style={[styles.resultsHint, { color: colors.mutedForeground }]}>No stories yet.</Text>
                 ) : (
                   storyResults.slice(0, 8).map((s) => (
-                    <View
-                      key={s.id}
-                      style={[styles.resultRow, { borderTopColor: colors.border }]}
-                    >
-                      <View
-                        style={[
-                          styles.resultAvatar,
-                          { backgroundColor: accent.primary + "1F" },
-                        ]}
-                      >
+                    <View key={s.id} style={[styles.resultRow, { borderTopColor: colors.border }]}>
+                      <View style={[styles.resultAvatar, { backgroundColor: accent.primary + "1F" }]}>
                         <Feather name="award" size={16} color={accent.primary} />
                       </View>
                       <View style={{ flex: 1 }}>
-                        <Text
-                          style={[styles.resultTitle, { color: colors.foreground }]}
-                          numberOfLines={2}
-                        >
-                          {s.headline}
-                        </Text>
-                        <Text
-                          style={[styles.resultSub, { color: colors.mutedForeground }]}
-                          numberOfLines={1}
-                        >
-                          {s.pro?.companyName || s.pro?.name || "Pro"}
-                          {s.serviceTag ? ` · ${s.serviceTag}` : ""}
+                        <Text style={[styles.resultTitle, { color: colors.foreground }]} numberOfLines={2}>{s.headline}</Text>
+                        <Text style={[styles.resultSub, { color: colors.mutedForeground }]} numberOfLines={1}>
+                          {s.pro?.companyName || s.pro?.name || "Pro"}{s.serviceTag ? ` · ${s.serviceTag}` : ""}
                         </Text>
                       </View>
                     </View>
@@ -568,61 +505,23 @@ export function UserSearchModal({
           {deals.length > 0 ? (
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-                  Deals & Offers
-                </Text>
-                <Text style={[styles.sectionMeta, { color: colors.mutedForeground }]}>
-                  {deals.length} active
-                </Text>
+                <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Deals & Offers</Text>
+                <Text style={[styles.sectionMeta, { color: colors.mutedForeground }]}>{deals.length} active</Text>
               </View>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.dealsScroll}
-              >
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.dealsScroll}>
                 {deals.map((d) => {
                   const ends = new Date(d.endDate);
                   const days = Math.max(0, Math.ceil((ends.getTime() - Date.now()) / 86400000));
                   return (
-                    <Pressable
-                      key={d.id}
-                      onPress={() => goUser(d.proClerkId)}
-                      style={[
-                        styles.dealCard,
-                        { backgroundColor: colors.card, borderColor: colors.border },
-                      ]}
-                    >
+                    <Pressable key={d.id} onPress={() => goUser(d.proClerkId)} style={[styles.dealCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
                       <View style={[styles.dealRibbon, { backgroundColor: accent.primary }]}>
-                        <Text
-                          style={[styles.dealRibbonText, { color: accent.primaryForeground }]}
-                        >
-                          {d.serviceTag}
-                        </Text>
+                        <Text style={[styles.dealRibbonText, { color: accent.primaryForeground }]}>{d.serviceTag}</Text>
                       </View>
-                      <Text
-                        style={[styles.dealHeadline, { color: colors.foreground }]}
-                        numberOfLines={2}
-                      >
-                        {d.headline}
-                      </Text>
-                      {d.description ? (
-                        <Text
-                          style={[styles.dealDesc, { color: colors.mutedForeground }]}
-                          numberOfLines={2}
-                        >
-                          {d.description}
-                        </Text>
-                      ) : null}
+                      <Text style={[styles.dealHeadline, { color: colors.foreground }]} numberOfLines={2}>{d.headline}</Text>
+                      {d.description ? <Text style={[styles.dealDesc, { color: colors.mutedForeground }]} numberOfLines={2}>{d.description}</Text> : null}
                       <View style={styles.dealFooter}>
-                        <Text
-                          style={[styles.dealPro, { color: colors.foreground }]}
-                          numberOfLines={1}
-                        >
-                          {d.pro?.companyName || d.pro?.name || "Local pro"}
-                        </Text>
-                        <Text style={[styles.dealEnds, { color: accent.primary }]}>
-                          {days === 0 ? "Ends today" : `${days}d left`}
-                        </Text>
+                        <Text style={[styles.dealPro, { color: colors.foreground }]} numberOfLines={1}>{d.pro?.companyName || d.pro?.name || "Local pro"}</Text>
+                        <Text style={[styles.dealEnds, { color: accent.primary }]}>{days === 0 ? "Ends today" : `${days}d left`}</Text>
                       </View>
                     </Pressable>
                   );
@@ -633,59 +532,23 @@ export function UserSearchModal({
 
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-                In Your Area
-              </Text>
-              {zip ? (
-                <Text style={[styles.sectionMeta, { color: colors.mutedForeground }]}>
-                  ZIP {zip}
-                </Text>
-              ) : (
-                <Text style={[styles.sectionMeta, { color: colors.mutedForeground }]}>
-                  Add ZIP above
-                </Text>
-              )}
+              <Text style={[styles.sectionTitle, { color: colors.foreground }]}>In Your Area</Text>
+              {zip ? <Text style={[styles.sectionMeta, { color: colors.mutedForeground }]}>ZIP {zip}</Text> : <Text style={[styles.sectionMeta, { color: colors.mutedForeground }]}>Add ZIP above</Text>}
             </View>
             {areaItems.length === 0 ? (
-              <View
-                style={[
-                  styles.emptyArea,
-                  { borderColor: colors.border, backgroundColor: colors.card },
-                ]}
-              >
+              <View style={[styles.emptyArea, { borderColor: colors.border, backgroundColor: colors.card }]}>
                 <Feather name="map-pin" size={16} color={colors.mutedForeground} />
-                <Text style={[styles.emptyAreaText, { color: colors.mutedForeground }]}>
-                  No nearby activity yet. As pros log work in your ZIP, you'll see it here.
-                </Text>
+                <Text style={[styles.emptyAreaText, { color: colors.mutedForeground }]}>No nearby activity yet. As pros log work in your ZIP, you'll see it here.</Text>
               </View>
             ) : (
               areaItems.slice(0, 8).map((it) => (
-                <Pressable
-                  key={`${it.kind}-${it.id}`}
-                  onPress={() => (it.pro?.clerkId ? goUser(it.pro.clerkId) : undefined)}
-                  style={[
-                    styles.areaItem,
-                    { backgroundColor: colors.card, borderColor: colors.border },
-                  ]}
-                >
+                <Pressable key={`${it.kind}-${it.id}`} onPress={() => (it.pro?.clerkId ? goUser(it.pro.clerkId) : undefined)} style={[styles.areaItem, { backgroundColor: colors.card, borderColor: colors.border }]}>
                   <View style={[styles.areaTagDot, { backgroundColor: accent.primary }]} />
                   <View style={{ flex: 1 }}>
-                    <Text
-                      style={[styles.areaHeadline, { color: colors.foreground }]}
-                      numberOfLines={2}
-                    >
-                      {it.headline}
-                    </Text>
-                    <Text
-                      style={[styles.areaMeta, { color: colors.mutedForeground }]}
-                      numberOfLines={1}
-                    >
+                    <Text style={[styles.areaHeadline, { color: colors.foreground }]} numberOfLines={2}>{it.headline}</Text>
+                    <Text style={[styles.areaMeta, { color: colors.mutedForeground }]} numberOfLines={1}>
                       {it.kind === "success_story" ? "Success story" : "Recently completed"}
-                      {it.pro?.companyName
-                        ? ` · ${it.pro.companyName}`
-                        : it.pro?.name
-                        ? ` · ${it.pro.name}`
-                        : ""}
+                      {it.pro?.companyName ? ` · ${it.pro.companyName}` : it.pro?.name ? ` · ${it.pro.name}` : ""}
                       {it.propertyName ? ` · ${it.propertyName}` : ""}
                     </Text>
                   </View>
@@ -695,19 +558,8 @@ export function UserSearchModal({
           </View>
         </ScrollView>
 
-        {/* Inline profile modal when no external onUserPress was provided. */}
-        {!onUserPress ? (
-          <PublicProfileModal
-            visible={!!viewClerkId}
-            clerkId={viewClerkId}
-            onClose={() => setViewClerkId(null)}
-          />
-        ) : null}
+        {!onUserPress ? <PublicProfileModal visible={!!viewClerkId} clerkId={viewClerkId} onClose={() => setViewClerkId(null)} /> : null}
 
-        {/* #645 / #656 — Kind chooser sheet for the Invite button. Same
-            sheet the inbox blocked banner and public profile modal use,
-            with Collaborator pinned as the recommended default and the
-            optional personal-note composer enabled. */}
         <ConnectionKindChooser
           visible={!!chooserTarget}
           onClose={() => setChooserTarget(null)}
@@ -715,13 +567,21 @@ export function UserSearchModal({
           pending={connect.isPending}
           recommendedKind="collaborator"
           title="Invite as…"
-          subtitle={
-            chooserTarget
-              ? `Pick how you'd like to classify ${chooserTarget.name}.`
-              : "Pick how you'd like to classify this person."
-          }
+          subtitle={chooserTarget ? `Pick how you'd like to classify ${chooserTarget.name}.` : "Pick how you'd like to classify this person."}
           showPersonalNote
           testID="search-invite-kind-chooser"
+        />
+
+        <FoundYourBusinessModal
+          visible={businessCreateOpen}
+          initialName={prosQ.trim()}
+          onClose={() => setBusinessCreateOpen(false)}
+          onCreated={() => {
+            setBusinessCreateOpen(false);
+            void queryClient.invalidateQueries({ queryKey: ["/api/entity-setup/business/search"] });
+            void queryClient.invalidateQueries({ queryKey: ["/api/entities/mine"] });
+            onClose();
+          }}
         />
       </View>
     </Modal>
@@ -761,15 +621,7 @@ function SearchBar({
   const expanded = focused || value.trim().length > 0;
   const icon = kind === "friends" ? "users" : kind === "pros" ? "tool" : "award";
   return (
-    <View
-      style={[
-        styles.searchWrap,
-        {
-          backgroundColor: colors.card,
-          borderColor: expanded ? accent.primary : colors.border,
-        },
-      ]}
-    >
+    <View style={[styles.searchWrap, { backgroundColor: colors.card, borderColor: expanded ? accent.primary : colors.border }]}>
       <View style={styles.searchHeader}>
         <Feather name={icon} size={14} color={accent.primary} />
         <Text style={[styles.searchLabel, { color: colors.foreground }]}>{label}</Text>
@@ -796,30 +648,13 @@ function SearchBar({
             placeholderTextColor={colors.mutedForeground}
             keyboardType="number-pad"
             maxLength={5}
-            style={[
-              styles.zipInput,
-              {
-                color: colors.foreground,
-                borderColor: colors.border,
-                backgroundColor: colors.background,
-              },
-            ]}
+            style={[styles.zipInput, { color: colors.foreground, borderColor: colors.border, backgroundColor: colors.background }]}
           />
         ) : null}
       </View>
       {expanded ? (
         <View style={styles.resultsPanel}>
-          {loading ? (
-            <Text style={[styles.resultsHint, { color: colors.mutedForeground }]}>
-              Searching…
-            </Text>
-          ) : value.trim().length === 0 ? (
-            <Text style={[styles.resultsHint, { color: colors.mutedForeground }]}>
-              {emptyText}
-            </Text>
-          ) : (
-            results
-          )}
+          {loading ? <Text style={[styles.resultsHint, { color: colors.mutedForeground }]}>Searching…</Text> : value.trim().length === 0 ? <Text style={[styles.resultsHint, { color: colors.mutedForeground }]}>{emptyText}</Text> : results}
         </View>
       ) : null}
     </View>
@@ -828,172 +663,51 @@ function SearchBar({
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
+  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingBottom: 12, borderBottomWidth: StyleSheet.hairlineWidth },
   title: { fontSize: 16, fontFamily: "Inter_700Bold" },
-
   searchStack: { paddingHorizontal: 14, paddingTop: 14, gap: 10 },
   searchWrap: { borderRadius: 14, borderWidth: 1, padding: 10 },
   searchHeader: { flexDirection: "row", alignItems: "center", gap: 6 },
   searchLabel: { fontSize: 12, fontFamily: "Inter_700Bold", letterSpacing: 0.4 },
-  searchInputRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginTop: 6,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
-    fontFamily: "Inter_500Medium",
-    paddingVertical: 4,
-    minWidth: 0,
-  },
-  zipInput: {
-    width: 64,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-    fontSize: 13,
-    fontFamily: "Inter_600SemiBold",
-    textAlign: "center",
-  },
-  filterRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    paddingHorizontal: 16,
-    marginTop: 8,
-    marginBottom: -4,
-  },
-  filterChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
-    borderWidth: 1,
-  },
+  searchInputRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 6 },
+  searchInput: { flex: 1, fontSize: 14, fontFamily: "Inter_500Medium", paddingVertical: 4, minWidth: 0 },
+  zipInput: { width: 64, paddingVertical: 4, paddingHorizontal: 8, borderRadius: 8, borderWidth: 1, fontSize: 13, fontFamily: "Inter_600SemiBold", textAlign: "center" },
+  filterRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, paddingHorizontal: 16, marginTop: 8, marginBottom: -4 },
+  filterChip: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, borderWidth: 1 },
   filterChipText: { fontSize: 12, fontFamily: "Inter_600SemiBold", maxWidth: 220 },
   resultsPanel: { marginTop: 8 },
   resultsHint: { fontSize: 12, fontFamily: "Inter_400Regular", paddingVertical: 6 },
-  resultRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    paddingVertical: 10,
-    borderTopWidth: StyleSheet.hairlineWidth,
-  },
-  resultAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-  },
+  resultRow: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 10, borderTopWidth: StyleSheet.hairlineWidth },
+  resultAvatar: { width: 32, height: 32, borderRadius: 16, alignItems: "center", justifyContent: "center", overflow: "hidden" },
   resultAvatarImg: { width: "100%", height: "100%" },
   resultTitle: { fontSize: 13, fontFamily: "Inter_600SemiBold" },
   resultSub: { fontSize: 11, fontFamily: "Inter_400Regular", marginTop: 1 },
-
-  actionBtn: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
-    minWidth: 70,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  addBusinessRow: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 11, borderTopWidth: StyleSheet.hairlineWidth },
+  addBusinessIcon: { width: 32, height: 32, borderRadius: 16, alignItems: "center", justifyContent: "center" },
+  actionBtn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 999, minWidth: 70, alignItems: "center", justifyContent: "center" },
   actionBtnText: { fontSize: 12, fontFamily: "Inter_600SemiBold" },
-  actionPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
+  actionPill: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, borderWidth: StyleSheet.hairlineWidth },
   actionPillText: { fontSize: 11, fontFamily: "Inter_600SemiBold" },
-
-  topProPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 3,
-    backgroundColor: "#E2E8EE",
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 999,
-  },
+  topProPill: { flexDirection: "row", alignItems: "center", gap: 3, backgroundColor: "#E2E8EE", paddingHorizontal: 6, paddingVertical: 2, borderRadius: 999 },
   topProText: { fontFamily: "Inter_700Bold", fontSize: 10, color: "#3B4856" },
-  sponsorPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 3,
-    backgroundColor: "#FFF3C4",
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 999,
-  },
+  sponsorPill: { flexDirection: "row", alignItems: "center", gap: 3, backgroundColor: "#FFF3C4", paddingHorizontal: 6, paddingVertical: 2, borderRadius: 999 },
   sponsorText: { fontFamily: "Inter_700Bold", fontSize: 10, color: "#9A7B00" },
-
   section: { marginTop: 20, paddingHorizontal: 14 },
-  sectionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 8,
-  },
+  sectionHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 8 },
   sectionTitle: { fontSize: 14, fontFamily: "Inter_700Bold" },
   sectionMeta: { fontSize: 11, fontFamily: "Inter_500Medium" },
-
   dealsScroll: { gap: 10, paddingRight: 10 },
   dealCard: { width: 220, borderRadius: 14, borderWidth: 1, padding: 12, gap: 6 },
-  dealRibbon: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 999,
-  },
+  dealRibbon: { alignSelf: "flex-start", paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 },
   dealRibbonText: { fontSize: 10, fontFamily: "Inter_700Bold" },
   dealHeadline: { fontSize: 13, fontFamily: "Inter_700Bold" },
   dealDesc: { fontSize: 11, fontFamily: "Inter_400Regular" },
-  dealFooter: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 4,
-  },
+  dealFooter: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 4 },
   dealPro: { fontSize: 11, fontFamily: "Inter_600SemiBold", flex: 1 },
   dealEnds: { fontSize: 11, fontFamily: "Inter_700Bold", marginLeft: 6 },
-
-  emptyArea: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    padding: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
+  emptyArea: { flexDirection: "row", alignItems: "center", gap: 10, padding: 12, borderRadius: 12, borderWidth: 1 },
   emptyAreaText: { flex: 1, fontSize: 12, fontFamily: "Inter_400Regular" },
-
-  areaItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    padding: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-    marginBottom: 8,
-  },
+  areaItem: { flexDirection: "row", alignItems: "center", gap: 10, padding: 12, borderRadius: 12, borderWidth: 1, marginBottom: 8 },
   areaTagDot: { width: 8, height: 8, borderRadius: 4 },
   areaHeadline: { fontSize: 13, fontFamily: "Inter_600SemiBold" },
   areaMeta: { fontSize: 11, fontFamily: "Inter_400Regular", marginTop: 2 },
