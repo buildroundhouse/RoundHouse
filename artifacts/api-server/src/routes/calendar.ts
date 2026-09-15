@@ -9,6 +9,7 @@ import {
   notificationsTable,
   calendarAppointmentsTable as appointments,
   calendarUnavailableTable as unavailable,
+  calendarAvailabilityTable as availability,
   type CalendarParty,
 } from "@workspace/db";
 import { requireAuth, type AuthRequest } from "../middlewares/requireAuth";
@@ -605,6 +606,59 @@ router.post(
       })
       .returning();
     res.status(201).json(block);
+  }),
+);
+router.get(
+  "/calendar-availability",
+  requireAuth,
+  wrap(async (r, res) => {
+    res.json({
+      slots: await db
+        .select()
+        .from(availability)
+        .where(eq(availability.userId, r.userId))
+        .orderBy(asc(availability.startsAt)),
+    });
+  }),
+);
+router.post(
+  "/calendar-availability",
+  requireAuth,
+  wrap(async (r, res) => {
+    if (r.body?.removeId) {
+      await db
+        .delete(availability)
+        .where(
+          and(
+            eq(availability.id, Number(r.body.removeId)),
+            eq(availability.userId, r.userId),
+          ),
+        );
+      res.json({ ok: true });
+      return;
+    }
+    const { startsAt, duration } = scheduleInput(r.body ?? {});
+    const endsAt = new Date(startsAt.getTime() + duration * 60000);
+    const overlaps = await db
+      .select({ id: availability.id })
+      .from(availability)
+      .where(
+        and(
+          eq(availability.userId, r.userId),
+          lt(availability.startsAt, endsAt),
+          gt(availability.endsAt, startsAt),
+        ),
+      );
+    if (overlaps.length)
+      throw new CalendarError(
+        409,
+        "This open time overlaps another availability slot.",
+      );
+    const [slot] = await db
+      .insert(availability)
+      .values({ userId: r.userId, startsAt, endsAt })
+      .returning();
+    res.status(201).json(slot);
   }),
 );
 export default router;
