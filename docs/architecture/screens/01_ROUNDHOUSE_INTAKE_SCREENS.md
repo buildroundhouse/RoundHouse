@@ -1,232 +1,283 @@
 # ROUNDHOUSE — INTAKE SCREENS
 
-## Governing Intake Rule
+## Governing Navigation
 
-Intake establishes the person’s permanent Identity and the Home, Business, or Facility context they are actually joining.
+Intake begins after the person’s Identity has been established.
 
-A Role is not created as a free-floating social profile.
+Every screen displays:
 
-RoundHouse has four top-level Role categories:
+**Back** · **current screen / total screens**
 
-1. **Home**
-2. **Trade**
-3. **Supplier**
-4. **History Viewer**
+Back returns to the previous screen with all entered information preserved.
 
-**History Viewer is not a new-user intake choice.** It is the private role used to view the person’s own History after legitimate Home, Trade, or Supplier participation exists.
+The Review screen displays the completed information by section. Each section has **Edit**, which returns directly to that screen. Saving the change returns to Review.
 
-A person arriving through an Invitation should resume the invitation context after sign-in / account creation rather than starting a disconnected intake path.
+Invitation-driven intake may skip screens already established by the invitation.
 
 ---
 
-## Free Account Creation Limit
+## Initial Entity Requirement
 
-A free account may create:
+A new account cannot enter the Command Center until at least one legitimate Entity has been created or connected.
 
-- **one Home**
-- **one Business**
+The first Entity must be one of:
 
-The one-Business limit applies across Trade and Supplier Businesses combined.
+- a Property
+- a Trade Business
+- a Supplier Business
 
-A free account may still search for and connect to additional existing Homes, Businesses, or Facilities when the governing access rules allow it.
+If the person has not completed at least one Entity connection, intake is not complete and the account remains in intake.
 
-If a free account that already created its permitted Home tries to create another Home, stop the creation flow and show:
+**History Viewer does not exist before the first legitimate Entity relationship exists.**
 
-**You’ve reached your free account limit.**  
-**Add Pro to create another Home.**
-
-**ADD PRO**
-
-If a free account that already created its permitted Business tries to create another Trade or Supplier Business, stop the creation flow and show:
-
-**You’ve reached your free account limit.**  
-**Add Pro to create another Business.**
-
-**ADD PRO**
-
-The limit applies to **creating** additional Homes or Businesses. It does not prevent searching for or connecting to an existing one.
+History is created only after the person has successfully established their first legitimate Property or Business relationship.
 
 ---
 
-## Screen 1 — What Are You Here For?
+# SCREEN 1 — CHOOSE PATH
 
-Show three primary choices:
+**What are you here to set up or connect to?**
 
-- **HOME**
-- **TRADE**
-- **SUPPLIER**
+- PROPERTY
+- TRADE
+- SUPPLIER
 
-History Viewer is not shown as an intake choice.
-
-If the person arrived through a valid invitation, RoundHouse may skip this screen and continue directly into the invited Home, Business, or Facility context.
+History Viewer is not an intake choice.
 
 ---
 
-# HOME INTAKE
+# PROPERTY
 
-## Home Screen 2 — Find Your Home
+## Screen 2 — PROPERTY TYPE
 
-Address autocomplete:
+- Residential
+- Commercial
 
-- Street Address
+**Continue**
+
+---
+
+# RESIDENTIAL PROPERTY
+
+## Screen 3 — FIND PROPERTY
+
+Enter:
+
+- Street address
 - Unit / Apt
 - City
 - State
 - ZIP
 
-Select standardized address.
+RoundHouse searches existing Properties.
 
-RoundHouse searches for the Home / Property before offering creation.
+If found:
 
-**Found:** select the existing Home.  
-**Not Found:** offer **+ Add Home** when the person is allowed to create one.
+**Select Property**
 
-If the account is free and has already created one Home, **+ Add Home** opens the Pro limit message instead of Home creation.
+If not found:
 
-A person who is connecting to an existing Home follows the applicable authorization / invitation path rather than creating a duplicate Home.
+**+ ADD PROPERTY**
 
----
+A free account that has already created one Property sees:
 
-## Home Screen 3 — Your Role
+**You’ve reached your free account limit.  
+Add Pro to create another Property.**
 
-Show the roles that are valid for the selected Home and account state.
+**ADD PRO**
 
-### Unpaid
-
-- **Homeowner**
-
-### Paid / Administrative
-
-- **Home Admin**
-- **Home Pro (Owner)**
-- **Home Pro (Manager)**
-- **Home Pro (Teammate)**
-
-### Viewer
-
-- **Home (Viewer)**
-
-A Home Viewer may be paid or unpaid.
-
-Viewer access is available when either:
-
-- the Viewer has a paid subscription; or
-- the Homeowner / controlling Home account has a paid subscription.
-
-A person does not become an Owner, Manager, Admin, or Teammate merely because they can view the Home.
-
-Role choices that require paid access must not silently assign themselves to a free account. If the person selects a paid role without qualifying paid access, show the appropriate Pro / subscription path before activation.
+Searching for or connecting to an existing Property remains available.
 
 ---
 
-## Home Screen 4 — Your Home
+## Screen 4 — ROLE
 
-For a newly created Home:
+Choose the person’s relationship to this Property:
+
+- Homeowner
+- Home Admin
+- Home Pro (Owner)
+- Home Pro (Manager)
+- Home Pro (Teammate)
+- Home (Viewer)
+
+Paid roles require qualifying paid access before activation.
+
+Home (Viewer) may qualify through either the Viewer’s paid subscription or the controlling Property account’s paid subscription.
+
+**Continue**
+
+---
+
+## Screen 5 — PROPERTY PROFILE
+
+Shown only when creating a new Property.
+
+Enter:
 
 - Property photo
-- Optional Property name
+- Property name — optional
 - Confirm address
+- Basic Property information
 
-Existing Homes skip this screen when appropriate.
+**Continue**
 
-A Home Viewer connecting through an invitation normally confirms the Home and granted view scope instead of creating Home information.
-
----
-
-## Home Screen 5 — About Your Home
-
-For applicable Homeowner / Home Pro paths:
-
-- How long have you lived here?
-
-Do not ask Homeowner-specific questions when they do not apply to the selected Role.
+Existing Properties skip this screen.
 
 ---
 
-## Home Screen 6 — What Are You Working On?
+## Screen 6 — ROLE DETAILS
 
-Selectable Home-goal chips for applicable active Home roles.
+This screen changes according to the Role selected on Screen 4.
 
-Home (Viewer) does not receive operating authority merely by being granted view access.
+It asks only for information required for that Role.
+
+A Homeowner can receive ownership-related questions.
+
+A Home Admin or Manager receives management-related questions.
+
+A Home (Viewer) does not receive ownership or management questions.
+
+**Continue**
 
 ---
 
-## Home Screen 7 — Review
+## Screen 7 — REVIEW
 
-Show:
+Display:
 
-- Home / Property
-- Role title exactly as it will appear
-- authority, where applicable
-- permission scope
-- inviter / authority source when invitation-driven
-- Home / Profile information
-- paid status when it affects access or Role
+**Property** — Edit  
+**Role** — Edit  
+**Property Profile** — Edit, when applicable  
+**Role Details** — Edit, when applicable  
+**Subscription / access status** — Edit or Add Pro when applicable
 
 **ACTIVATE**
 
 ---
 
-## Home Screen 8 — You’re In
+## Screen 8 — COMPLETE
 
-Eligible Home participants receive the applicable completion experience.
+**You’re in.**
 
-Home (Viewer) does not receive gamification treatment merely for viewing.
-
-**ENTER YOUR COMMAND CENTER**
+**ENTER COMMAND CENTER**
 
 ---
 
-# TRADE INTAKE
+# COMMERCIAL PROPERTY
 
-## Trade Screen 2 — Find Your Business
+## Screen 3 — FIND PROPERTY / FACILITY
 
-Business autocomplete / search.
+Search by address or Facility name.
 
-Results show:
+If found:
+
+**Select Property / Facility**
+
+If not found:
+
+**+ ADD PROPERTY**
+
+The same one-free-Property creation limit applies.
+
+---
+
+## Screen 4 — ROLE & AUTHORITY
+
+Choose the Role and authority that describe the person’s relationship to the Commercial Property.
+
+This screen uses the governing Property roles and authority available to Commercial Properties.
+
+**Continue**
+
+---
+
+## Screen 5 — PROPERTY / FACILITY PROFILE
+
+Shown only when creating a new Commercial Property.
+
+Enter:
+
+- Property / Facility name
+- Photo
+- Address
+- Basic Facility information
+
+**Continue**
+
+---
+
+## Screen 6 — ROLE DETAILS
+
+Collect only information required by the selected Role and authority.
+
+**Continue**
+
+---
+
+## Screen 7 — REVIEW
+
+Display each completed section with **Edit**.
+
+**ACTIVATE**
+
+---
+
+## Screen 8 — COMPLETE
+
+**ENTER COMMAND CENTER**
+
+---
+
+# TRADE
+
+## Screen 2 — FIND BUSINESS
+
+Search by:
 
 - Business name
 - Location
 
-**Found:** select Business.  
-**Not Found:** offer **+ Add Business** when the person is allowed to create one.
+If found:
 
-If the account is free and has already created one Business of either Trade or Supplier type, **+ Add Business** opens the Pro limit message instead of Business creation.
+**Select Business**
 
-A Trade Professional invited into an existing Business should resume that Business relationship rather than creating a duplicate Business.
+If not found:
 
----
+**+ ADD BUSINESS**
 
-## Trade Screen 3 — Your Role
+A free account that has already created one Business sees:
 
-Show the roles valid for the selected Business and account state.
+**You’ve reached your free account limit.  
+Add Pro to create another Business.**
 
-### Unpaid
+**ADD PRO**
 
-- **Trade Professional**
-
-### Paid / Administrative
-
-- **Trade Admin**
-- **Trade Pro (Owner)**
-- **Trade Pro (Manager)**
-- **Trade Pro (Lead)**
-- **Trade Pro (Owner – Lead)**
-- **Trade Pro (Manager – Lead)**
-
-There is no plain **Trade Pro** title.
-
-An unpaid working Trade account is **Trade Professional**.
-
-Admin requires paid access and therefore does not receive a separate Pro label.
-
-Role choices that require paid access must route through the appropriate Pro / subscription path before activation when the account does not yet qualify.
+The person may still search for and connect to an existing Business.
 
 ---
 
-## Trade Screen 4 — Business Profile
+## Screen 3 — ROLE
 
-For a new Business or authorized setup:
+Choose:
+
+- Trade Professional
+- Trade Admin
+- Trade Pro (Owner)
+- Trade Pro (Manager)
+- Trade Pro (Lead)
+- Trade Pro (Owner – Lead)
+- Trade Pro (Manager – Lead)
+
+**Continue**
+
+---
+
+## Screen 4 — BUSINESS PROFILE
+
+Shown only when creating a Business or when required information is missing.
+
+Enter:
 
 - Business logo / photo
 - Business name
@@ -234,227 +285,159 @@ For a new Business or authorized setup:
 - Years in business
 - Employee count
 
-Existing completed Businesses skip this screen when appropriate.
+**Continue**
 
 ---
 
-## Trade Screen 5 — Business Services
+## Screen 5 — SERVICES
 
-Selectable Service chips filtered by Trade category.
+Select Trade services.
 
-**+ Add Service**
+**+ ADD SERVICE**
 
----
-
-## Trade Screen 6 — Your Trade Profile
-
-- Position / trade
-- Optional descriptive title where appropriate
-
-Uses the person’s existing Identity photo.
-
-The governing RoundHouse Role title remains the selected Role from Trade Screen 3.
+**Continue**
 
 ---
 
-## Trade Screen 7 — Your Experience
+## Screen 6 — TRADE PROFILE
 
-- Years of trade experience
-- relevant experience / position selections
-- Business / management experience when relevant
-- personal skills / strengths
+Enter:
 
----
+- Trade / position
+- Descriptive title, if applicable
 
-## Trade Screen 8 — Licenses & Certifications
-
-Optional credentials.
-
-A **Licensed** selection opens the appropriate credential fields.
+**Continue**
 
 ---
 
-## Trade Screen 9 — Review
+## Screen 7 — EXPERIENCE
 
-Show:
+Enter:
 
-- Business
-- Role title exactly as it will appear
-- authority, where applicable
-- invitation / Business relationship when applicable
-- Trade Profile
-- paid status when it affects access or Role
+- Years of experience
+- Relevant experience
+- Management experience where applicable
+- Skills / strengths
+
+**Continue**
+
+---
+
+## Screen 8 — LICENSES & CERTIFICATIONS
+
+Add applicable licenses and certifications.
+
+**Skip** or **Continue**
+
+---
+
+## Screen 9 — REVIEW
+
+Display:
+
+**Business** — Edit  
+**Role** — Edit  
+**Business Profile** — Edit  
+**Services** — Edit  
+**Trade Profile** — Edit  
+**Experience** — Edit  
+**Licenses & Certifications** — Edit  
+**Subscription / access status** — Edit or Add Pro when applicable
 
 **ACTIVATE**
 
 ---
 
-## Trade Screen 10 — You’re In
+## Screen 10 — COMPLETE
 
-Apply the completion experience appropriate to the activated Trade Role.
-
-**ENTER YOUR COMMAND CENTER**
+**ENTER COMMAND CENTER**
 
 ---
 
-# SUPPLIER INTAKE
+# SUPPLIER
 
-## Supplier Screen 2 — Find Your Business
+## Screen 2 — FIND BUSINESS
 
-Business autocomplete / search.
+Search for an existing Supplier Business.
 
-**Found:** select Business.  
-**Not Found:** offer **+ Add Business** when the person is allowed to create one.
+If not found:
 
-If the account is free and has already created one Business of either Trade or Supplier type, **+ Add Business** opens the Pro limit message instead of Business creation.
+**+ ADD BUSINESS**
 
----
-
-## Supplier Screen 3 — Your Role
-
-Show the roles valid for the selected Business and account state.
-
-### Unpaid
-
-- **Supplier**
-
-### Paid / Administrative
-
-- **Supplier Admin**
-- **Supplier Pro (Owner)**
-- **Supplier Pro (Manager)**
-- **Supplier Pro (Lead)**
-- **Supplier Pro (Owner – Lead)**
-- **Supplier Pro (Manager – Lead)**
-
-Admin requires paid access and therefore does not receive a separate Pro label.
-
-Role choices that require paid access must route through the appropriate Pro / subscription path before activation when the account does not yet qualify.
+The same one-free-Business creation limit applies.
 
 ---
 
-## Supplier Screen 4 — Business Profile
+## Screen 3 — ROLE
 
-For a new Supplier Business or authorized setup:
+Choose:
 
-- Business logo / photo
+- Supplier
+- Supplier Admin
+- Supplier Pro (Owner)
+- Supplier Pro (Manager)
+- Supplier Pro (Lead)
+- Supplier Pro (Owner – Lead)
+- Supplier Pro (Manager – Lead)
+
+**Continue**
+
+---
+
+## Screen 4 — BUSINESS PROFILE
+
+Enter:
+
+- Logo / photo
 - Business name
 - Address
 - Years in business
 - Employee count where applicable
 
-Existing completed Businesses skip this screen when appropriate.
+**Continue**
 
 ---
 
-## Supplier Screen 5 — Products / Services
+## Screen 5 — PRODUCTS & SERVICES
 
-Collect the Supplier categories, products, materials, or services needed to describe what the Business provides.
+Select the products, materials, categories, and services the Business provides.
 
----
-
-## Supplier Screen 6 — Your Supplier Profile
-
-Collect the person-specific information appropriate to their Supplier Role.
+**Continue**
 
 ---
 
-## Supplier Screen 7 — Review
+## Screen 6 — SUPPLIER PROFILE
 
-Show:
+Enter the person-specific information required for the selected Supplier Role.
 
-- Business
-- Role title exactly as it will appear
-- authority, where applicable
-- invitation / Business relationship when applicable
-- Supplier Profile
-- paid status when it affects access or Role
+**Continue**
+
+---
+
+## Screen 7 — REVIEW
+
+Every section has **Edit**.
 
 **ACTIVATE**
 
 ---
 
-## Supplier Screen 8 — You’re In
+## Screen 8 — COMPLETE
 
-Apply the completion experience appropriate to the activated Supplier Role.
-
-**ENTER YOUR COMMAND CENTER**
+**ENTER COMMAND CENTER**
 
 ---
 
-# COMMERCIAL FACILITY / PROPERTY
+# BACK & EDIT BEHAVIOR
 
-Commercial Facility / Property remains a Property subtype, not a separate top-level Role category.
+**Back never erases completed information.**
 
-A person connecting to a Commercial Facility must do so through a legitimate Property / Facility relationship and the applicable Role / authority rules.
+Changing an earlier answer recalculates later screens when necessary.
 
-RoundHouse must not restore the retired **Commercial Management**, **Commercial Team Member**, or **Commercial Viewer** role names.
+For example, changing Residential to Commercial changes the remaining Property intake screens, but RoundHouse retains any information that still applies.
 
-Where the current governing Roles document does not yet define a distinct commercial-facing display title, intake must preserve the Property / Facility relationship and authority without inventing a new Role title.
+Changing Role updates the Role Details screen and paid-access requirements.
 
-Commercial intake must preserve:
+From Review, **Edit** opens the exact originating screen. After saving, the person returns to Review.
 
-- Facility / Property
-- person
-- governing Role
-- authority
-- inviter / authority source
-- permission scope
-- paid-party status where required
-
----
-
-# HISTORY VIEWER
-
-History Viewer is not a selectable intake pathway.
-
-History Viewer is the role used inside the person’s private History.
-
-It may be paid or unpaid.
-
-History allows the person to view their combined legitimate history and use the limited functions governed for History, including **Share RoundHouse** and connecting to a Home, Business, or Facility.
-
-History does not replace an active Home, Trade, Supplier, or Facility relationship.
-
----
-
-# Paid-Party Interaction Rule
-
-For any people-to-people interaction, organization, or coordination inside a Home, Business, or Facility, **at least one party to that relationship must have a paid subscription**.
-
-The paid party may be:
-
-- the person interacting or participating; or
-- the person who owns or controls the Home, Business, or Facility.
-
-This rule must be checked before intake activates shared organizational access between people.
-
-A free account may still use the functions legitimately available to its own Role and may search for existing Homes, Businesses, or Facilities.
-
----
-
-# Invitation-Driven Activation
-
-When someone enters RoundHouse from **Share RoundHouse** or another invitation link:
-
-1. identify / authenticate the person;
-2. preserve the invitation token and intended Home, Business, or Facility;
-3. determine the intended Role and authority;
-4. check whether the paid-party rule is satisfied for the requested shared interaction;
-5. collect only the intake information still required for that Role;
-6. return to the pending invitation / approval flow;
-7. activate participation only after required consent and governing authority are satisfied.
-
-The invitation flow is governed by **`33_INVITATIONS.md`**.
-
----
-
-# Role and History Preservation
-
-Changing a person’s Role or authority during later participation does not alter, erase, or rewrite their previous Timeline activity, records, messages, Work, CAPTURE, or other legitimate contributions.
-
-Historical activity remains attributed to the person, the Role and authority held at the time, and the original date and context.
-
----
-
-Every pathway displays **current screen / total screens**, adjusted when screens are skipped.
+**Nothing is activated until the person presses ACTIVATE on the Review screen.**
