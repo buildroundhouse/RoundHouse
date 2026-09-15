@@ -33,12 +33,24 @@ const BUSINESS_SETUP_KINDS = new Set([
   "facilities_collab",
 ]);
 
+type EntityMembership = {
+  role?: string | null;
+  permissions?: {
+    scope?: {
+      creationCapacity?: string;
+      temporaryAdmin?: boolean;
+      unclaimed?: boolean;
+    } | null;
+  } | null;
+};
+
 type EntityRow = {
   id: number;
   kind: string;
   displayName?: string;
   name?: string;
   isAdminDemo: boolean;
+  myMembership?: EntityMembership | null;
 };
 
 type ListEntitiesResponse = {
@@ -65,11 +77,48 @@ export function FoundYourBusinessCard() {
     queryFn: () => customFetch<ListEntitiesResponse>("/api/entities/mine"),
   });
 
-  const hasBusiness = (data?.entities ?? []).some((e) => e.kind === "business");
+  const business = (data?.entities ?? []).find((e) => e.kind === "business") ?? null;
 
   if (!canStartBusiness) return null;
   if (isLoading) return null;
-  if (hasBusiness) return null;
+
+  if (business) {
+    const capacity =
+      business.myMembership?.permissions?.scope?.creationCapacity ??
+      (business.myMembership?.role === "owner" ? "owner" : "temporary_admin");
+    const label = capacity === "temporary_admin" ? "Temporary Admin" : "Owner";
+    const unclaimed = business.myMembership?.permissions?.scope?.unclaimed === true;
+    return (
+      <View
+        style={[
+          styles.card,
+          { backgroundColor: colors.card, borderColor: colors.border },
+        ]}
+      >
+        <View style={styles.iconWrap}>
+          <View
+            style={[
+              styles.iconCircle,
+              { backgroundColor: colors.scoreBackground ?? colors.muted },
+            ]}
+          >
+            <Feather name="briefcase" size={18} color={colors.primary} />
+          </View>
+        </View>
+        <View style={styles.body}>
+          <Text style={[styles.title, { color: colors.foreground }]}>
+            {business.displayName || business.name || "Business"}
+          </Text>
+          <Text style={[styles.blurb, { color: colors.mutedForeground }]}>
+            Business Entity · {label}{unclaimed ? " · Unclaimed" : ""}
+          </Text>
+          <Text style={[styles.entityNote, { color: colors.mutedForeground }]}>
+            This Business is attached to your Profile and available to RoundHouse Entity tools.
+          </Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View
@@ -148,11 +197,10 @@ export function FoundYourBusinessModal({
     mutationFn: async () => {
       const trimmed = displayName.trim();
       if (!trimmed) throw new Error("Business name is required");
-      return customFetch<EntityRow>("/api/entities", {
+      return customFetch<EntityRow>("/api/entity-setup/business", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          kind: "business",
           displayName: trimmed,
           legalName: legalName.trim() || undefined,
           tagline: tagline.trim() || undefined,
@@ -390,6 +438,7 @@ const styles = StyleSheet.create({
   body: { flex: 1, gap: 6 },
   title: { fontSize: 16, fontFamily: "Inter_700Bold" },
   blurb: { fontSize: 13, fontFamily: "Inter_400Regular", lineHeight: 18 },
+  entityNote: { fontSize: 11, fontFamily: "Inter_400Regular", lineHeight: 15 },
   button: {
     alignSelf: "flex-start",
     marginTop: 8,
