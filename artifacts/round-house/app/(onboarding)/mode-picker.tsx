@@ -96,9 +96,13 @@ export default function ModePickerScreen() {
             setError("");
             try {
               const created = await activate.mutateAsync({ data: { kind: "collab" } });
+              // The baseline collab mode is auto-created for every account.
+              // Stamp an explicit marker only when the person actually chooses
+              // Viewer here, so onboarding can distinguish that choice from the
+              // system-created baseline and never silently assign Viewer.
               await completeIntake.mutateAsync({
                 modeId: created.id,
-                data: { intakeData: {} },
+                data: { intakeData: { viewerSelected: true } },
               });
               await refetchModes();
               await refetchProfile();
