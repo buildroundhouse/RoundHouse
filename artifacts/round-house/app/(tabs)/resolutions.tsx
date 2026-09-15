@@ -30,6 +30,7 @@ function ResolutionWorkspace() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [text, setText] = useState(""); const [verified, setVerified] = useState(false);
   const [error, setError] = useState("");
+  const [helpOpen, setHelpOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [contextId, setContextId] = useState<number | null>(null);
   const [recipientId, setRecipientId] = useState("");
@@ -86,7 +87,20 @@ function ResolutionWorkspace() {
     <View style={s.content}>
       {back}
       <View style={s.heading}><Text style={[s.title, { color: c.text }]}>Resolution Center</Text>
-        <Text style={[s.subtitle, { color: c.mutedForeground }]}>Keep the conversation moving. Verify the outcome.</Text>
+        <Pressable accessibilityRole="button" accessibilityState={{ expanded: helpOpen }} onPress={() => setHelpOpen(true)} style={[s.helpButton, { borderColor: c.border, backgroundColor: c.card }]}>
+          <Text style={[s.helpButtonText, { color: c.text }]}>How things get resolved?</Text>
+        </Pressable>
+        {helpOpen ? (
+          <View style={[s.helpPanel, { borderColor: c.border, backgroundColor: c.card }]}>
+            <Pressable accessibilityRole="button" accessibilityLabel="Close resolution instructions" onPress={() => setHelpOpen(false)} style={s.helpClose}>
+              <Ionicons name="close" size={20} color={c.mutedForeground} />
+            </Pressable>
+            <Text style={[s.helpLine, { color: c.text }]}><Text style={s.helpStrong}>Red</Text> — ball’s in your court.</Text>
+            <Text style={[s.helpLine, { color: c.text }]}><Text style={s.helpStrong}>Green</Text> — volley’s back to them.</Text>
+            <Text style={[s.helpLine, { color: c.text }]}><Text style={s.helpStrong}>Escalation:</Text> Yellow → Red → Fire for unanswered follow-ups.</Text>
+            <Text style={[s.helpLine, { color: c.text }]}>Only the originator can mark the matter resolved.</Text>
+          </View>
+        ) : null}
         {!viewer && !!contexts.data?.contexts.length && <View style={{ marginTop: 16, alignSelf: "flex-start" }}>{button("New resolution", () => { setError(""); setQuestion(""); setContextId(null); setRecipientId(""); setCreating(true); }, false, true)}</View>}
         {viewer && <Text style={[s.subtitle, { color: c.mutedForeground }]}>Viewer · Read-only history</Text>}
         {!viewer && contexts.isError && button("Retry loading resolution permissions", () => void contexts.refetch())}</View>
@@ -178,6 +192,8 @@ const s = StyleSheet.create({
   screen: { flex: 1 }, content: { width: "100%", maxWidth: 760, alignSelf: "center", paddingHorizontal: 20 },
   back: { minHeight: 48, flexDirection: "row", alignItems: "center", gap: 9, paddingVertical: 10 }, backText: { fontSize: 15, fontWeight: "600" },
   heading: { paddingTop: 12, paddingBottom: 24 }, title: { fontSize: 29, fontWeight: "700", letterSpacing: -0.7 }, subtitle: { fontSize: 14, lineHeight: 21, marginTop: 8 },
+  helpButton: { alignSelf: "flex-start", borderWidth: StyleSheet.hairlineWidth, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 9, marginTop: 10 }, helpButtonText: { fontSize: 14, lineHeight: 20, fontWeight: "700" },
+  helpPanel: { position: "relative", borderWidth: StyleSheet.hairlineWidth, borderRadius: 12, paddingHorizontal: 14, paddingTop: 15, paddingRight: 42, paddingBottom: 8, marginTop: 10 }, helpClose: { position: "absolute", top: 7, right: 7, width: 30, height: 30, alignItems: "center", justifyContent: "center", borderRadius: 15 }, helpLine: { fontSize: 13, lineHeight: 19, marginBottom: 7 }, helpStrong: { fontWeight: "700" },
   loading: { padding: 45 }, group: { marginBottom: 28 }, groupHeading: { flexDirection: "row", alignItems: "center", gap: 8 },
   dot: { width: 8, height: 8, borderRadius: 4 }, groupTitle: { fontSize: 19, fontWeight: "700", flex: 1 }, count: { fontSize: 16, fontWeight: "600" }, groupDescription: { fontSize: 13, marginTop: 6, marginBottom: 12 },
   empty: { gap: 16, paddingVertical: 25 }, emptyText: { fontSize: 14, paddingVertical: 14, lineHeight: 21 },
