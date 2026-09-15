@@ -45,6 +45,11 @@ Original Entity records remain in the Entity's history.
 
 - New users complete the Entity-first intake or join an Entity. They cannot choose
   an unaffiliated Viewer account to bypass intake.
+- If an account was mistakenly given only the automatic Viewer/Collaborator
+  baseline and support returns it to original intake, clear identity completion,
+  the baseline mode, and its outward account together. While identity completion
+  remains empty, sign-in must not recreate either baseline. Completing identity
+  re-enables normal baseline provisioning and continues into Entity-first intake.
 - Verified former participants can return to their retained account without
   creating or joining a replacement Entity.
 - Command Center, Profile, and View Profile display **Unaffiliated** on the
