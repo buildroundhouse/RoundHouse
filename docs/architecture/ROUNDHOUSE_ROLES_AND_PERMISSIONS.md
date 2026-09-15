@@ -4,20 +4,24 @@
 
 RoundHouse has four top-level Role categories:
 
-1. **Home**
+1. **Property**
 2. **Trade**
 3. **Supplier**
 4. **History Viewer**
 
 Each category has sub-roles that define how the person participates and, where applicable, what authority they hold.
 
-The **Homeowner is the center of the Property experience**. Trade, Supplier, Viewer, Admin, Manager, and other supporting roles exist around that relationship.
+The **Homeowner is the center of the Residential Property experience**. Trade, Supplier, Viewer, Admin, Manager, and other supporting roles exist around that relationship.
 
 A person’s current Role or authority may change without altering or erasing their previous Timeline activity, records, messages, Work, CAPTURE, or other legitimate contributions.
 
 ---
 
-## 1. Home Roles
+## 1. Property Roles
+
+Property includes Residential Property and Commercial Property / Facility.
+
+Residential Property uses the following Home titles:
 
 ### Homeowner
 The standard unpaid homeowner role.
@@ -38,6 +42,8 @@ Paid Home role with management authority.
 
 ### Home Pro (Teammate)
 Paid Home role participating as part of the Home team.
+
+Commercial Property / Facility follows the same Property authority system. Its Role and authority must reflect the person’s actual relationship to that Property without inventing a separate Commercial role system.
 
 ---
 
@@ -102,6 +108,8 @@ History Viewer may be paid or unpaid.
 
 It allows the person to view their combined legitimate history, use **Share RoundHouse**, and connect to a Property or Business.
 
+History Viewer does not exist for a brand-new account before the person has established at least one legitimate Property or Business relationship.
+
 ---
 
 # Authority
@@ -110,12 +118,12 @@ Authority determines what a person can control within their current Role.
 
 ## Paid-Party Rule
 
-For any people-to-people interaction, organization, or coordination inside a Home, Business, or Facility, **at least one party to that relationship must have a paid subscription**.
+For any people-to-people interaction, organization, or coordination inside a Property, Business, or Facility, **at least one party to that relationship must have a paid subscription**.
 
 The paid party may be either:
 
 - the person interacting or participating, or
-- the person who owns or controls the Home, Business, or Facility.
+- the person who owns or controls the Property, Business, or Facility.
 
 Examples:
 
@@ -137,8 +145,8 @@ A Viewer may:
 - use **Share RoundHouse**
 - search for a Property or Business
 - connect to an existing Property or Business
-- create a new Home or Business within free-account limits
-- operate a Home or Business they create within the limits of the free role
+- create a new Property or Business within free-account limits
+- operate a Property or Business they create within the limits of the free role
 
 A Viewer may not:
 
@@ -149,12 +157,12 @@ A Viewer may not:
 
 A free account may create:
 
-- **one Home**
+- **one Property**
 - **one Business**
 
-A free account cannot proactively transfer ownership of a Home or Business it created.
+A free account cannot proactively transfer ownership of a Property or Business it created.
 
-Ownership transfer begins only when another person finds that Home or Business and **requests ownership transfer**.
+Ownership transfer begins only when another person finds that Property or Business and **requests ownership transfer**.
 
 ---
 
@@ -162,7 +170,7 @@ Ownership transfer begins only when another person finds that Home or Business a
 
 Admin requires paid access.
 
-Admin can establish and administer a Home, Trade Business, or Supplier Business without claiming ownership.
+Admin can establish and administer a Property, Trade Business, or Supplier Business without claiming ownership.
 
 Admin may organize workers, create and manage teams, administer participants, and use paid management functions.
 
@@ -204,7 +212,7 @@ Manager appears in:
 
 Lead identifies primary responsibility for professional work.
 
-Lead applies to Trade and Supplier roles, not Home roles.
+Lead applies to Trade and Supplier roles, not Property roles.
 
 Lead appears in:
 
@@ -236,12 +244,14 @@ A Role or authority change affects current and future access only.
 
 ## Governing Rule
 
-**RoundHouse has four top-level Role categories: Home, Trade, Supplier, and History Viewer.**
+**RoundHouse has four top-level Role categories: Property, Trade, Supplier, and History Viewer.**
 
 **Their sub-role titles define the person’s current participation and authority.**
 
-**Pro indicates paid status in Home, Trade, and Supplier titles. Admin also requires paid access and therefore does not receive a separate Pro label.**
+**Pro indicates paid status in Property, Trade, and Supplier titles. Admin also requires paid access and therefore does not receive a separate Pro label.**
 
-**For shared interaction or organization between people inside a Home, Business, or Facility, at least one party to the relationship must have a paid subscription.**
+**For shared interaction or organization between people inside a Property, Business, or Facility, at least one party to the relationship must have a paid subscription.**
+
+**A free account may create one Property and one Business.**
 
 **Role and authority changes affect current and future access without rewriting previous contributions or historical attribution.**
