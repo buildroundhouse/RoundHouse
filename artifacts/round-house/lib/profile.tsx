@@ -57,6 +57,22 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       ? modes.find((m) => m.id === activeModeId) ?? modes[0] ?? null
       : modes[0] ?? null;
 
+    // The server permanently seeds a neutral `collab` mode so every account
+    // has a safe baseline skin. That seed is NOT the same thing as the person
+    // choosing Viewer during onboarding. Without this distinction, a brand-new
+    // account can be auto-routed into the app as Viewer before ever choosing
+    // Home / Trade / Commercial. The picker stamps viewerSelected=true only
+    // when the person explicitly chooses Viewer.
+    const operationalModes = modes.filter(
+      (m) =>
+        m.kind !== "collab" &&
+        m.kind !== "trade_pro_collab" &&
+        m.kind !== "facilities_collab",
+    );
+    const activeModeData = (activeMode?.intakeData ?? {}) as Record<string, unknown>;
+    const viewerExplicitlyChosen =
+      activeMode?.kind === "collab" && activeModeData.viewerSelected === true;
+
     // Outward accounts can be sourced from either the dedicated list
     // endpoint or the embedded copy on /users/me. Prefer the dedicated
     // list when it's loaded so optimistic mutations are reflected
@@ -91,6 +107,14 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     } else if (modes.length === 0) {
       status = { kind: "needs-mode-picker" };
     } else if (!activeMode) {
+      status = { kind: "needs-mode-picker" };
+    } else if (
+      activeMode.kind === "collab" &&
+      operationalModes.length === 0 &&
+      !viewerExplicitlyChosen
+    ) {
+      // A system-created neutral Viewer baseline must never count as the
+      // user's role choice. Send them to the real role picker instead.
       status = { kind: "needs-mode-picker" };
     } else if (!activeMode.intakeCompletedAt) {
       status = { kind: "needs-intake", mode: activeMode };
