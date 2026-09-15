@@ -93,7 +93,7 @@ function ResolutionWorkspace() {
         {helpOpen ? (
           <View style={[s.helpPanel, { borderColor: c.border, backgroundColor: c.card }]}>
             <Pressable accessibilityRole="button" accessibilityLabel="Close resolution instructions" onPress={() => setHelpOpen(false)} style={s.helpClose}>
-              <Ionicons name="close" size={20} color={c.mutedForeground} />
+              <Feather name="x" size={20} color={c.mutedForeground} />
             </Pressable>
             <Text style={[s.helpLine, { color: c.text }]}><Text style={s.helpStrong}>Red</Text> — ball’s in your court.</Text>
             <Text style={[s.helpLine, { color: c.text }]}><Text style={s.helpStrong}>Green</Text> — volley’s back to them.</Text>
