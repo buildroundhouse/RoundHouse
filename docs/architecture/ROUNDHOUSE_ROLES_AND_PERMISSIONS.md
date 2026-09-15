@@ -23,13 +23,30 @@ The owner of the home and the primary authority over the Property.
 Someone the Homeowner allows to participate in managing or caring for the home. Authority depends on the permissions given to them.
 
 ### Property Viewer
-A person given authorized view-only access to a specific Property without becoming a Team Member and without receiving contribution or management authority.
+Property Viewer is the single Viewer Role for both Residential Properties and Commercial Facilities.
 
-Property Viewer is the single Viewer Role for both Residential Properties and Commercial Facilities. There is no separate Home Viewer or Commercial Viewer Role.
+It creates a real connection between the person and a specific Property or Facility, but with deliberately limited participation. It is intended for friends, family, future collaborators, prospective participants, or other invited people who need to connect with and look at the Property without taking part in its operational activity.
 
-A Property Viewer relationship always identifies the specific Property / Facility and the scope the Viewer may see. Property Viewer does not create a free-floating Roundhouse relationship and does not exist without a Property / Facility connection.
+A Property Viewer can see only what the Property Owner or authorized Manager has chosen to share.
 
-A Home Team Member who is removed from the Home Team may remain as a Property Viewer where continued visibility is appropriate, but only through deliberate current authorization to that Property.
+A Property Viewer may:
+
+- message within the Property context;
+- use **Share Roundhouse**;
+- search for other Properties or Businesses to connect with.
+
+A Property Viewer may not:
+
+- create Notes;
+- use CAPTURE;
+- create or perform Work;
+- create or manage appointments or Calendar activity;
+- manage people or participants;
+- otherwise operate inside the Property.
+
+Property Viewer does not participate in points, badges, status tiers, or other gamification.
+
+A Property Viewer relationship always identifies the specific Property / Facility and the scope the Viewer may see. There is no separate Home Viewer or Commercial Viewer Role.
 
 ### Trade Professional
 A person providing professional trade or service work. Access to one Property or Job does not automatically provide access to another.
@@ -39,7 +56,7 @@ A person may create their own Trade Business and become a Trade Professional. Be
 ### Trade Team Member
 A person working as part of a Trade Business or team. Being a Trade Team Member does not automatically provide access to every client, Property, Job, invoice, or Business record.
 
-There is **no Trade Viewer Role**. The only active Viewer Role is Property Viewer, which is tied to a specific Residential Property or Commercial Facility. Public or otherwise authorized viewing of a Trade Business or Trade Professional does not require someone to become a participant in that Business.
+There is **no Trade Viewer Role**. The active Viewer Role is Property Viewer, which is tied to a specific Residential Property or Commercial Facility.
 
 A former Trade participant retains their own legitimate historical work through the permanent History Viewer Entity described below.
 
@@ -54,13 +71,15 @@ A person or Business providing materials, products, or recurring goods or servic
 
 ## 2. History Viewer Entity
 
-History Viewer is a permanent Entity attached to a person's Roundhouse account after that person first connects to an actual Property or Business.
+History Viewer is a permanent, limited Entity created after a person first connects to an actual Property or Business.
 
-History Viewer is **not a Role inside another Property or Business**. It is its own permanent, limited Entity whose purpose is to house and display that person's legitimate historical participation across Properties, Businesses, Jobs, and Work.
+Its purpose is to give that person one place to see everything they have legitimately done across all of the Properties and Businesses they have participated in, presented together in one combined Timeline stream.
 
-History Viewer remains available even while the person has active Property or Business relationships. If every active Property and Business relationship later ends, History Viewer remains attached to the account.
+History Viewer is broader than any single Property or Business because it pulls the person's historical activity from all of those relationships into one place. It can display the person's historical Notes, messages, comments, CAPTURE, Work, completed Jobs, photos, milestones, Resolutions, accomplishments, ratings, and other activity they are entitled to retain.
 
-History Viewer presents a combined Timeline of the person's legitimate history while preserving the original source of every item, including the original Property, Business, Role, date, Work context, and attribution.
+Every historical item keeps its original context, including the Property or Business it came from, the Role the person held, the Job or Work context, date, and attribution.
+
+History Viewer remains available while the person has active Property or Business relationships and remains attached to the account if every active relationship later ends.
 
 History Viewer does not transfer ownership of historical records away from their original Property or Business and does not restore current access to a former Property or Business.
 
@@ -68,22 +87,26 @@ History Viewer does not transfer ownership of historical records away from their
 
 History Viewer may:
 
-- display the complete combined Timeline of the person's legitimate historical participation;
-- display Work, photos, CAPTURE evidence, completed Jobs, milestones, accomplishments, ratings, and attribution the person is entitled to retain;
-- identify the original Property, Business, Job, Role, and date associated with each historical item;
-- allow the person to search for, connect to, claim where appropriate, or set up a Property or Business.
+- display the person's complete combined historical Timeline across Properties and Businesses;
+- display historical Notes, messages, comments, CAPTURE, Work, Jobs, photos, milestones, Resolutions, accomplishments, ratings, and attribution the person is entitled to retain;
+- identify the original Property, Business, Job, Role, date, and context associated with each historical item;
+- allow the person to search for, connect to, claim where appropriate, or set up a Property or Business;
+- use **Share Roundhouse**.
 
 History Viewer may not:
 
-- create Notes;
+- create new Notes;
+- send new messages or comments;
 - use CAPTURE;
 - create or manage Work;
 - create or manage appointments or Calendar activity;
 - manage people or participants;
 - create current activity inside a former Property or Business;
-- expose new activity, current finances, current team information, current private messages, or other records for which the former relationship no longer grants access.
+- conduct Business or Property operations from the History Viewer.
 
-Historical access through History Viewer is read-only and limited to the person's legitimate historical participation.
+History Viewer does not participate in points, badges, status tiers, or other gamification.
+
+History Viewer is comprehensive and read-only: it allows the person to see everything they are legitimately entitled to see from their own history without allowing new operational activity there.
 
 ## 3. Active Roles and Historical Participation
 
@@ -384,4 +407,4 @@ Current access and historical record are separate.
 
 ## Governing Rule
 
-**Role identifies how someone is currently participating. Authority determines what they can control. Permissions determine what they can see and do. Property Viewer is the single view-only Role for a specific Residential Property or Commercial Facility. History Viewer is a permanent limited Entity created after a person first connects to an actual Property or Business; it houses that person's legitimate combined historical Timeline and remains even if all active Property and Business relationships later end. History Viewer does not restore current access and cannot create Notes, CAPTURE, Work, appointments, or other operational activity. A Business may bring its own subcontractors forward, and a Property Manager with explicitly delegated participant-management authority may approve them on the Owner's behalf. Every permission retains its source: Business-derived access ends automatically when the governing Business relationship ends, while independently authorized access survives. Active Roles and authority can end without erasing historical participation.**
+**Role identifies how someone is currently participating. Authority determines what they can control. Permissions determine what they can see and do. Property Viewer is the single limited Viewer Role for a specific Residential Property or Commercial Facility: it creates a real Property connection, may support messaging, Share Roundhouse, and search for other Properties or Businesses, but does not allow operational activity or gamification. History Viewer is a permanent limited Entity created after a person first connects to an actual Property or Business; it combines the person's legitimate historical activity from all Properties and Businesses into one read-only Timeline stream, including historical Notes, messages, comments, CAPTURE, Work, Jobs, photos, milestones, Resolutions, accomplishments, ratings, and attribution. History Viewer allows connection to future Properties or Businesses but does not allow new Business or Property activity and does not participate in gamification. A Business may bring its own subcontractors forward, and a Property Manager with explicitly delegated participant-management authority may approve them on the Owner's behalf. Every permission retains its source: Business-derived access ends automatically when the governing Business relationship ends, while independently authorized access survives. Active Roles and authority can end without erasing historical participation.**
