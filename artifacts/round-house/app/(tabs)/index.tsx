@@ -1,3 +1,6 @@
+import { modeForAccount, type ProfileEntity } from "@/lib/personal-profile";
+import { commandCenterIdentity } from "@/lib/command-center-identity";
+import { OutwardAccountSwitcher } from "@/components/OutwardAccountSwitcher";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   Image,
@@ -7,15 +10,17 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
   type LayoutChangeEvent,
 } from "react-native";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import {
-  useGetFeed,
+  customFetch,
+  type GetFeedQueryResult,
   useGetMyRelationships,
   useSwitchActiveMode,
 } from "@workspace/api-client-react";
@@ -23,35 +28,45 @@ import type {
   RelationshipPerson,
   UserModeProfile,
 } from "@workspace/api-client-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MODE_LABELS } from "@/lib/intake-schemas";
 import { ProjectTimeline, workLogToEvent } from "@/components/ProjectTimeline";
 import { TimelineMotionDebugPanel } from "@/lib/timelineMotionDebug";
-import { ConciergeSheet } from "@/components/ConciergeSheet";
 import { useProfile } from "@/lib/profile";
-import { useActiveAccountAvatarUrl, InboxButton } from "@/components/TopBarAvatar";
+import {
+  MailboxButton,
+  NotificationBellButton,
+} from "@/components/TopBarAvatar";
+import { resolveStorageUrl } from "@/lib/uploads";
+import { AnalyticsRewardsModal } from "@/components/AnalyticsRewardsModal";
+import { WoodRewardsButton } from "@/components/WoodRewardsButton";
 import { getModeAccent } from "@/lib/modeAccent";
 import { ModeSwitcher } from "@/components/ModeSwitcher";
-import { openCapturePhoto } from "@/components/CaptureFAB";
-import { OutwardAccountSwitcher } from "@/components/OutwardAccountSwitcher";
 import {
   HomeSidePanelOverlay,
   type HomeSidePanelKey,
 } from "@/components/HomeSidePanelOverlay";
 import LogsScreen from "@/app/(tabs)/logs";
-import InvoicesScreen from "@/app/(tabs)/invoices";
+import { ReceiptsPanel } from "@/components/ReceiptsPanel";
 import PropertiesScreen from "@/app/(tabs)/properties";
-import MyJobsScreen from "@/app/my-jobs";
-import RemindersScreen from "@/app/reminders";
+import { TasksListsSheet } from "@/components/TasksListsSheet";
+import { DailyGrind } from "@/components/DailyGrind";
+import { useDailyGrindOpening } from "@/lib/useDailyGrindOpening";
 
 function TimelineHeader({
   avatarUrl,
   onOpenProfile,
+  onOpenRewards,
   accountName,
+  roleLabel,
+  points,
 }: {
   avatarUrl: string | null;
   onOpenProfile: () => void;
+  onOpenRewards: () => void;
   accountName: string;
+  roleLabel: string;
+  points: number;
 }) {
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -63,7 +78,8 @@ function TimelineHeader({
         { paddingTop: topPad, borderBottomColor: colors.border },
       ]}
     >
-      {/* LEFT: profile/company photo + company name */}
+      {/* The photo identifies the person; the name identifies the space. */}
+      <View style={styles.headerAccountGroup}>
       <Pressable
         onPress={onOpenProfile}
         accessibilityLabel="Open profile"
@@ -77,26 +93,29 @@ function TimelineHeader({
           <Image source={{ uri: avatarUrl }} style={styles.headerAvatarImg} />
         ) : null}
       </Pressable>
-      <View style={{ flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: 8 }}>
+      <View style={styles.headerIdentity}>
+        {accountName ? (
         <Text
-          style={[styles.headerCompany, { color: colors.foreground, flexShrink: 1 }]}
+          style={[styles.headerCompany, { color: colors.foreground }]}
           numberOfLines={1}
           ellipsizeMode="tail"
         >
           {accountName}
-        </Text>
+        </Text>) : null}
+        <Text style={[styles.headerRole, { color: colors.mutedForeground }]} numberOfLines={1}>{roleLabel}</Text>
         <OutwardAccountSwitcher variant="headerButton" />
       </View>
-
-      {/* RIGHT: personal inbox — follows the human across every screen */}
-      <InboxButton />
+      </View>
+      <WoodRewardsButton onPress={onOpenRewards} points={points} />
+      <NotificationBellButton />
+      <MailboxButton />
     </View>
   );
 }
 
 // Bookmark-style side tabs that protrude from the right edge, matching the
 // curved 3D look of the iOS Photos app side tabs. Each tab renders a single
-// rotated text label (90°) inside a card with a left-rounded silhouette and a
+// vertical label and upright icon inside a card with a left-rounded silhouette and a
 // soft shadow. Tabs stack vertically and are vertically centered as a group
 // so the screen feels balanced regardless of timeline length.
 type SideTabSpec = {
@@ -135,7 +154,9 @@ function SideTab({
       ]}
     >
       <View style={styles.sideTabInner}>
-        <Feather name={spec.icon} size={15} color={SIDE_TAB_FG} />
+        <View style={{ transform: [{ rotate: "-90deg" }] }}>
+          <Feather name={spec.icon} size={15} color={SIDE_TAB_FG} />
+        </View>
         <Text style={styles.sideTabText} numberOfLines={1}>
           {spec.label}
         </Text>
@@ -156,7 +177,10 @@ function SideTabStack({
   onTabLayout?: (key: string, y: number) => void;
 }) {
   return (
-    <View pointerEvents="box-none" style={[styles.sideTabStack, { top: topOffset }]}>
+    <View
+      pointerEvents="box-none"
+      style={[styles.sideTabStack, { top: topOffset }]}
+    >
       {tabs.map((t) => (
         <SideTab
           key={t.key}
@@ -178,50 +202,38 @@ function SideTabStack({
 // blue used by the bottom-tab active state and "Switch / Add Account"
 // link) — explicitly NOT the mode accent, so the icon reads blue even
 // when a non-homeowner mode (e.g. trade/amber) is active.
-function CameraIconButton({
+function TimelineSearchButton({
   topOffset,
   color,
+  open,
+  onPress,
 }: {
   topOffset: number;
   color: string;
+  open: boolean;
+  onPress: () => void;
 }) {
-  const handlePress = () => {
-    // CaptureFAB handles the web fallback (file input with capture
-    // attribute → system camera UI on mobile Safari), so we delegate
-    // unconditionally instead of bailing on web.
-    openCapturePhoto();
-  };
   return (
     <View
       pointerEvents="box-none"
       style={[styles.cameraIconHost, { top: topOffset }]}
     >
       <Pressable
-        onPress={handlePress}
+        onPress={onPress}
         accessibilityRole="button"
-        accessibilityLabel="Capture a photo"
+        accessibilityLabel={open ? "Close Timeline search" : "Search Timeline"}
+        accessibilityState={{ expanded: open }}
         hitSlop={16}
         style={({ pressed }) => [
           styles.cameraIconBtn,
           { opacity: pressed ? 0.6 : 1 },
         ]}
       >
-        {/* Compose the camera by layering: Feather "camera" gives the
-            outlined camera body (matches the reference's frame), and
-            Feather "aperture" sits on top to replace the body's plain
-            lens circle with the multi-blade aperture/shutter. The
-            aperture is sized smaller and offset slightly downward so it
-            lands inside the body's lens cutout. */}
-        <Feather name="camera" size={32} color={color} />
-        <View pointerEvents="none" style={styles.cameraIconAperture}>
-          <Feather name="aperture" size={16} color={color} />
-        </View>
+        <Feather name={open ? "x" : "search"} size={27} color={color} />
       </Pressable>
     </View>
   );
 }
-
-
 
 function PeopleStrip({
   people,
@@ -291,7 +303,10 @@ function PeopleStrip({
         style={[
           styles.avatar,
           styles.addAvatar,
-          { borderColor: colors.border, marginLeft: visible.length === 0 ? 0 : 6 },
+          {
+            borderColor: colors.border,
+            marginLeft: visible.length === 0 ? 0 : 6,
+          },
         ]}
       >
         <Feather name="plus" size={18} color={colors.mutedForeground} />
@@ -305,19 +320,23 @@ export default function TimelineScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
-  // The right-side bookmark stack now anchors near the TOP of the screen
-  // (just below the avatar/account-name header) instead of being centered
-  // vertically. Putting them up high frees the lower 2/3 of the right edge
-  // so the timeline can breathe and the eye is drawn to the messy camera
-  // button on the opposite top corner.
+  // The right-side working tabs anchor just below the account header. The
+  // Timeline search control shares that starting line on the left.
   // Header / strip / timeline padding constants used to compute where the
   // timeline thread (spine) begins on screen. The capture button and the
   // right-side bookmark stack are aligned to that exact y so they read as
   // a single horizontal "start line" together with the spine.
-  const HEADER_AREA = 46; // TimelineHeader rendered height (paddingTop + content)
+  const HEADER_AREA = 78; // TimelineHeader rendered height (paddingTop + content)
   const PEOPLE_STRIP_BLOCK = 12 + 36; // marginTop + avatar row height
   const TIMELINE_PAD_TOP = 6; // ProjectTimeline root paddingTop
-  const { profile, activeMode, modes, refetchModes, refetchProfile, activeOutwardAccount } = useProfile();
+  const {
+    profile,
+    activeMode,
+    modes,
+    refetchModes,
+    refetchProfile,
+    activeOutwardAccount,
+  } = useProfile();
   const switchMutation = useSwitchActiveMode();
   const queryClient = useQueryClient();
   const handleSwitchMode = async (m: UserModeProfile) => {
@@ -331,31 +350,37 @@ export default function TimelineScreen() {
     }
   };
 
-  const accent = useMemo(() => getModeAccent(activeMode?.kind ?? null), [activeMode?.kind]);
+  const accent = useMemo(
+    () => getModeAccent(activeMode?.kind ?? null),
+    [activeMode?.kind],
+  );
 
-  const headerAvatarUrl = useActiveAccountAvatarUrl();
+  const headerAvatarUrl = resolveStorageUrl(profile?.avatarUrl);
 
-  const activeAccountName = useMemo(() => {
-    const a = activeOutwardAccount;
-    if (!a) return "Account";
-    return (
-      a.title?.trim() ||
-      a.displayName?.trim() ||
-      a.companyName?.trim() ||
-      ((MODE_LABELS as Record<string, string>)[a.kind] ?? "Account")
-    );
-  }, [activeOutwardAccount]);
+  const headerMode = modeForAccount(activeOutwardAccount, modes, activeMode);
+  const entities = useQuery({ queryKey: ["/api/entities/mine", activeOutwardAccount?.id], enabled: !!activeOutwardAccount?.id,
+    queryFn: () => customFetch<{ entities: ProfileEntity[] }>("/api/entities/mine") });
+  const { entityName: activeAccountName, roleLabel: headerRoleLabel } = commandCenterIdentity(activeOutwardAccount, headerMode, entities.data?.entities ?? []);
 
-  const feedQuery = useGetFeed();
+  const feedQuery = useQuery({ queryKey: ["/api/logs/feed", "personal", profile?.clerkId, activeOutwardAccount?.id, headerMode?.id], enabled: !!profile,
+    queryFn: () => customFetch<GetFeedQueryResult>("/api/logs/feed?scope=personal") });
   const peopleQuery = useGetMyRelationships();
   const logs = feedQuery.data?.logs ?? [];
+  const points = useMemo(
+    () => logs.reduce((total, log) => total + (log.score ?? 0), 0),
+    [logs],
+  );
   const peopleData = peopleQuery.data;
 
   const allPeople = useMemo<RelationshipPerson[]>(() => {
     if (!peopleData) return [];
     const seen = new Set<number>();
     const out: RelationshipPerson[] = [];
-    for (const p of [...peopleData.core, ...peopleData.clients, ...peopleData.collaborators]) {
+    for (const p of [
+      ...peopleData.core,
+      ...peopleData.clients,
+      ...peopleData.collaborators,
+    ]) {
       if (seen.has(p.id)) continue;
       seen.add(p.id);
       out.push(p);
@@ -363,8 +388,7 @@ export default function TimelineScreen() {
     return out;
   }, [peopleData]);
 
-  const refreshing =
-    feedQuery.isRefetching || peopleQuery.isRefetching;
+  const refreshing = feedQuery.isRefetching || peopleQuery.isRefetching;
   const onRefresh = () => {
     feedQuery.refetch();
     peopleQuery.refetch();
@@ -387,7 +411,9 @@ export default function TimelineScreen() {
     HEADER_AREA +
     (allPeople.length > 0 ? PEOPLE_STRIP_BLOCK : 0) +
     TIMELINE_PAD_TOP;
-  const [measuredTimelineTop, setMeasuredTimelineTop] = useState<number | null>(null);
+  const [measuredTimelineTop, setMeasuredTimelineTop] = useState<number | null>(
+    null,
+  );
   const handleTimelineWrapLayout = useCallback((e: LayoutChangeEvent) => {
     // layout.y is relative to the ScrollView's content container, which
     // sits at window y = 0 (the screen container is flex:1 with no
@@ -399,19 +425,22 @@ export default function TimelineScreen() {
       setMeasuredTimelineTop((prev) => (prev === y ? prev : y));
     }
   }, []);
-  const rightStackTop = measuredTimelineTop ?? estimatedTimelineTop;
+  const timelineStartTop = measuredTimelineTop ?? estimatedTimelineTop;
+  const rightStackTop = timelineStartTop + 52;
 
   const goPeople = () => router.push("/(tabs)/clients" as never);
   const goProperty = (id: number) => router.push(`/property/${id}` as never);
+  const [rewardsVisible, setRewardsVisible] = useState(false);
   const goProfile = () => router.push("/(tabs)/profile" as never);
-  const goNotifications = () => router.push("/(tabs)/notifications" as never);
 
   // Active side panel state — replaces the previous router.push for the
   // five right-edge tabs so they open as a dimmed overlay instead of a
   // new screen. Tapping the same tab again toggles it closed; tapping a
   // different tab swaps content without flicker.
-  const [activeSidePanel, setActiveSidePanel] = useState<HomeSidePanelKey | null>(null);
-  const [conciergeOpen, setConciergeOpen] = useState(false);
+  const [activeSidePanel, setActiveSidePanel] =
+    useState<HomeSidePanelKey | null>(null);
+  const [timelineSearchOpen, setTimelineSearchOpen] = useState(false);
+  const [timelineQuery, setTimelineQuery] = useState("");
   const [tabOriginYs, setTabOriginYs] = useState<Record<string, number>>({});
   const handleTabLayout = useCallback((key: string, y: number) => {
     setTabOriginYs((prev) => (prev[key] === y ? prev : { ...prev, [key]: y }));
@@ -421,32 +450,49 @@ export default function TimelineScreen() {
   }, []);
   const closeSidePanel = useCallback(() => setActiveSidePanel(null), []);
 
-  // Reminders panel exposes its "+" handler to the overlay header via a
-  // ref-style setter so the overlay header can render an Add button that
-  // opens the same modal the standalone screen would have shown.
-  const remindersAddRef = useRef<(() => void) | null>(null);
-  const setRemindersAdd = useCallback((open: () => void) => {
-    remindersAddRef.current = open;
-  }, []);
+  const openDailyGrind = useCallback(() => setActiveSidePanel("reminders"), []);
+  useDailyGrindOpening(openDailyGrind);
 
   const feedLoaded = !feedQuery.isLoading;
   const timelineEvents = useMemo(() => logs.map(workLogToEvent), [logs]);
+  const visibleTimelineEvents = useMemo(() => {
+    const needle = timelineQuery.trim().toLocaleLowerCase();
+    if (!needle) return timelineEvents;
+    return timelineEvents.filter((event) =>
+      [
+        event.title,
+        event.note,
+        event.propertyName,
+        event.authorName,
+        event.kind,
+      ]
+        .filter(Boolean)
+        .some((value) => String(value).toLocaleLowerCase().includes(needle)),
+    );
+  }, [timelineEvents, timelineQuery]);
 
+  const [tasksCanAdd, setTasksCanAdd] = useState(false);
+  const tasksAddRef = useRef<(() => void) | null>(null);
+  const setTasksAdd = useCallback((fn: (() => void) | null) => { tasksAddRef.current = fn; setTasksCanAdd(!!fn); }, []);
   const SIDE_TABS: SideTabSpec[] = useMemo(
     () => [
-      { key: "logs", label: "Logs", icon: "file-text", onPress: () => toggleSidePanel("logs") },
-      { key: "jobs", label: "Jobs", icon: "briefcase", onPress: () => toggleSidePanel("jobs") },
+      {
+        key: "reminders",
+        label: "Daily Grind",
+        icon: "sunrise",
+        onPress: () => toggleSidePanel("reminders"),
+      },
+      {
+        key: "jobs",
+        label: "Tasks / Lists",
+        icon: "check-square",
+        onPress: () => toggleSidePanel("jobs"),
+      },
       {
         key: "receipts",
         label: "Receipts",
         icon: "credit-card",
         onPress: () => toggleSidePanel("receipts"),
-      },
-      {
-        key: "reminders",
-        label: "Reminders",
-        icon: "bell",
-        onPress: () => toggleSidePanel("reminders"),
       },
       {
         key: "properties",
@@ -460,9 +506,9 @@ export default function TimelineScreen() {
 
   const PANEL_TITLES: Record<HomeSidePanelKey, string> = {
     logs: "Logs",
-    jobs: "My Jobs",
+    jobs: "Tasks / Lists",
     receipts: "Receipts",
-    reminders: "Reminders",
+    reminders: "Daily Grind",
     properties: "Properties",
   };
 
@@ -480,13 +526,20 @@ export default function TimelineScreen() {
         contentContainerStyle={{ paddingBottom: bottomPad }}
         keyboardShouldPersistTaps="handled"
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={accent.primary} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={accent.primary}
+          />
         }
       >
         <TimelineHeader
           avatarUrl={headerAvatarUrl}
           onOpenProfile={goProfile}
+          onOpenRewards={() => setRewardsVisible(true)}
           accountName={activeAccountName}
+          roleLabel={headerRoleLabel}
+          points={points}
         />
 
         {/* The standalone OutwardAccountSwitcher card used to live here, but
@@ -499,7 +552,47 @@ export default function TimelineScreen() {
             adding contacts already lives on the Clients tab. */}
         {allPeople.length > 0 ? (
           <View style={{ paddingHorizontal: 14, marginTop: 12 }}>
-            <PeopleStrip people={allPeople} onOpen={goPeople} onAdd={goPeople} accent={accent} />
+            <PeopleStrip
+              people={allPeople}
+              onOpen={goPeople}
+              onAdd={goPeople}
+              accent={accent}
+            />
+          </View>
+        ) : null}
+
+        {timelineSearchOpen ? (
+          <View
+            style={[
+              styles.timelineSearchWrap,
+              { borderColor: colors.border, backgroundColor: colors.card },
+            ]}
+          >
+            <Feather name="search" size={18} color={colors.mutedForeground} />
+            <TextInput
+              value={timelineQuery}
+              onChangeText={setTimelineQuery}
+              placeholder="Search your Timeline…"
+              placeholderTextColor={colors.mutedForeground}
+              autoFocus
+              returnKeyType="search"
+              accessibilityLabel="Search your Timeline"
+              style={[styles.timelineSearchInput, { color: colors.foreground }]}
+            />
+            {timelineQuery ? (
+              <Pressable
+                onPress={() => setTimelineQuery("")}
+                accessibilityRole="button"
+                accessibilityLabel="Clear Timeline search"
+                hitSlop={10}
+              >
+                <Feather
+                  name="x-circle"
+                  size={18}
+                  color={colors.mutedForeground}
+                />
+              </Pressable>
+            ) : null}
           </View>
         ) : null}
 
@@ -513,10 +606,23 @@ export default function TimelineScreen() {
           onLayout={handleTimelineWrapLayout}
           collapsable={false}
         >
-          <ProjectTimeline events={timelineEvents} onOpenProperty={goProperty} />
+          <ProjectTimeline
+            events={visibleTimelineEvents}
+            onOpenProperty={goProperty}
+          />
         </View>
       </ScrollView>
-      <CameraIconButton topOffset={rightStackTop} color={colors.primary} />
+      <TimelineSearchButton
+        topOffset={timelineStartTop}
+        color={colors.primary}
+        open={timelineSearchOpen}
+        onPress={() => {
+          setTimelineSearchOpen((current) => {
+            if (current) setTimelineQuery("");
+            return !current;
+          });
+        }}
+      />
       <SideTabStack
         topOffset={rightStackTop}
         tabs={SIDE_TABS}
@@ -526,53 +632,23 @@ export default function TimelineScreen() {
       <HomeSidePanelOverlay
         panelKey={activeSidePanel}
         originY={overlayOriginY}
-        topOffset={rightStackTop}
+        topOffset={(activeSidePanel === "reminders" || activeSidePanel === "jobs") ? (Platform.OS === "web" ? 8 : insets.top + 4) : rightStackTop}
         title={activeSidePanel ? PANEL_TITLES[activeSidePanel] : ""}
         onClose={closeSidePanel}
-        headerRight={
-          activeSidePanel === "reminders" ? (
-            <Pressable
-              onPress={() => remindersAddRef.current?.()}
-              accessibilityLabel="Add reminder"
-              hitSlop={10}
-              style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1, padding: 4 })}
-            >
-              <Feather name="plus" size={22} color={colors.foreground} />
-            </Pressable>
-          ) : null
-        }
+        headerRight={activeSidePanel === "jobs" && tasksCanAdd ? <Pressable accessibilityRole="button" accessibilityLabel="Create task or list" onPress={() => tasksAddRef.current?.()} style={{padding: 8}}><Feather name="plus" size={22} color="#f1f2f4" /></Pressable> : undefined}
+
       >
         {activeSidePanel === "logs" ? <LogsScreen embedded /> : null}
-        {activeSidePanel === "jobs" ? <MyJobsScreen embedded /> : null}
-        {activeSidePanel === "receipts" ? <InvoicesScreen embedded /> : null}
+        {activeSidePanel === "jobs" ? <TasksListsSheet key={`${profile?.clerkId}:${activeOutwardAccount?.id}`} onRequestAdd={setTasksAdd} /> : null}
+        {activeSidePanel === "receipts" ? <ReceiptsPanel /> : null}
         {activeSidePanel === "reminders" ? (
-          <RemindersScreen embedded onRequestAdd={setRemindersAdd} />
+          <DailyGrind />
         ) : null}
-        {activeSidePanel === "properties" ? <PropertiesScreen embedded /> : null}
+        {activeSidePanel === "properties" ? (
+          <PropertiesScreen embedded />
+        ) : null}
       </HomeSidePanelOverlay>
-      {/* Floating concierge entry point. The 402 paywall is enforced
-          server-side: tapping while on the free tier triggers the
-          existing global paywall sheet via maybeShowPaywallFromError
-          inside the streaming helper. */}
-      <Pressable
-        onPress={() => setConciergeOpen(true)}
-        accessibilityRole="button"
-        accessibilityLabel="Open AI concierge"
-        style={({ pressed }) => [
-          styles.conciergeFab,
-          {
-            bottom: insets.bottom + 92,
-            backgroundColor: colors.primary,
-            opacity: pressed ? 0.85 : 1,
-          },
-        ]}
-      >
-        <Feather name="message-circle" size={22} color="#fff" />
-      </Pressable>
-      <ConciergeSheet
-        visible={conciergeOpen}
-        onClose={() => setConciergeOpen(false)}
-      />
+      {rewardsVisible ? <AnalyticsRewardsModal visible onClose={() => setRewardsVisible(false)} /> : null}
       <TimelineMotionDebugPanel />
     </View>
   );
@@ -580,43 +656,65 @@ export default function TimelineScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  conciergeFab: {
-    position: "absolute",
-    right: 18,
-    width: 54,
-    height: 54,
-    borderRadius: 27,
+  timelineSearchWrap: {
+    minHeight: 48,
+    marginHorizontal: 56,
+    marginTop: 8,
+    paddingHorizontal: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 24,
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.18,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 6,
+    gap: 10,
+  },
+  timelineSearchInput: {
+    flex: 1,
+    minHeight: 46,
+    fontSize: 16,
+    fontFamily: "Inter_400Regular",
   },
 
   homeHeader: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 6,
     paddingHorizontal: 12,
     paddingBottom: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
+  headerAccountGroup: { flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: 7 },
   headerAvatar: {
-    width: 36, height: 36, borderRadius: 18, borderWidth: 1, overflow: "hidden",
-    alignItems: "center", justifyContent: "center",
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1,
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
   },
   headerAvatarImg: { width: "100%", height: "100%" },
   headerCompany: {
-    fontSize: 15, fontFamily: "Inter_700Bold",
+    fontSize: 14,
+    fontFamily: "Inter_700Bold",
+    flexShrink: 1,
   },
+  headerIdentity: { flex: 1, minWidth: 0, justifyContent: "center", alignItems: "flex-start", gap: 2 },
+  headerRole: { fontSize: 12, lineHeight: 16, fontFamily: "Inter_500Medium" },
 
   peopleRow: { flexDirection: "row", alignItems: "center" },
   avatar: {
-    width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center", overflow: "hidden",
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
   },
-  addAvatar: { borderWidth: 1, borderStyle: "solid", backgroundColor: "transparent" },
+  addAvatar: {
+    borderWidth: 1,
+    borderStyle: "solid",
+    backgroundColor: "transparent",
+  },
   avatarImg: { width: "100%", height: "100%" },
   avatarText: { fontSize: 13, fontFamily: "Inter_700Bold" },
 
@@ -635,7 +733,7 @@ const styles = StyleSheet.create({
   sideTabStack: {
     position: "absolute",
     right: 0,
-    gap: 12,
+    gap: 16,
   },
 
   // Slim tapered bookmark silhouette — quiet/ambient so the tabs whisper
@@ -644,7 +742,7 @@ const styles = StyleSheet.create({
   // the RIGHT pull the edges inward toward the screen edge for a soft taper.
   sideTab: {
     width: 22,
-    height: 80,
+    height: 94,
     backgroundColor: SIDE_TAB_BG,
     borderTopLeftRadius: 14,
     borderBottomLeftRadius: 14,
@@ -659,14 +757,13 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
 
-  // Rotate the inner row 90° so icon + label read top-to-bottom along the
-  // tab's spine. Rotating the View (not each glyph) preserves kerning.
+  // Rotate the label row along the narrow tab; counter-rotate only the icon.
   sideTabInner: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
+    width: 90,
     transform: [{ rotate: "90deg" }],
-    width: 76,
     justifyContent: "center",
   },
   sideTabText: {
@@ -676,11 +773,8 @@ const styles = StyleSheet.create({
     color: SIDE_TAB_FG,
   },
 
-  // Lean camera-icon button at the top-LEFT of the Timeline screen.
-  // The host is absolutely positioned over the scroll content; the icon
-  // itself sits inside a small Pressable with no tile, no ghost shadow,
-  // and no shutter-dot — just the glyph. hitSlop on the Pressable keeps
-  // the tap target generous despite the lighter visual footprint.
+  // Timeline Search sits at the upper-left edge of the Timeline. The host is
+  // intentionally compact, while hitSlop preserves a 44pt+ target.
   cameraIconHost: {
     position: "absolute",
     left: 14,

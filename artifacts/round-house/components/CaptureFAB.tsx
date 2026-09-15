@@ -1,3 +1,7 @@
+import { useAuth } from "@/lib/auth";
+import { getTaskCaptureTarget, type CaptureTarget } from "@/lib/taskLists";
+import { useProfile } from "@/lib/profile";
+import { isViewerKind } from "@/lib/personal-profile";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -29,6 +33,7 @@ import {
 import { uploadAsset } from "@/lib/uploads";
 import { AttachmentList, type AttachmentItem } from "@/components/AttachmentList";
 import { DueDatePickerModal } from "@/components/DueDatePickerModal";
+import { ConciergeSheet } from "@/components/ConciergeSheet";
 
 let externalOpenLog: (() => void) | null = null;
 export function openCaptureLog() {
@@ -96,11 +101,17 @@ function isoFromDays(days: number | null): string | null {
 }
 
 export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = {}) {
+  const { activeOutwardAccount, activeMode, activeOutwardAccountId } = useProfile();
+  const { userId } = useAuth();
+  const [taskTarget, setTaskTarget] = useState<CaptureTarget | null>(null);
+  const readOnly = isViewerKind(activeOutwardAccount?.kind ?? activeMode?.kind);
+  const explainReadOnly = () => Alert.alert("Viewer account", "Viewer access is read-only. Switch to an account with contribution permission to capture work.");
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
 
   const [chooserOpen, setChooserOpen] = useState(false);
+  const [conciergeOpen, setConciergeOpen] = useState(false);
   const [mode, setMode] = useState<Mode | null>(null);
 
   const [note, setNote] = useState("");
@@ -130,18 +141,21 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
   // Expose a global "open log mode directly" hook for other screens.
   useEffect(() => {
     externalOpenLog = () => {
+      if (readOnly) { explainReadOnly(); return; }
       setChooserOpen(false);
-      setMode("log");
+      openMode("log");
     };
     externalOpenPhoto = () => {
       setChooserOpen(false);
       openMode("photo");
     };
     externalOpenPhotoForLog = (pid: number) => {
+      if (readOnly) { explainReadOnly(); return; }
       // Pre-assign the chosen log BEFORE switching modes so the
       // composer mounts with "WHERE IS THIS FOR?" already filled in
       // and the upload tile points at the right property.
       setChooserOpen(false);
+      setTaskTarget(null);
       setPropertyId(pid);
       Haptics.selectionAsync();
       setMode("photo");
@@ -161,9 +175,10 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
       if (externalOpenNote) externalOpenNote = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [readOnly, userId, activeOutwardAccountId]);
 
   function reset() {
+    setTaskTarget(null);
     setNote("");
     setPhotoUri(null);
     setAttachments([]);
@@ -206,8 +221,11 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
   }
 
   function openMode(next: Mode) {
+    if (readOnly) { explainReadOnly(); return; }
     setChooserOpen(false);
     Haptics.selectionAsync();
+    const target = getTaskCaptureTarget();
+    setTaskTarget(target?.userId === userId && target.accountId === activeOutwardAccountId ? target : null);
     setMode(next);
     if (next === "photo" && Platform.OS !== "web") {
       // Try opening the camera right away on native. We deliberately
@@ -263,6 +281,7 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
   }
 
   async function handleSubmit() {
+    if (readOnly) { explainReadOnly(); return; }
     const hasText = note.trim().length > 0;
     if (!hasText && !photoUri && attachments.length === 0) {
       Alert.alert("Empty entry", "Add a note, photo, or file to log.");
@@ -270,6 +289,14 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
     }
     setSubmitting(true);
     try {
+      if (taskTarget) {
+        if (taskTarget.userId !== userId || taskTarget.accountId !== activeOutwardAccountId) throw new Error("Switch back to the original account before saving.");
+        const captured = [...attachments];
+        if (photoUri) captured.push({ ...(await uploadAsset({ uri: photoUri })), kind: "image" });
+        await taskTarget.save(note.trim(), captured);
+        close();
+        return;
+      }
       let pid = propertyId;
       // Inline create property if user has none and entered a name.
       if (pid == null) {
@@ -348,13 +375,16 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
           <Pressable
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              setMode("log");
+              openMode("photo");
             }}
             onLongPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              setChooserOpen(true);
+              setConciergeOpen(true);
             }}
             delayLongPress={350}
+            accessibilityRole="button"
+            accessibilityLabel="Capture"
+            accessibilityHint={readOnly ? "Viewer access is read-only. Press and hold to open the assistant." : "Tap to open the camera. Press and hold to open the assistant."}
             style={({ pressed }) => [
               styles.fab,
               {
@@ -364,10 +394,16 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
               },
             ]}
           >
-            <Feather name="edit-3" size={18} color={colors.primaryForeground ?? "#fff"} />
+            <Feather name="camera" size={20} color={colors.primaryForeground ?? "#fff"} />
           </Pressable>
+          <Text pointerEvents="none" style={styles.assistantHint}>press & hold assistant</Text>
         </View>
       )}
+
+      <ConciergeSheet
+        visible={conciergeOpen}
+        onClose={() => setConciergeOpen(false)}
+      />
 
       {/* Quick action chooser */}
       <Modal visible={chooserOpen} transparent animationType="fade" onRequestClose={() => setChooserOpen(false)}>
@@ -440,6 +476,7 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
             keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
           >
             <ScrollView contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 32 }]}>
+              {taskTarget ? <Text style={[styles.label, { color: colors.foreground }]}>ATTACHING TO: {taskTarget.label}</Text> : <>
               {/* Property pill / picker */}
               <Text style={[styles.label, { color: colors.mutedForeground }]}>WHERE IS THIS FOR?</Text>
               {properties.length > 0 ? (
@@ -472,6 +509,7 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
                 </View>
               )}
 
+              </>}
               {/* Note */}
               <Text style={[styles.label, { color: colors.mutedForeground, marginTop: 20 }]}>
                 {mode === "note" ? "NOTE" : "WHAT HAPPENED"}
@@ -520,7 +558,7 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
               ) : null}
 
               {/* Assign + due date (owners/admins only, work-log only) */}
-              {canAssign && assignableMembers.length > 0 ? (
+              {!taskTarget && canAssign && assignableMembers.length > 0 ? (
                 <>
                   <Text style={[styles.label, { color: colors.mutedForeground, marginTop: 20 }]}>
                     ASSIGN TO
@@ -769,6 +807,7 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: "center",
   },
+  assistantHint: { position: "absolute", top: 72, width: 120, textAlign: "center", color: "#1677FF", fontSize: 10, lineHeight: 13, fontFamily: "Inter_500Medium" },
   fab: {
     width: 64,
     height: 64,

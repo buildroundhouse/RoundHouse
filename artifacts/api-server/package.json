@@ -12,6 +12,8 @@
     "purge:outward-accounts": "pnpm run build && node --enable-source-maps ./dist/scripts/purge-outward-accounts.mjs"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1131.0",
+    "@aws-sdk/s3-request-presigner": "^3.1131.0",
     "@google-cloud/storage": "^7.19.0",
     "@workspace/api-zod": "workspace:*",
     "@workspace/db": "workspace:*",

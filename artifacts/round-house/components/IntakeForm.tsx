@@ -90,9 +90,9 @@ export function IntakeForm({
     setTouched((t) => (t[key] ? t : { ...t, [key]: true }));
   }, []);
 
-  const hasPropertyAddress =
-    intake.kind === "home" &&
-    intake.fields.some((f) => f.key === "placeAddress");
+  const hasPropertyAddress = intake.fields.some(
+    (f) => f.key === "placeAddress",
+  );
   const addressError = hasPropertyAddress
     ? propertyAddressError(readPropertyAddress(data.propertyAddress))
     : null;

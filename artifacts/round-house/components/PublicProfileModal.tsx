@@ -1,3 +1,4 @@
+import { PERSONAL_FIELDS, readPersonalDetails } from "@/lib/personal-profile";
 import React, { useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -223,9 +224,10 @@ export function PublicProfileModal({
     (typeof intake.bannerUrl === "string" && intake.bannerUrl) ||
     (typeof intake.coverPhotoUrl === "string" && intake.coverPhotoUrl) ||
     null;
-  const bannerUri = counterpartOA?.bannerUrl
+  const legacyBannerUri = counterpartOA?.bannerUrl
     ? resolveStorageUrl(counterpartOA.bannerUrl, null)
     : resolveStorageUrl(ownerBannerPath, user?.updatedAt ?? null);
+  const bannerUri = typeof intake.profileBannerUrl === "string" ? resolveStorageUrl(intake.profileBannerUrl) : legacyBannerUri;
 
   // #671 — When the modal was opened from a row tied to a specific
   // operator skin (Game Room Admin, Facility Admin, …), surface the
@@ -355,6 +357,9 @@ export function PublicProfileModal({
           <View style={{ width: 38 }} />
         </View>
 
+        {counterpartOutwardAccountId ? <Pressable accessibilityRole="button" accessibilityLabel="View Client Portfolio" onPress={() => {
+          onClose(); router.push({ pathname: "/(tabs)/invoices", params: { clientAccountId: String(counterpartOutwardAccountId) } } as never);
+        }} style={{ minHeight: 48, paddingHorizontal: 20, justifyContent: "center" }}><Text style={{ color: colors.primary, fontWeight: "600" }}>View Client Portfolio</Text></Pressable> : null}
         {isFetching && !profile ? (
           <View style={styles.loading}>
             <ActivityIndicator color={colors.foreground} />
@@ -553,6 +558,12 @@ export function PublicProfileModal({
               </View>
               <Text style={[styles.name, { color: colors.foreground }]}>{user.name}</Text>
               <Text style={[styles.handle, { color: colors.mutedForeground }]}>@{user.username}</Text>
+              {intake.personalProfile ? <View style={{ width: "100%", padding: 16, gap: 14 }}>
+                {PERSONAL_FIELDS.map(({ key, label }) => {
+                  const field = readPersonalDetails(intake.personalProfile)[key];
+                  return field?.public && field.value ? <View key={key} style={{ gap: 5 }}><Text style={{ color: colors.foreground, fontWeight: "600" }}>{label}</Text><Text style={{ color: colors.foreground }}>{field.value}</Text></View> : null;
+                })}
+              </View> : null}
               {company ? (
                 <Text style={[styles.company, { color: colors.foreground }]}>{company}</Text>
               ) : null}

@@ -1,5 +1,8 @@
 # Round House — Workspace
 
+> **Current intake — September 14, 2026:** Follow [Sequential entity intake](docs/SEQUENTIAL_ENTITY_INTAKE.md) for onboarding. Use separate Property/Business, type, and relationship screens. Viewer replaces Collaborator in intake. This legacy file must not be used to restore role-first entry.
+
+
 ## Overview
 
 pnpm workspace monorepo using TypeScript. Multi-user mobile social platform for property work-logging with Clerk auth, role-based permissions, shared property timelines, direct messaging, and push notifications.

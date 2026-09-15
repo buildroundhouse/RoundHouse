@@ -1,6 +1,7 @@
 import { Redirect } from "expo-router";
 import { useAuth } from "@/lib/auth";
 import { useProfile } from "@/lib/profile";
+import { SetupRetry } from "@/components/SetupRetry";
 import { LoadingScreen } from "@/components/LoadingScreen";
 
 export default function Index() {
@@ -14,6 +15,8 @@ export default function Index() {
   if (!isSignedIn) {
     return <Redirect href="/(auth)/sign-in" />;
   }
+
+  if (status.kind === "error") return <SetupRetry onRetry={status.retry} />;
 
   if (status.kind === "needs-identity") {
     return <Redirect href="/(onboarding)/identity" />;

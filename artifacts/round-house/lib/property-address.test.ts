@@ -8,6 +8,7 @@ import {
   addressFromPlace,
   findPropertyAddresses,
   formatPropertyAddress,
+  formatPostalCodeInput,
 } from "./property-address.ts";
 
 const parts = {
@@ -38,6 +39,27 @@ test("a full street result fills city, state and ZIP", () => {
   assert.equal(a.state, "TX");
   assert.equal(a.status, "matched");
   assert.equal(propertyAddressError(a), null);
+});
+test("ZIP+4 is offered only when the matched address supplies its suffix", () => {
+  const a = addressFromPlace({ ...place, addressComponents: [...place.addressComponents,
+    { types: ["postal_code_suffix"], longText: "1234", shortText: "1234" }] })!;
+  assert.equal(a.zip, "78701");
+  assert.equal(a.zipPlus4, "78701-1234");
+  assert.equal(propertyAddressError(a), null);
+  assert.equal(propertyAddressError({ ...a, zip: a.zipPlus4! }), null);
+  assert.equal(addressFromPlace(place)!.zipPlus4, undefined);
+});
+test("pasted ZIP+4 is normalized with or without a hyphen", () => {
+  for (const zip of ["78701-1234", "787011234", "78701–1234"]) assert.equal(formatPostalCodeInput(zip), "78701-1234");
+  assert.equal(formatPostalCodeInput("78701"), "78701");
+});
+test("hosted lookup works without a Google key", async () => {
+  const expected = addressFromPlace(place)!;
+  const result = await findPropertyAddresses(expected, undefined, new AbortController().signal, async (a) => {
+    assert.equal(a.street, "123 Main Street");
+    return [expected];
+  });
+  assert.deepEqual(result, [expected]);
 });
 test("never invents a ZIP from a city-only result", () => {
   assert.equal(

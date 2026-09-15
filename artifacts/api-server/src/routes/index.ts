@@ -1,5 +1,9 @@
 import { Router, type IRouter } from "express";
+import calendarRouter from "./calendar";
+import financialDocumentsRouter from "./financial-documents";
 import healthRouter from "./health";
+import addressLookupRouter from "./address-lookup";
+import entryProfileRouter from "./entry-profile";
 import usersRouter from "./users";
 import propertiesRouter from "./properties";
 import propertyKnowledgeRouter from "./property-knowledge";
@@ -20,16 +24,25 @@ import teamSeatsRouter from "./team-seats";
 import adminRouter from "./admin";
 import remindersRouter from "./reminders";
 import questionsRouter from "./questions";
+import resolutionsRouter from "./resolutions";
 import companyNoticesRouter from "./companyNotices";
 import gameRoomRouter from "./game-room";
 import presetChipsRouter from "./preset-chips";
 import adminDemoProfilesRouter from "./admin-demo-profiles";
+import entitySetupRouter from "./entity-setup";
 import entitiesRouter from "./entities";
 import conciergeRouter from "./concierge";
 
+import taskListsRouter from "./task-lists";
+
 const router: IRouter = Router();
+router.use(taskListsRouter);
 
 router.use(healthRouter);
+router.use(financialDocumentsRouter);
+router.use(calendarRouter);
+router.use(addressLookupRouter);
+router.use(entryProfileRouter);
 router.use(usersRouter);
 router.use(propertiesRouter);
 router.use(propertyKnowledgeRouter);
@@ -50,10 +63,12 @@ router.use(teamSeatsRouter);
 router.use(adminRouter);
 router.use(remindersRouter);
 router.use(questionsRouter);
+router.use(resolutionsRouter);
 router.use(companyNoticesRouter);
 router.use(gameRoomRouter);
 router.use(presetChipsRouter);
 router.use(adminDemoProfilesRouter);
+router.use(entitySetupRouter);
 router.use(entitiesRouter);
 router.use(conciergeRouter);
 

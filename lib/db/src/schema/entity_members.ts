@@ -39,6 +39,11 @@ export type EntityMemberPermissions = {
   seeBilling?: boolean;
   createOnProperties?: boolean;
   manageTeam?: boolean;
+  /** Entity creation/control metadata. Stored in JSONB, so this needs no DB migration. */
+  creationCapacity?: "owner" | "temporary_admin";
+  temporaryAdmin?: boolean;
+  unclaimed?: boolean;
+  manageParticipants?: boolean;
   /**
    * Per-property classification (worker / outside_service_provider /
    * collaborator) carried on property memberships. Lets the

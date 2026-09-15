@@ -3,18 +3,18 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export interface Tier {
-  key: "bronze" | "silver" | "gold" | "platinum";
+  key: "wood" | "iron";
   label: string;
   fg: string;
   bg: string;
   min: number;
 }
 
+// Current Reward Center direction. Additional status names and thresholds remain
+// configurable; legacy Bronze / Silver / Gold / Platinum must not surface here.
 const TIERS: Tier[] = [
-  { key: "bronze", label: "Bronze", fg: "#8B5A2B", bg: "#F2E6D8", min: 0 },
-  { key: "silver", label: "Silver", fg: "#5A6470", bg: "#E5E9EE", min: 100 },
-  { key: "gold", label: "Gold", fg: "#9A7B00", bg: "#FFF3C4", min: 500 },
-  { key: "platinum", label: "Platinum", fg: "#3B4856", bg: "#E2E8EE", min: 1500 },
+  { key: "wood", label: "Wood", fg: "#6F4E37", bg: "#EFE2D2", min: 0 },
+  { key: "iron", label: "Iron", fg: "#4E5964", bg: "#E4E8EB", min: 1500 },
 ];
 
 export function tierForScore(score: number): Tier {
@@ -42,36 +42,17 @@ export function BadgeTier({ score, size = "sm", onPress }: Props) {
   const fontSize = size === "md" ? 13 : 12;
 
   const content = (
-    <View
-      style={[
-        styles.pill,
-        {
-          backgroundColor: tier.bg,
-          paddingVertical: padV,
-          paddingHorizontal: padH,
-        },
-      ]}
-    >
+    <View style={[styles.pill, { backgroundColor: tier.bg, paddingVertical: padV, paddingHorizontal: padH }]}>
       <Feather name="award" size={dim} color={tier.fg} />
       <Text style={[styles.text, { color: tier.fg, fontSize }]}>{tier.label}</Text>
     </View>
   );
 
   if (!onPress) return content;
-  return (
-    <Pressable onPress={onPress} hitSlop={8}>
-      {content}
-    </Pressable>
-  );
+  return <Pressable onPress={onPress} hitSlop={8}>{content}</Pressable>;
 }
 
 const styles = StyleSheet.create({
-  pill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    borderRadius: 999,
-    alignSelf: "flex-start",
-  },
+  pill: { flexDirection: "row", alignItems: "center", gap: 4, borderRadius: 999, alignSelf: "flex-start" },
   text: { fontFamily: "Inter_700Bold" },
 });

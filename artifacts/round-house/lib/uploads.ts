@@ -15,6 +15,7 @@ export function resolveStorageUrl(
   bust?: string | number | Date | null,
 ): string | null {
   if (!path) return null;
+  if (path.startsWith("data:image/")) return path;
   const isAbsolute = /^https?:\/\//.test(path);
   const normalized = isAbsolute ? path : path.startsWith("/") ? path : `/${path}`;
   const apiPath = isAbsolute
@@ -70,8 +71,9 @@ export async function uploadAsset(input: {
   size?: number | null;
 }): Promise<UploadedAsset> {
   const blob = await readFileAsBlob(input.uri);
-  const size = input.size ?? blob.size ?? 0;
+  const size = blob.size;
   if (!size) throw new Error("Cannot upload empty file");
+  if (size > 25 * 1024 * 1024) throw new Error("Please choose a file smaller than 25 MB");
   const name = input.name || input.uri.split("/").pop() || "upload";
   const contentType = guessContentType(name, input.contentType ?? blob.type ?? undefined);
 

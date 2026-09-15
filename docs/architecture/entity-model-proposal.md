@@ -1,5 +1,8 @@
 # Entity Model — Architecture Proposal
 
+> **Intake update — September 14, 2026:** The approved intake sequence is documented in [Sequential entity intake](../SEQUENTIAL_ENTITY_INTAKE.md). Its screen order and Viewer terminology supersede any conflicting intake interpretation of this older proposal. Other proposal sections retain their stated status.
+
+
 > Status: **Proposal for review.** No code changes have been made.
 > Audience: the project owner. Read top-to-bottom, then react.
 > The proposal is forward-looking. It does not catalogue or judge any in-flight task; the user is clearing those separately.
@@ -688,11 +691,20 @@ WHERE asset_owner_outward_account_id = :myAvatarId
 
 ### What revoke-access does (and doesn't)
 
+The September 14, 2026 [Unaffiliated Viewer lifecycle](../UNAFFILIATED_VIEWER_LOGIC.md)
+governs departure for every role, including owners who sell a home or business
+and teammates whose employment ends. Once no approved affiliation remains, retain
+the same personal account as **Unaffiliated / Viewer** and preserve its own work
+history. This includes work performed through a former shared company account;
+the asset-owner query below alone is not sufficient for that case. Historical
+attribution must support personal history without restoring company access.
+
+
 If the homeowner removes the trade pro from their property:
 - The trade pro's `entity_members` row on that property entity flips to `status='removed'`.
 - The trade pro **loses read access** to the property entity going forward. Their queries `WHERE entity_id = :propertyId` start returning nothing.
 - The trade pro's portfolio query `WHERE asset_owner_outward_account_id = :myAvatarId` **still returns those rows.** The data isn't deleted; the read scope just changes.
-- The photo no longer appears in the property timeline for the property's controller either (it disappears for nobody — but only the avatar that owns the asset can still see it from their portfolio query).
+- The original photo remains in the property history for authorized participants. Removal ends the former participant's Entity access without deleting the original record or their retained personal history.
 
 This is the "creator should not lose their own portfolio history" rule, expressed as two independent read scopes on the same row.
 

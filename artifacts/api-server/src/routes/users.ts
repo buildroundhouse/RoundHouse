@@ -1,3 +1,4 @@
+import { protectPersonalProfile, validatePersonalProfile } from "../lib/personalProfilePrivacy";
 import { Router, type IRouter } from "express";
 import { eq, and, ne, or, ilike, sql, inArray, isNull } from "drizzle-orm";
 import {
@@ -236,10 +237,10 @@ router.get("/users/me", requireAuth, async (req, res): Promise<void> => {
     [user] = await db.select(selfUserColumns).from(usersTable).where(eq(usersTable.clerkId, userId));
   }
 
-  // #572: every signed-in user must own a permanent
+  // #572: every identity-complete user must own a permanent
   // Collaborator / Friend outward account. Backfill it on /users/me
-  // (idempotent) so legacy users self-heal on next login and brand-new
-  // users get one before the client renders the switcher.
+  // (idempotent) so legacy users self-heal on next login. The helper
+  // intentionally does nothing during original identity intake.
   await ensureCollabBaselineOutwardAccount(userId);
 
   const intake = await loadActiveModeIntake(userId, user.lastActiveModeId ?? null);
@@ -1201,10 +1202,9 @@ router.put("/users/me/identity", requireAuth, async (req, res): Promise<void> =>
 
 router.get("/users/me/modes", requireAuth, async (req, res): Promise<void> => {
   const { userId } = req as AuthRequest;
-  // #572: every user must always have the permanent Collaborator /
-  // Friend mode. Backfill before reading so the client never observes
-  // an empty modes list (which would route the user back through the
-  // mode picker on every fresh device).
+  // #572: every identity-complete user must have the permanent
+  // Collaborator / Friend mode. The helper intentionally leaves an
+  // identity-incomplete account empty so it returns to original intake.
   await ensureCollabBaselineMode(userId);
   const modes = await db
     .select()
@@ -1270,6 +1270,17 @@ router.put("/users/me/modes/:modeId", requireAuth, async (req, res): Promise<voi
   if (!existing) {
     res.status(404).json({ error: "Mode not found" });
     return;
+  }
+  if ("personalProfile" in incoming) {
+    const error = validatePersonalProfile(incoming.personalProfile);
+    if (error) { res.status(400).json({ error }); return; }
+  }
+  if ("profileBannerUrl" in incoming) {
+    const banner = incoming.profileBannerUrl;
+    if (typeof banner !== "string" || !banner.startsWith("/objects/")) {
+      res.status(400).json({ error: "Choose an uploaded profile banner." }); return;
+    }
+    await assertCallerOwnsUploads(userId, [banner]);
   }
   // Merge incoming on top of existing so partial updates (e.g. just changing the
   // banner image) don't drop other required intake fields. If the caller wants
@@ -1652,13 +1663,18 @@ router.get("/users/:userId", requireAuth, async (req, res): Promise<void> => {
     }
   }
 
+  const personal = protectPersonalProfile(intakeSnapshot, isSelf, teamSeatRedactsContacts);
+  Object.assign(sanitized, personal.userOverrides);
   res.json({
     user: sanitized,
     activeModeKind,
-    intakeSnapshot,
+    intakeSnapshot: personal.intake,
     connection,
     myReverseConnection,
-    counterpartOutwardAccount,
+    // Keep the legacy biography copy consistent with personal visibility.
+    counterpartOutwardAccount: !isSelf && intakeSnapshot.personalProfile && counterpartOutwardAccount
+      ? { ...counterpartOutwardAccount, bio: sanitized.bio }
+      : counterpartOutwardAccount,
     isSelf,
     serviceStoryCounts,
   });

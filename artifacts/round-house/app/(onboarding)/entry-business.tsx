@@ -1,44 +1,490 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Feather } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import { useAuth } from "@/lib/auth";
-import { BUSINESS_TYPES, businessProfileReady, emptyEntryBusinessProfile, loadEntryBusinessProfile, saveEntryBusinessProfile, tradeVisualFor, type EntryBusinessProfile } from "@/lib/entry-business-profile";
+import {
+  businessProfileReady,
+  emptyEntryBusinessProfile,
+  loadEntryBusinessProfile,
+  saveEntryBusinessProfile,
+  tradeVisualFor,
+  type EntryBusinessProfile,
+} from "@/lib/entry-business-profile";
+import { useActivateMode } from "@workspace/api-client-react";
+import { readEntrySelection, type EntryParams } from "@/lib/entry-intake";
+import { saveEntryDraft } from "@/lib/entry-draft";
 import { entryRequiredColor, entryTokens as t } from "@/lib/entry-tokens";
 
 export default function EntryBusinessScreen() {
-  const colors=useColors(), insets=useSafeAreaInsets(), router=useRouter(); const {userId}=useAuth();
-  const {name}=useLocalSearchParams<{name?:string}>(); const initialName=typeof name==="string"?name:"";
-  const [form,setForm]=useState<EntryBusinessProfile>(()=>emptyEntryBusinessProfile(initialName)); const [showTypes,setShowTypes]=useState(false); const [submitted,setSubmitted]=useState(false); const [saving,setSaving]=useState(false); const [error,setError]=useState("");
-  const set=(key:keyof EntryBusinessProfile)=>(value:string)=>{setForm(c=>({...c,[key]:value}));setSubmitted(false);setError("")};
-  useEffect(()=>{if(!userId)return;void loadEntryBusinessProfile(userId).then(saved=>{if(saved)setForm({...saved,businessName:saved.businessName||initialName})})},[userId,initialName]);
-  const missing=useMemo(()=>{const m:string[]=[];if(!form.businessName.trim())m.push("Business name");if(!form.phone.trim())m.push("Phone number");if(!/^\d{5}$/.test(form.zip.trim()))m.push("ZIP Code");return m},[form]);
-  const visual=tradeVisualFor(form.businessType);
+  const colors = useColors(),
+    insets = useSafeAreaInsets(),
+    router = useRouter();
+  const { userId } = useAuth();
+  const params = useLocalSearchParams<EntryParams>();
+  const selection = readEntrySelection(params);
+  const initialName = "";
+  const activate = useActivateMode();
+  const createdMode = useRef<number | null>(null);
+  const [form, setForm] = useState<EntryBusinessProfile>(() => ({
+    ...emptyEntryBusinessProfile(initialName),
+    businessType: selection?.businessType ?? "",
+  }));
+  const [submitted, setSubmitted] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const set = (key: keyof EntryBusinessProfile) => (value: string) => {
+    setForm((c) => ({ ...c, [key]: value }));
+    setSubmitted(false);
+    setError("");
+  };
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+    void loadEntryBusinessProfile(userId)
+      .then((saved) => {
+        if (cancelled) return;
+        if (saved)
+          setForm({
+            ...saved,
+            businessName: saved.businessName || initialName,
+            businessType: selection?.businessType ?? saved.businessType,
+          });
+      })
+      .catch(() => {
+        /* A missing local draft must not block a new profile. */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, initialName, selection?.businessType]);
+  const missing = useMemo(() => {
+    const m: string[] = [];
+    if (!form.businessName.trim()) m.push("Business name");
+    if (!form.phone.trim()) m.push("Phone number");
+    if (!/^\d{5}$/.test(form.zip.trim())) m.push("ZIP Code");
+    return m;
+  }, [form]);
+  const visual = tradeVisualFor(form.businessType);
 
-  const pickImage=async (field:"logoUri"|"photoUri",square:boolean)=>{setError("");if(Platform.OS!=="web"){const p=await ImagePicker.requestMediaLibraryPermissionsAsync();if(!p.granted){setError("Photo permission is required.");return}}const r=await ImagePicker.launchImageLibraryAsync({mediaTypes:ImagePicker.MediaTypeOptions.Images,allowsEditing:true,aspect:square?[1,1]:[16,9],quality:.85});if(!r.canceled&&r.assets?.[0]?.uri)set(field)(r.assets[0].uri)};
-  const submit=async()=>{setSubmitted(true);if(!businessProfileReady(form))return;if(!userId){setError("Your account session is not ready yet.");return}setSaving(true);try{await saveEntryBusinessProfile(userId,form)}catch{setError("Couldn't save this business yet. Please try again.")}finally{setSaving(false)}};
+  const pickImage = async (field: "logoUri" | "photoUri", square: boolean) => {
+    setError("");
+    if (Platform.OS !== "web") {
+      const p = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!p.granted) {
+        setError("Photo permission is required.");
+        return;
+      }
+    }
+    const r = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: square ? [1, 1] : [16, 9],
+      quality: 0.85,
+    });
+    if (!r.canceled && r.assets?.[0]?.uri) set(field)(r.assets[0].uri);
+  };
+  const submit = async () => {
+    if (saving) return;
+    setSubmitted(true);
+    if (!businessProfileReady(form)) return;
+    if (!userId) {
+      setError("Your account session is not ready yet.");
+      return;
+    }
+    setSaving(true);
+    try {
+      await saveEntryBusinessProfile(userId, form);
+      if (!selection)
+        throw new Error("Choose your business type and relationship first.");
+      if (createdMode.current === null)
+        createdMode.current = (
+          await activate.mutateAsync({ data: { kind: "trade_pro" } })
+        ).id;
+      await saveEntryDraft(userId, createdMode.current, {
+        selection,
+        data: {
+          companyName: form.businessName,
+          businessPhone: form.phone,
+          primaryZip: form.zip,
+          businessAddress: form.streetAddress,
+          streetAddress: form.streetAddress,
+          website: form.website,
+          instagram: form.instagram,
+          businessType: form.businessType,
+          specialties: form.specialties,
+        },
+      });
+      router.push({
+        pathname: "/(onboarding)/intake",
+        params: { modeId: String(createdMode.current), kind: "trade_pro" },
+      });
+    } catch {
+      setError("Couldn't save this business yet. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
-  return <KeyboardAvoidingView behavior={Platform.OS==="ios"?"padding":undefined} style={[styles.root,{backgroundColor:colors.background}]}><ScrollView contentContainerStyle={[styles.scroll,{paddingTop:insets.top+t.md,paddingBottom:insets.bottom+t.xxl}]} keyboardShouldPersistTaps="handled">
-    <Pressable onPress={()=>router.back()} style={styles.back}><Feather name="chevron-left" size={22} color={colors.foreground}/><Text style={{color:colors.foreground}}>Back</Text></Pressable>
-    <Text style={[styles.title,{color:colors.foreground}]}>Add business</Text><Text style={[styles.intro,{color:colors.mutedForeground}]}>Start the permanent business profile. Only business name, phone number, and ZIP Code are required.</Text>
+  if (!selection || selection.entity !== "business")
+    return <Redirect href="/(onboarding)/entry" />;
+  if (selection.relationship !== "owner")
+    return (
+      <Redirect
+        href={{
+          pathname: "/(onboarding)/entry-access",
+          params: { ...selection },
+        }}
+      />
+    );
+  return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      style={[styles.root, { backgroundColor: colors.background }]}
+    >
+      <ScrollView
+        contentContainerStyle={[
+          styles.scroll,
+          {
+            paddingTop: insets.top + t.spacing.md,
+            paddingBottom: insets.bottom + t.spacing.xxl,
+          },
+        ]}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Pressable onPress={() => router.back()} style={styles.back}>
+          <Feather name="chevron-left" size={22} color={colors.foreground} />
+          <Text style={{ color: colors.foreground }}>Back</Text>
+        </Pressable>
+        <Text style={[styles.title, { color: colors.foreground }]}>
+          Add business
+        </Text>
+        <Text style={[styles.intro, { color: colors.mutedForeground }]}>
+          Start the permanent business profile. Only business name, phone
+          number, and ZIP Code are required.
+        </Text>
 
-    <View style={styles.mediaRow}>
-      <Pressable onPress={()=>pickImage("logoUri",true)} style={[styles.logoBox,{backgroundColor:colors.card,borderColor:colors.border}]}>{form.logoUri?<Image source={{uri:form.logoUri}} style={styles.fillImage}/>:<><Feather name="image" size={25} color={colors.primary}/><Text style={[styles.mediaLabel,{color:colors.foreground}]}>Add logo</Text></>}</Pressable>
-      <Pressable onPress={()=>pickImage("photoUri",false)} style={[styles.coverBox,{backgroundColor:colors.card,borderColor:colors.border}]}>{form.photoUri?<Image source={{uri:form.photoUri}} style={styles.fillImage}/>:<View style={styles.fallback}><Feather name={visual.icon} size={34} color={colors.primary}/><Text style={[styles.fallbackTitle,{color:colors.foreground}]}>{visual.label}</Text><Text style={[styles.fallbackText,{color:colors.mutedForeground}]}>Trade photo placeholder</Text><Text style={[styles.changeText,{color:colors.primary}]}>Choose photo</Text></View>}</Pressable>
-    </View>
-    <Text style={[styles.mediaHelp,{color:colors.mutedForeground}]}>Logo is optional. If no business photo is chosen, Roundhouse uses the trade visual selected from Business Type.</Text>
+        <View style={styles.mediaRow}>
+          <Pressable
+            onPress={() => pickImage("logoUri", true)}
+            style={[
+              styles.logoBox,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
+            {form.logoUri ? (
+              <Image source={{ uri: form.logoUri }} style={styles.fillImage} />
+            ) : (
+              <>
+                <Feather name="image" size={25} color={colors.primary} />
+                <Text style={[styles.mediaLabel, { color: colors.foreground }]}>
+                  Add logo
+                </Text>
+              </>
+            )}
+          </Pressable>
+          <Pressable
+            onPress={() => pickImage("photoUri", false)}
+            style={[
+              styles.coverBox,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
+            {form.photoUri ? (
+              <Image source={{ uri: form.photoUri }} style={styles.fillImage} />
+            ) : (
+              <View style={styles.fallback}>
+                <Feather name={visual.icon} size={34} color={colors.primary} />
+                <Text
+                  style={[styles.fallbackTitle, { color: colors.foreground }]}
+                >
+                  {visual.label}
+                </Text>
+                <Text
+                  style={[
+                    styles.fallbackText,
+                    { color: colors.mutedForeground },
+                  ]}
+                >
+                  Trade photo placeholder
+                </Text>
+                <Text style={[styles.changeText, { color: colors.primary }]}>
+                  Choose photo
+                </Text>
+              </View>
+            )}
+          </Pressable>
+        </View>
+        <Text style={[styles.mediaHelp, { color: colors.mutedForeground }]}>
+          Logo is optional. If no business photo is chosen, Roundhouse uses the
+          trade visual selected from Business Type.
+        </Text>
 
-    <Field label="Business name" required value={form.businessName} onChange={set("businessName")} placeholder="DMT DESIGN BUILD" colors={colors} error={submitted&&!form.businessName.trim()}/>
-    <View style={styles.field}><Text style={[styles.label,{color:colors.foreground}]}>Business type</Text><TextInput value={form.businessType} onChangeText={set("businessType")} placeholder="Handyman, contractor, designer..." placeholderTextColor={colors.mutedForeground} style={[styles.input,{backgroundColor:colors.card,borderColor:colors.border,color:colors.foreground}]} autoCapitalize="words"/><Pressable onPress={()=>setShowTypes(v=>!v)} style={styles.typeToggle}><Text style={[styles.typeToggleText,{color:colors.primary}]}>{showTypes?"Hide common types":"Choose from common types"}</Text><Feather name={showTypes?"chevron-up":"chevron-down"} size={17} color={colors.primary}/></Pressable>{showTypes?<View style={styles.chips}>{BUSINESS_TYPES.map(type=><Pressable key={type} onPress={()=>{set("businessType")(type);setShowTypes(false)}} style={[styles.chip,{backgroundColor:form.businessType===type?colors.primary:colors.card,borderColor:form.businessType===type?colors.primary:colors.border}]}><Text style={[styles.chipText,{color:form.businessType===type?colors.primaryForeground:colors.foreground}]}>{type}</Text></Pressable>)}</View>:null}</View>
-    <Field label="Phone number" required value={form.phone} onChange={set("phone")} placeholder="(512) 555-0123" colors={colors} phone error={submitted&&!form.phone.trim()}/><Field label="ZIP Code" required value={form.zip} onChange={(v:string)=>set("zip")(v.replace(/[^\d]/g,"").slice(0,5))} placeholder="78701" colors={colors} numeric error={submitted&&!/^\d{5}$/.test(form.zip.trim())}/>
-    <Text style={[styles.sectionTitle,{color:colors.foreground}]}>Business details</Text><Text style={[styles.sectionIntro,{color:colors.mutedForeground}]}>Optional — complete these now or later.</Text>
-    <Field label="Street address" value={form.streetAddress} onChange={set("streetAddress")} placeholder="Street address" colors={colors}/><Field label="Website" value={form.website} onChange={set("website")} placeholder="www.example.com" colors={colors} lower/><Field label="Instagram" value={form.instagram} onChange={set("instagram")} placeholder="@businessname" colors={colors} lower/><Field label="Number of employees" value={form.employees} onChange={set("employees")} placeholder="5" colors={colors} numeric/><Field label="Years in business" value={form.yearsInBusiness} onChange={set("yearsInBusiness")} placeholder="12" colors={colors} numeric/>
-    <View style={styles.field}><Text style={[styles.label,{color:colors.foreground}]}>Specialties</Text><TextInput value={form.specialties} onChangeText={set("specialties")} placeholder="Custom millwork, remodeling, historic restoration..." placeholderTextColor={colors.mutedForeground} multiline textAlignVertical="top" style={[styles.input,styles.longInput,{backgroundColor:colors.card,borderColor:colors.border,color:colors.foreground}]}/></View>
-    {submitted&&missing.length?<Text style={styles.errorText}>Please complete: {missing.join(", ")}</Text>:null}{error?<Text style={styles.errorText}>{error}</Text>:null}<Pressable onPress={submit} disabled={saving} style={[styles.button,{backgroundColor:colors.primary},saving&&{opacity:.6}]}><Text style={[styles.buttonText,{color:colors.primaryForeground}]}>{saving?"Saving...":"Continue"}</Text></Pressable>
-  </ScrollView></KeyboardAvoidingView>;
+        <Field
+          label="Business name"
+          required
+          value={form.businessName}
+          onChange={set("businessName")}
+          placeholder="DMT DESIGN BUILD"
+          colors={colors}
+          error={submitted && !form.businessName.trim()}
+        />
+        <Text style={[styles.label, { color: colors.foreground }]}>
+          {selection?.businessType} · Owner
+        </Text>
+        <Field
+          label="Phone number"
+          required
+          value={form.phone}
+          onChange={set("phone")}
+          placeholder="(512) 555-0123"
+          colors={colors}
+          phone
+          error={submitted && !form.phone.trim()}
+        />
+        <Field
+          label="ZIP Code"
+          required
+          value={form.zip}
+          onChange={(v: string) =>
+            set("zip")(v.replace(/[^\d]/g, "").slice(0, 5))
+          }
+          placeholder="78701"
+          colors={colors}
+          numeric
+          error={submitted && !/^\d{5}$/.test(form.zip.trim())}
+        />
+        <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
+          Business details
+        </Text>
+        <Text style={[styles.sectionIntro, { color: colors.mutedForeground }]}>
+          Optional — complete these now or later.
+        </Text>
+        <Field
+          label="Street address"
+          value={form.streetAddress}
+          onChange={set("streetAddress")}
+          placeholder="Street address"
+          colors={colors}
+        />
+        <Field
+          label="Website"
+          value={form.website}
+          onChange={set("website")}
+          placeholder="www.example.com"
+          colors={colors}
+          lower
+        />
+        <Field
+          label="Instagram"
+          value={form.instagram}
+          onChange={set("instagram")}
+          placeholder="@businessname"
+          colors={colors}
+          lower
+        />
+        <Field
+          label="Number of employees"
+          value={form.employees}
+          onChange={set("employees")}
+          placeholder="5"
+          colors={colors}
+          numeric
+        />
+        <Field
+          label="Years in business"
+          value={form.yearsInBusiness}
+          onChange={set("yearsInBusiness")}
+          placeholder="12"
+          colors={colors}
+          numeric
+        />
+        <View style={styles.field}>
+          <Text style={[styles.label, { color: colors.foreground }]}>
+            Specialties
+          </Text>
+          <TextInput
+            value={form.specialties}
+            onChangeText={set("specialties")}
+            placeholder="Custom millwork, remodeling, historic restoration..."
+            placeholderTextColor={colors.mutedForeground}
+            multiline
+            textAlignVertical="top"
+            style={[
+              styles.input,
+              styles.longInput,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+                color: colors.foreground,
+              },
+            ]}
+          />
+        </View>
+        {submitted && missing.length ? (
+          <Text style={styles.errorText}>
+            Please complete: {missing.join(", ")}
+          </Text>
+        ) : null}
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        <Pressable
+          onPress={submit}
+          disabled={saving}
+          style={[
+            styles.button,
+            { backgroundColor: colors.primary },
+            saving && { opacity: 0.6 },
+          ]}
+        >
+          <Text
+            style={[styles.buttonText, { color: colors.primaryForeground }]}
+          >
+            {saving ? "Saving..." : "Continue"}
+          </Text>
+        </Pressable>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
 }
-function Field({label,required=false,value,onChange,placeholder,colors,phone=false,numeric=false,lower=false,error=false}:any){return <View style={styles.field}><View style={styles.labelRow}><Text style={[styles.label,{color:colors.foreground}]}>{label}</Text>{required?<Text style={styles.required}>Required</Text>:null}</View><TextInput value={value} onChangeText={onChange} placeholder={placeholder} placeholderTextColor={colors.mutedForeground} keyboardType={phone?"phone-pad":numeric?"number-pad":"default"} autoCapitalize={lower?"none":"words"} autoCorrect={false} style={[styles.input,{backgroundColor:colors.card,borderColor:error?entryRequiredColor:colors.border,color:colors.foreground}]}/>{error?<Text style={styles.errorText}>Required</Text>:null}</View>}
-const styles=StyleSheet.create({root:{flex:1},scroll:{paddingHorizontal:t.xl,gap:t.lg},back:{flexDirection:"row",alignItems:"center",gap:4,marginBottom:4},title:{fontSize:t.type.title,fontFamily:"Inter_700Bold"},intro:{fontSize:t.type.body,lineHeight:20,marginBottom:4},mediaRow:{gap:t.sm},logoBox:{width:t.media.logoSize,height:t.media.logoSize,borderWidth:1,borderRadius:t.radius.card,alignItems:"center",justifyContent:"center",gap:7,overflow:"hidden"},coverBox:{width:"100%",height:t.media.coverHeight,borderWidth:1,borderRadius:t.radius.card,overflow:"hidden"},fillImage:{width:"100%",height:"100%",resizeMode:"cover"},fallback:{flex:1,alignItems:"center",justifyContent:"center",gap:6,padding:t.md},fallbackTitle:{fontSize:17,fontFamily:"Inter_700Bold"},fallbackText:{fontSize:t.type.helper},changeText:{fontSize:13,fontFamily:"Inter_600SemiBold",marginTop:3},mediaLabel:{fontSize:13,fontFamily:"Inter_600SemiBold"},mediaHelp:{fontSize:t.type.helper,lineHeight:17,marginTop:-8},field:{gap:8},labelRow:{flexDirection:"row",alignItems:"center",gap:8},label:{fontSize:t.type.label,fontFamily:"Inter_600SemiBold"},required:{fontSize:11,fontFamily:"Inter_700Bold",color:entryRequiredColor},input:{minHeight:t.control.inputHeight,borderRadius:t.radius.input,borderWidth:1,paddingHorizontal:t.md,fontSize:15},longInput:{minHeight:100,paddingTop:t.md,paddingBottom:t.md},typeToggle:{flexDirection:"row",alignItems:"center",gap:5,alignSelf:"flex-start"},typeToggleText:{fontSize:13,fontFamily:"Inter_600SemiBold"},chips:{flexDirection:"row",flexWrap:"wrap",gap:8,paddingTop:4},chip:{borderWidth:1,borderRadius:t.radius.pill,paddingHorizontal:11,paddingVertical:8},chipText:{fontSize:12,fontFamily:"Inter_500Medium"},sectionTitle:{fontSize:t.type.section,fontFamily:"Inter_700Bold",marginTop:6},sectionIntro:{fontSize:13,lineHeight:18,marginTop:-10},errorText:{color:entryRequiredColor,fontSize:12,lineHeight:17},button:{height:t.control.buttonHeight,borderRadius:t.radius.button,alignItems:"center",justifyContent:"center",marginTop:4},buttonText:{fontSize:t.type.button,fontFamily:"Inter_600SemiBold"}});
+function Field({
+  label,
+  required = false,
+  value,
+  onChange,
+  placeholder,
+  colors,
+  phone = false,
+  numeric = false,
+  lower = false,
+  error = false,
+}: any) {
+  return (
+    <View style={styles.field}>
+      <View style={styles.labelRow}>
+        <Text style={[styles.label, { color: colors.foreground }]}>
+          {label}
+        </Text>
+        {required ? <Text style={styles.required}>Required</Text> : null}
+      </View>
+      <TextInput
+        value={value}
+        onChangeText={onChange}
+        placeholder={placeholder}
+        placeholderTextColor={colors.mutedForeground}
+        keyboardType={phone ? "phone-pad" : numeric ? "number-pad" : "default"}
+        autoCapitalize={lower ? "none" : "words"}
+        autoCorrect={false}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.card,
+            borderColor: error ? entryRequiredColor : colors.border,
+            color: colors.foreground,
+          },
+        ]}
+      />
+      {error ? <Text style={styles.errorText}>Required</Text> : null}
+    </View>
+  );
+}
+const styles = StyleSheet.create({
+  root: { flex: 1 },
+  scroll: { paddingHorizontal: t.spacing.xl, gap: t.spacing.lg },
+  back: { flexDirection: "row", alignItems: "center", gap: 4, marginBottom: 4 },
+  title: { fontSize: t.type.title, fontFamily: "Inter_700Bold" },
+  intro: { fontSize: t.type.body, lineHeight: 20, marginBottom: 4 },
+  mediaRow: { gap: t.spacing.sm },
+  logoBox: {
+    width: t.media.logoSize,
+    height: t.media.logoSize,
+    borderWidth: 1,
+    borderRadius: t.radius.card,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 7,
+    overflow: "hidden",
+  },
+  coverBox: {
+    width: "100%",
+    height: t.media.coverHeight,
+    borderWidth: 1,
+    borderRadius: t.radius.card,
+    overflow: "hidden",
+  },
+  fillImage: { width: "100%", height: "100%", resizeMode: "cover" },
+  fallback: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    padding: t.spacing.md,
+  },
+  fallbackTitle: { fontSize: 17, fontFamily: "Inter_700Bold" },
+  fallbackText: { fontSize: t.type.helper },
+  changeText: { fontSize: 13, fontFamily: "Inter_600SemiBold", marginTop: 3 },
+  mediaLabel: { fontSize: 13, fontFamily: "Inter_600SemiBold" },
+  mediaHelp: { fontSize: t.type.helper, lineHeight: 17, marginTop: -8 },
+  field: { gap: 8 },
+  labelRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  label: { fontSize: t.type.label, fontFamily: "Inter_600SemiBold" },
+  required: {
+    fontSize: 11,
+    fontFamily: "Inter_700Bold",
+    color: entryRequiredColor,
+  },
+  input: {
+    minHeight: t.control.inputHeight,
+    borderRadius: t.radius.input,
+    borderWidth: 1,
+    paddingHorizontal: t.spacing.md,
+    fontSize: 15,
+  },
+  longInput: {
+    minHeight: 100,
+    paddingTop: t.spacing.md,
+    paddingBottom: t.spacing.md,
+  },
+  typeToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    alignSelf: "flex-start",
+  },
+  typeToggleText: { fontSize: 13, fontFamily: "Inter_600SemiBold" },
+  chips: { flexDirection: "row", flexWrap: "wrap", gap: 8, paddingTop: 4 },
+  chip: {
+    borderWidth: 1,
+    borderRadius: t.radius.pill,
+    paddingHorizontal: 11,
+    paddingVertical: 8,
+  },
+  chipText: { fontSize: 12, fontFamily: "Inter_500Medium" },
+  sectionTitle: {
+    fontSize: t.type.section,
+    fontFamily: "Inter_700Bold",
+    marginTop: 6,
+  },
+  sectionIntro: { fontSize: 13, lineHeight: 18, marginTop: -10 },
+  errorText: { color: entryRequiredColor, fontSize: 12, lineHeight: 17 },
+  button: {
+    height: t.control.buttonHeight,
+    borderRadius: t.radius.button,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 4,
+  },
+  buttonText: { fontSize: t.type.button, fontFamily: "Inter_600SemiBold" },
+});

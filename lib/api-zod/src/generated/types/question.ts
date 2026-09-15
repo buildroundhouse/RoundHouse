@@ -21,6 +21,11 @@ export interface Question {
   responseText?: string | null;
   /** For "ask_pro" after the client confirms. One of appointment, list, curious. */
   nextStep?: string | null;
+  /**
+   * Number of unanswered prompts in this specific Resolution thread.
+   * @minimum 1
+   */
+  unansweredPromptCount: number;
   confirmedAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;

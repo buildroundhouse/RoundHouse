@@ -15,6 +15,7 @@ import { Feather } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
 import {
+  customFetch,
   useSearchUsers,
   useSearchPros,
   useSearchSuccessStories,
@@ -31,7 +32,7 @@ import {
   type UserModeKind,
   type ConnectionKind,
 } from "@workspace/api-client-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MODE_LABELS } from "@/lib/intake-schemas";
 import { kindLabelForName } from "@/lib/account-display";
 import { resolveStorageUrl } from "@/lib/uploads";
@@ -39,9 +40,18 @@ import { useProfile } from "@/lib/profile";
 import { getModeAccent } from "@/lib/modeAccent";
 import { PublicProfileModal } from "@/components/PublicProfileModal";
 import { ConnectionKindChooser } from "@/components/ConnectionKindChooser";
+import { FoundYourBusinessModal } from "@/components/FoundYourBusinessCard";
 
 type SearchKind = "friends" | "pros" | "stories";
 type RowState = "invite" | "sent" | "connected" | "pending_account";
+type BusinessEntitySearchRow = {
+  id: number;
+  kind: string;
+  displayName?: string;
+  name?: string;
+  companyName?: string | null;
+  tagline?: string | null;
+};
 
 interface Props {
   visible: boolean;
@@ -74,6 +84,8 @@ export function UserSearchModal({
   const [serviceFilter, setServiceFilter] = useState<string | null>(initialService ?? null);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [viewClerkId, setViewClerkId] = useState<string | null>(null);
+  const [businessCreateOpen, setBusinessCreateOpen] = useState(false);
+  const [businessDeb, setBusinessDeb] = useState("");
   // #645 / #656 — when the user taps Invite we open the same kind
   // chooser sheet the inbox blocked banner uses, so they can classify
   // the relationship (Client / Core / Collaborator) and add an
@@ -90,6 +102,7 @@ export function UserSearchModal({
       setStoriesQ("");
       setServiceFilter(null);
       setPendingId(null);
+      setBusinessCreateOpen(false);
       return;
     }
     if (initialQuery !== undefined) setFriendsQ(initialQuery);
@@ -105,6 +118,12 @@ export function UserSearchModal({
     const t = setTimeout(() => setFriendsDeb(friendsQ.trim()), 200);
     return () => clearTimeout(t);
   }, [friendsQ, visible]);
+
+  useEffect(() => {
+    if (!visible) return;
+    const t = setTimeout(() => setBusinessDeb(prosQ.trim()), 250);
+    return () => clearTimeout(t);
+  }, [prosQ, visible]);
 
   const friendsQuery = useSearchUsers(
     {
@@ -208,6 +227,14 @@ export function UserSearchModal({
       },
     },
   );
+  const businessEntityQuery = useQuery({
+    enabled: visible && businessDeb.length >= 2,
+    queryKey: ["/api/entity-setup/business/search", businessDeb],
+    queryFn: () =>
+      customFetch<{ entities: BusinessEntitySearchRow[] }>(
+        `/api/entity-setup/business/search?q=${encodeURIComponent(businessDeb)}`,
+      ),
+  });
   const storiesQuery = useSearchSuccessStories(
     { q: storiesQ.trim() },
     {
@@ -237,6 +264,7 @@ export function UserSearchModal({
   );
 
   const proResults = (prosQuery.data?.pros ?? []) as ProSearchResult[];
+  const businessEntityResults = businessEntityQuery.data?.entities ?? [];
   const storyResults = (storiesQuery.data?.stories ?? []) as SuccessStory[];
   const deals = (dealsQuery.data?.deals ?? []) as Deal[];
   const areaItems = (areaQuery.data?.items ?? []) as AreaFeedItem[];
@@ -313,13 +341,6 @@ export function UserSearchModal({
                 ) : (
                   friendUsers.slice(0, 8).map((u, ix) => {
                     const avatarUri = resolveStorageUrl(u.avatarUrl ?? null);
-                    // #620: suppress the kind suffix when the user's name
-                    // already contains every word of the label (e.g. name
-                    // "My Home" + label "My Home", or name "Beach Home" +
-                    // label "Home"), so the @handle row doesn't repeat
-                    // the same words shown in the name above. Partial
-                    // overlaps (e.g. "Smith Home" vs. "My Home") still
-                    // render the label.
                     const role =
                       u.activeModeKind != null
                         ? kindLabelForName(
@@ -409,9 +430,7 @@ export function UserSearchModal({
                             ]}
                           >
                             <Feather name="users" size={12} color={accent.primary} />
-                            <Text style={[styles.actionPillText, { color: accent.primary }]}>
-                              Connected
-                            </Text>
+                            <Text style={[styles.actionPillText, { color: accent.primary }]}>Connected</Text>
                           </View>
                         ) : (
                           <View
@@ -420,11 +439,7 @@ export function UserSearchModal({
                               { borderColor: colors.border, backgroundColor: colors.card },
                             ]}
                           >
-                            <Text
-                              style={[styles.actionPillText, { color: colors.mutedForeground }]}
-                            >
-                              Pending
-                            </Text>
+                            <Text style={[styles.actionPillText, { color: colors.mutedForeground }]}>Pending</Text>
                           </View>
                         )}
                       </Pressable>
@@ -445,19 +460,41 @@ export function UserSearchModal({
               showZip
               accent={accent}
               colors={colors}
-              loading={prosQuery.isFetching}
+              loading={prosQuery.isFetching || businessEntityQuery.isFetching}
               emptyText={
                 accent.copyTone === "trade"
                   ? "Find subs by trade, company, or ZIP."
                   : "Type a trade (e.g. plumber, drywall) and your ZIP."
               }
               results={
-                proResults.length === 0 ? (
-                  <Text style={[styles.resultsHint, { color: colors.mutedForeground }]}>
-                    No pros found in that area yet.
-                  </Text>
-                ) : (
-                  proResults.slice(0, 8).map((p) => (
+                <View>
+                  {businessEntityResults.slice(0, 6).map((entity) => (
+                    <View
+                      key={`business-${entity.id}`}
+                      style={[styles.resultRow, { borderTopColor: colors.border }]}
+                    >
+                      <View
+                        style={[
+                          styles.resultAvatar,
+                          { backgroundColor: accent.primary + "1F" },
+                        ]}
+                      >
+                        <Feather name="briefcase" size={16} color={accent.primary} />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text
+                          style={[styles.resultTitle, { color: colors.foreground }]}
+                          numberOfLines={1}
+                        >
+                          {entity.displayName || entity.name || entity.companyName || "Business"}
+                        </Text>
+                        <Text style={[styles.resultSub, { color: colors.mutedForeground }]}>
+                          Business Entity already exists
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
+                  {proResults.slice(0, 8).map((p) => (
                     <Pressable
                       key={p.id}
                       onPress={() => goUser(p.clerkId)}
@@ -506,8 +543,31 @@ export function UserSearchModal({
                         </Text>
                       </View>
                     </Pressable>
-                  ))
-                )
+                  ))}
+                  {businessEntityResults.length === 0 && businessDeb.length >= 2 && !businessEntityQuery.isFetching ? (
+                    <Pressable
+                      accessibilityRole="button"
+                      onPress={() => setBusinessCreateOpen(true)}
+                      style={[
+                        styles.addBusinessRow,
+                        { borderTopColor: colors.border },
+                      ]}
+                    >
+                      <View style={[styles.addBusinessIcon, { backgroundColor: accent.primary + "1F" }]}>
+                        <Feather name="plus" size={16} color={accent.primary} />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={[styles.resultTitle, { color: accent.primary }]}>+ Add Business</Text>
+                        <Text style={[styles.resultSub, { color: colors.mutedForeground }]} numberOfLines={1}>
+                          Create “{prosQ.trim()}” as a real Business Entity
+                        </Text>
+                      </View>
+                    </Pressable>
+                  ) : null}
+                  {proResults.length === 0 && businessEntityResults.length === 0 && businessDeb.length < 2 ? (
+                    <Text style={[styles.resultsHint, { color: colors.mutedForeground }]}>No pros found in that area yet.</Text>
+                  ) : null}
+                </View>
               }
             />
 
@@ -526,34 +586,18 @@ export function UserSearchModal({
               emptyText="Find proof of completed work."
               results={
                 storyResults.length === 0 ? (
-                  <Text style={[styles.resultsHint, { color: colors.mutedForeground }]}>
-                    No stories yet.
-                  </Text>
+                  <Text style={[styles.resultsHint, { color: colors.mutedForeground }]}>No stories yet.</Text>
                 ) : (
                   storyResults.slice(0, 8).map((s) => (
-                    <View
-                      key={s.id}
-                      style={[styles.resultRow, { borderTopColor: colors.border }]}
-                    >
-                      <View
-                        style={[
-                          styles.resultAvatar,
-                          { backgroundColor: accent.primary + "1F" },
-                        ]}
-                      >
+                    <View key={s.id} style={[styles.resultRow, { borderTopColor: colors.border }]}>
+                      <View style={[styles.resultAvatar, { backgroundColor: accent.primary + "1F" }]}>
                         <Feather name="award" size={16} color={accent.primary} />
                       </View>
                       <View style={{ flex: 1 }}>
-                        <Text
-                          style={[styles.resultTitle, { color: colors.foreground }]}
-                          numberOfLines={2}
-                        >
+                        <Text style={[styles.resultTitle, { color: colors.foreground }]} numberOfLines={2}>
                           {s.headline}
                         </Text>
-                        <Text
-                          style={[styles.resultSub, { color: colors.mutedForeground }]}
-                          numberOfLines={1}
-                        >
+                        <Text style={[styles.resultSub, { color: colors.mutedForeground }]} numberOfLines={1}>
                           {s.pro?.companyName || s.pro?.name || "Pro"}
                           {s.serviceTag ? ` · ${s.serviceTag}` : ""}
                         </Text>
@@ -568,18 +612,10 @@ export function UserSearchModal({
           {deals.length > 0 ? (
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-                  Deals & Offers
-                </Text>
-                <Text style={[styles.sectionMeta, { color: colors.mutedForeground }]}>
-                  {deals.length} active
-                </Text>
+                <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Deals & Offers</Text>
+                <Text style={[styles.sectionMeta, { color: colors.mutedForeground }]}>{deals.length} active</Text>
               </View>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.dealsScroll}
-              >
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.dealsScroll}>
                 {deals.map((d) => {
                   const ends = new Date(d.endDate);
                   const days = Math.max(0, Math.ceil((ends.getTime() - Date.now()) / 86400000));
@@ -587,37 +623,17 @@ export function UserSearchModal({
                     <Pressable
                       key={d.id}
                       onPress={() => goUser(d.proClerkId)}
-                      style={[
-                        styles.dealCard,
-                        { backgroundColor: colors.card, borderColor: colors.border },
-                      ]}
+                      style={[styles.dealCard, { backgroundColor: colors.card, borderColor: colors.border }]}
                     >
                       <View style={[styles.dealRibbon, { backgroundColor: accent.primary }]}>
-                        <Text
-                          style={[styles.dealRibbonText, { color: accent.primaryForeground }]}
-                        >
-                          {d.serviceTag}
-                        </Text>
+                        <Text style={[styles.dealRibbonText, { color: accent.primaryForeground }]}>{d.serviceTag}</Text>
                       </View>
-                      <Text
-                        style={[styles.dealHeadline, { color: colors.foreground }]}
-                        numberOfLines={2}
-                      >
-                        {d.headline}
-                      </Text>
+                      <Text style={[styles.dealHeadline, { color: colors.foreground }]} numberOfLines={2}>{d.headline}</Text>
                       {d.description ? (
-                        <Text
-                          style={[styles.dealDesc, { color: colors.mutedForeground }]}
-                          numberOfLines={2}
-                        >
-                          {d.description}
-                        </Text>
+                        <Text style={[styles.dealDesc, { color: colors.mutedForeground }]} numberOfLines={2}>{d.description}</Text>
                       ) : null}
                       <View style={styles.dealFooter}>
-                        <Text
-                          style={[styles.dealPro, { color: colors.foreground }]}
-                          numberOfLines={1}
-                        >
+                        <Text style={[styles.dealPro, { color: colors.foreground }]} numberOfLines={1}>
                           {d.pro?.companyName || d.pro?.name || "Local pro"}
                         </Text>
                         <Text style={[styles.dealEnds, { color: accent.primary }]}>
@@ -633,59 +649,31 @@ export function UserSearchModal({
 
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-                In Your Area
-              </Text>
+              <Text style={[styles.sectionTitle, { color: colors.foreground }]}>In Your Area</Text>
               {zip ? (
-                <Text style={[styles.sectionMeta, { color: colors.mutedForeground }]}>
-                  ZIP {zip}
-                </Text>
+                <Text style={[styles.sectionMeta, { color: colors.mutedForeground }]}>ZIP {zip}</Text>
               ) : (
-                <Text style={[styles.sectionMeta, { color: colors.mutedForeground }]}>
-                  Add ZIP above
-                </Text>
+                <Text style={[styles.sectionMeta, { color: colors.mutedForeground }]}>Add ZIP above</Text>
               )}
             </View>
             {areaItems.length === 0 ? (
-              <View
-                style={[
-                  styles.emptyArea,
-                  { borderColor: colors.border, backgroundColor: colors.card },
-                ]}
-              >
+              <View style={[styles.emptyArea, { borderColor: colors.border, backgroundColor: colors.card }]}>
                 <Feather name="map-pin" size={16} color={colors.mutedForeground} />
-                <Text style={[styles.emptyAreaText, { color: colors.mutedForeground }]}>
-                  No nearby activity yet. As pros log work in your ZIP, you'll see it here.
-                </Text>
+                <Text style={[styles.emptyAreaText, { color: colors.mutedForeground }]}>No nearby activity yet. As pros log work in your ZIP, you'll see it here.</Text>
               </View>
             ) : (
               areaItems.slice(0, 8).map((it) => (
                 <Pressable
                   key={`${it.kind}-${it.id}`}
                   onPress={() => (it.pro?.clerkId ? goUser(it.pro.clerkId) : undefined)}
-                  style={[
-                    styles.areaItem,
-                    { backgroundColor: colors.card, borderColor: colors.border },
-                  ]}
+                  style={[styles.areaItem, { backgroundColor: colors.card, borderColor: colors.border }]}
                 >
                   <View style={[styles.areaTagDot, { backgroundColor: accent.primary }]} />
                   <View style={{ flex: 1 }}>
-                    <Text
-                      style={[styles.areaHeadline, { color: colors.foreground }]}
-                      numberOfLines={2}
-                    >
-                      {it.headline}
-                    </Text>
-                    <Text
-                      style={[styles.areaMeta, { color: colors.mutedForeground }]}
-                      numberOfLines={1}
-                    >
+                    <Text style={[styles.areaHeadline, { color: colors.foreground }]} numberOfLines={2}>{it.headline}</Text>
+                    <Text style={[styles.areaMeta, { color: colors.mutedForeground }]} numberOfLines={1}>
                       {it.kind === "success_story" ? "Success story" : "Recently completed"}
-                      {it.pro?.companyName
-                        ? ` · ${it.pro.companyName}`
-                        : it.pro?.name
-                        ? ` · ${it.pro.name}`
-                        : ""}
+                      {it.pro?.companyName ? ` · ${it.pro.companyName}` : it.pro?.name ? ` · ${it.pro.name}` : ""}
                       {it.propertyName ? ` · ${it.propertyName}` : ""}
                     </Text>
                   </View>
@@ -695,19 +683,10 @@ export function UserSearchModal({
           </View>
         </ScrollView>
 
-        {/* Inline profile modal when no external onUserPress was provided. */}
         {!onUserPress ? (
-          <PublicProfileModal
-            visible={!!viewClerkId}
-            clerkId={viewClerkId}
-            onClose={() => setViewClerkId(null)}
-          />
+          <PublicProfileModal visible={!!viewClerkId} clerkId={viewClerkId} onClose={() => setViewClerkId(null)} />
         ) : null}
 
-        {/* #645 / #656 — Kind chooser sheet for the Invite button. Same
-            sheet the inbox blocked banner and public profile modal use,
-            with Collaborator pinned as the recommended default and the
-            optional personal-note composer enabled. */}
         <ConnectionKindChooser
           visible={!!chooserTarget}
           onClose={() => setChooserTarget(null)}
@@ -715,13 +694,21 @@ export function UserSearchModal({
           pending={connect.isPending}
           recommendedKind="collaborator"
           title="Invite as…"
-          subtitle={
-            chooserTarget
-              ? `Pick how you'd like to classify ${chooserTarget.name}.`
-              : "Pick how you'd like to classify this person."
-          }
+          subtitle={chooserTarget ? `Pick how you'd like to classify ${chooserTarget.name}.` : "Pick how you'd like to classify this person."}
           showPersonalNote
           testID="search-invite-kind-chooser"
+        />
+
+        <FoundYourBusinessModal
+          visible={businessCreateOpen}
+          initialName={prosQ.trim()}
+          onClose={() => setBusinessCreateOpen(false)}
+          onCreated={() => {
+            setBusinessCreateOpen(false);
+            void queryClient.invalidateQueries({ queryKey: ["/api/entity-setup/business/search"] });
+            void queryClient.invalidateQueries({ queryKey: ["/api/entities/mine"] });
+            onClose();
+          }}
         />
       </View>
     </Modal>
@@ -810,13 +797,9 @@ function SearchBar({
       {expanded ? (
         <View style={styles.resultsPanel}>
           {loading ? (
-            <Text style={[styles.resultsHint, { color: colors.mutedForeground }]}>
-              Searching…
-            </Text>
+            <Text style={[styles.resultsHint, { color: colors.mutedForeground }]}>Searching…</Text>
           ) : value.trim().length === 0 ? (
-            <Text style={[styles.resultsHint, { color: colors.mutedForeground }]}>
-              {emptyText}
-            </Text>
+            <Text style={[styles.resultsHint, { color: colors.mutedForeground }]}>{emptyText}</Text>
           ) : (
             results
           )}
@@ -903,6 +886,20 @@ const styles = StyleSheet.create({
   resultAvatarImg: { width: "100%", height: "100%" },
   resultTitle: { fontSize: 13, fontFamily: "Inter_600SemiBold" },
   resultSub: { fontSize: 11, fontFamily: "Inter_400Regular", marginTop: 1 },
+  addBusinessRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingVertical: 11,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  addBusinessIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 
   actionBtn: {
     paddingHorizontal: 14,

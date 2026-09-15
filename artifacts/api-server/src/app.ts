@@ -9,6 +9,7 @@ import { withActiveMode } from "./middlewares/withActiveMode";
 import { withActiveOutwardAccount } from "./middlewares/withActiveOutwardAccount";
 import { migrationReadiness } from "./middlewares/migrationReadiness";
 import { processStripeWebhook } from "./lib/stripeWebhook";
+import { attachHostedWeb } from "./lib/hostedWeb";
 
 const app: Express = express();
 // Disable Express's weak ETag generation. The default weak ETag matches
@@ -91,6 +92,7 @@ app.use("/api", async (req, res, next) => {
 });
 
 app.use("/api", router);
+attachHostedWeb(app, process.env.ROUNDHOUSE_WEB_DIR);
 
 const uploadOwnershipErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   if (err instanceof UploadOwnershipError) {

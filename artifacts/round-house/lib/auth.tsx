@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { onAuthStateChanged, signOut as fbSignOut, type User } from "firebase/auth";
+import { onIdTokenChanged, signOut as fbSignOut, type User } from "firebase/auth";
+import { Platform } from "react-native";
 import { setAuthTokenGetter } from "@workspace/api-client-react";
 import { auth, isFirebaseConfigured } from "./firebase";
 
@@ -32,11 +33,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!auth) return;
-    const unsub = onAuthStateChanged(auth, (u) => {
-      setUser(u);
-      setIsLoaded(true);
+    let active = true;
+    let sync = Promise.resolve();
+    const unsub = onIdTokenChanged(auth, (u) => {
+      // Serialize account switches so a delayed old response cannot restore
+      // the previous account's media cookie after sign-out.
+      sync = sync.then(async () => {
+        if (Platform.OS === "web") {
+          const base = process.env.EXPO_PUBLIC_DOMAIN ? `https://${process.env.EXPO_PUBLIC_DOMAIN}` : "";
+          try {
+            const token = u ? await u.getIdToken() : null;
+            const response = await fetch(`${base}/api/storage/session`, {
+              method: token ? "POST" : "DELETE", credentials: "include",
+              headers: token ? { Authorization: `Bearer ${token}` } : {},
+              signal: AbortSignal.timeout(10000),
+            });
+            if (!response.ok) console.warn("Could not initialize file access");
+          } catch {
+            console.warn("Could not initialize file access");
+          }
+        }
+        if (!active) return;
+        setUser(u);
+        setIsLoaded(true);
+      });
     });
-    return unsub;
+    return () => { active = false; unsub(); };
   }, []);
 
   const value = useMemo<AuthContextValue>(

@@ -37,6 +37,8 @@
  * is safe to run on a fresh database, on the current dev DB, and on the
  * production DB (whichever generation it is on).
  */
+import { CALENDAR_STEPS } from "../src/calendar-schema";
+import { FINANCIAL_DOCUMENT_STEPS } from "../src/financial-document-schema";
 import { pool } from "../src";
 import { migrateOutwardAccounts } from "./migrateOutwardAccounts";
 import { migrateTeamSeats } from "./migrateTeamSeats";
@@ -45,6 +47,8 @@ import { backfillCommentAuthorOutwardAccount } from "./backfillCommentAuthorOutw
 type Step = { name: string; sql: string };
 
 export const SCHEMA_STEPS: Step[] = [
+  ...FINANCIAL_DOCUMENT_STEPS,
+  ...CALENDAR_STEPS,
   // --- users -------------------------------------------------------------
   {
     name: "users.active_outward_account_id",
@@ -428,6 +432,38 @@ export const SCHEMA_STEPS: Step[] = [
     name: "reminders.notify_count (legacy DBs)",
     sql: `ALTER TABLE reminders ADD COLUMN IF NOT EXISTS notify_count integer NOT NULL DEFAULT 0;`,
   },
+  {
+    name: "reminder_questions table",
+    sql: `
+      CREATE TABLE IF NOT EXISTS reminder_questions (
+        id serial PRIMARY KEY,
+        user_clerk_id text NOT NULL,
+        counterparty_clerk_id text,
+        counterparty_name text,
+        kind text NOT NULL,
+        status text NOT NULL,
+        question_text text NOT NULL,
+        requested_action text,
+        response_text text,
+        next_step text,
+        unanswered_prompt_count integer NOT NULL DEFAULT 1,
+        resolution_state jsonb,
+        confirmed_at timestamptz,
+        created_at timestamptz NOT NULL DEFAULT now(),
+        updated_at timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE INDEX IF NOT EXISTS reminder_questions_user_idx ON reminder_questions (user_clerk_id);
+      CREATE INDEX IF NOT EXISTS reminder_questions_counterparty_idx ON reminder_questions (counterparty_clerk_id);
+    `,
+  },
+  {
+    name: "reminder_questions.unanswered_prompt_count (legacy DBs)",
+    sql: `ALTER TABLE reminder_questions ADD COLUMN IF NOT EXISTS unanswered_prompt_count integer NOT NULL DEFAULT 1;`,
+  },
+  {
+    name: "reminder_questions.resolution_state (legacy DBs)",
+    sql: `ALTER TABLE reminder_questions ADD COLUMN IF NOT EXISTS resolution_state jsonb;`,
+  },
 
   // --- company_notices --------------------------------------------------
   {
@@ -662,18 +698,21 @@ export const SCHEMA_STEPS: Step[] = [
     `,
   },
   {
-    // Tighten the (user, outward account) pair to be unique. Older
-    // dev DBs may already have created duplicate threads via the
-    // pre-unique index, so we collapse them to the lowest id first
-    // (the SELECT inside the DELETE finds dupes; the trick is safe to
-    // re-run because the second pass simply finds none).
+    // Tighten the (user, outward account) pair to be unique. Do not delete
+    // duplicate threads automatically: their messages may still refer to
+    // those IDs. Keep the records and fail readiness for a reviewed repair.
     name: "concierge_conversations_user_acct_unique",
     sql: `
-      DELETE FROM concierge_conversations a
-      USING concierge_conversations b
-      WHERE a.id > b.id
-        AND a.user_clerk_id = b.user_clerk_id
-        AND a.outward_account_id = b.outward_account_id;
+      DO $$
+      BEGIN
+        IF EXISTS (
+          SELECT 1 FROM concierge_conversations
+          GROUP BY user_clerk_id, outward_account_id
+          HAVING count(*) > 1
+        ) THEN
+          RAISE EXCEPTION 'Duplicate concierge conversations require a data-preserving repair before deployment';
+        END IF;
+      END $$;
       CREATE UNIQUE INDEX IF NOT EXISTS concierge_conversations_user_acct_unique
         ON concierge_conversations (user_clerk_id, outward_account_id);
     `,
@@ -991,7 +1030,9 @@ async function enforceNotNullConstraints(): Promise<{ unresolved: string[] }> {
           `    clerk_id to an outward_accounts row, or by deleting the orphaned rows)\n` +
           `    and re-run \`pnpm --filter @workspace/db migrate\`.`,
       );
-      unresolved.push(`${table}.${column} (${n} null row${n === 1 ? "" : "s"})`);
+      unresolved.push(
+        `${table}.${column} (${n} null row${n === 1 ? "" : "s"})`,
+      );
       continue;
     }
     // Wrap in a check so re-running is a no-op.
@@ -1072,7 +1113,8 @@ export async function migrate(): Promise<MigrateResult> {
 const isDirectRun =
   typeof process !== "undefined" &&
   process.argv[1] &&
-  (process.argv[1].endsWith("migrate.ts") || process.argv[1].endsWith("migrate.js"));
+  (process.argv[1].endsWith("migrate.ts") ||
+    process.argv[1].endsWith("migrate.js"));
 
 if (isDirectRun) {
   migrate()

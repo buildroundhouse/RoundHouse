@@ -25,7 +25,7 @@ export function firebaseErrorMessage(err: unknown): string {
       case "auth/network-request-failed":
         return "Network error. Check your connection and try again.";
       case "auth/operation-not-allowed":
-        return "Email/Password sign-in isn't enabled in your Firebase project. Enable it in Authentication → Sign-in method.";
+        return "This sign-in option isn't available yet. Please try another sign-in method.";
       case "auth/popup-blocked":
         return "Popup was blocked by the browser. Allow popups and try again.";
       case "auth/popup-closed-by-user":
