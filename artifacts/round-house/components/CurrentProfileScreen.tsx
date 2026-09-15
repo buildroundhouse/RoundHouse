@@ -7,6 +7,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { customFetch, useCompleteModeIntake, useUpdateMe } from "@workspace/api-client-react";
 import { useProfile } from "@/lib/profile";
+import { useAuth } from "@/lib/auth";
 import { useColors } from "@/hooks/useColors";
 import { resolveStorageUrl, uploadAsset } from "@/lib/uploads";
 import { ProfileNavigation } from "./ProfileNavigation";
@@ -43,6 +44,16 @@ export function CurrentProfileScreen({ onSettings }: { onSettings: () => void })
   const c = useColors(); const insets = useSafeAreaInsets(); const router = useRouter();
   const { profile, activeMode: selectedMode, modes, activeOutwardAccount, refetchProfile, refetchModes } = useProfile();
   const queryClient = useQueryClient();
+  const { signOut } = useAuth();
+  const [signingOut, setSigningOut] = useState(false);
+  async function handleSignOut() {
+    if (signingOut) return;
+    setSigningOut(true);
+    setError("");
+    try { await signOut(); }
+    catch { setError("Could not sign out. Please try again."); }
+    finally { setSigningOut(false); }
+  }
   const activeMode = modeForAccount(activeOutwardAccount, modes, selectedMode);
   const accountId = activeOutwardAccount?.id;
   const entities = useQuery({ queryKey: ["/api/entities/mine", accountId], enabled: !!accountId,
@@ -122,6 +133,12 @@ export function CurrentProfileScreen({ onSettings }: { onSettings: () => void })
         <ProfileRow title="Authority & Permissions" onPress={() => setPage("permissions")} icon="shield"/>
         <ProfileRow title="Subscription & Account" onPress={() => setPage("account")} icon="credit-card"/>
         <ProfileRow title="Other Settings" onPress={onSettings} icon="settings"/>
+        <Pressable accessibilityRole="button" accessibilityLabel="Sign out" accessibilityState={{ disabled: signingOut, busy: signingOut }}
+          testID="profile-sign-out" disabled={signingOut} onPress={() => void handleSignOut()}
+          style={({ pressed }) => [s.row, { borderColor: c.border, opacity: pressed || signingOut ? 0.6 : 1 }]}>
+          <Text style={[s.label, { color: c.foreground, flex: 1 }]}>{signingOut ? "Signing out…" : "Sign out"}</Text>
+          <Feather name="log-out" size={20} color={c.mutedForeground}/>
+        </Pressable>
         <Text style={[s.footer, { color: c.mutedForeground }]}>Roundhouse</Text>
       </View>
     </ScrollView>

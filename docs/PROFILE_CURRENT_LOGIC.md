@@ -2,6 +2,7 @@
 
 Implements the Profile structure in `docs/architecture/screens/03_ROUNDHOUSE_PROFILE_SCREENS.md` on the repository's `main` branch.
 
+- Sign out appears at the bottom of Profile, immediately below Other Settings and above the Roundhouse footer, for every account type. It uses the existing authentication sign-out action; the authenticated layout returns the user to sign-in. The button disables while signing out, and failures leave the user on Profile with a retry message.
 - Persistent, large Back to Command Center control navigates directly to `/(tabs)` without changing the active role or outward account.
 - Editable personal banner and photo, with the person visually dominant and Entity identity secondary.
 - View Profile shows only personal fields selected as Public. Both Share controls enter Invitation Center.
