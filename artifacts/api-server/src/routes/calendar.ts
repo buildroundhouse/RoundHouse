@@ -111,9 +111,10 @@ async function candidates(
   s: Scope,
   businessId: number | null,
   propertyId: number,
+  executor: Pick<typeof db, "select"> = db,
 ) {
   const ids = [propertyId, ...(businessId ? [businessId] : [])];
-  return db
+  return executor
     .select({
       membership: entityMembersTable,
       name: usersTable.name,
@@ -407,6 +408,7 @@ router.post(
         s,
         d.businessId,
         d.propertyEntityId,
+        tx,
       );
       const currentParty = (p: CalendarParty) =>
         currentPeople.some(
