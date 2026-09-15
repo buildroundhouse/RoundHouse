@@ -218,7 +218,7 @@ export function HomeSidePanelOverlay({
           left: 0,
           width: panelWidth,
           height: panelHeight,
-          backgroundColor: colors.background,
+          backgroundColor: panelKey === "jobs" ? "#17191d" : colors.background,
           borderTopRightRadius: 18,
           borderBottomRightRadius: 18,
           overflow: "hidden",
@@ -239,11 +239,11 @@ export function HomeSidePanelOverlay({
         <View
           style={[
             styles.panelHeader,
-            { borderBottomColor: colors.border, backgroundColor: colors.background },
+            { borderBottomColor: colors.border, backgroundColor: panelKey === "jobs" ? "#17191d" : colors.background },
           ]}
         >
           <Text
-            style={[styles.panelTitle, { color: colors.foreground }]}
+            style={[styles.panelTitle, { color: panelKey === "jobs" ? "#f1f2f4" : colors.foreground }]}
             numberOfLines={1}
             accessibilityRole="header"
           >
@@ -257,7 +257,7 @@ export function HomeSidePanelOverlay({
               accessibilityLabel="Close panel"
               style={({ pressed }) => [styles.closeBtn, { opacity: pressed ? 0.6 : 1 }]}
             >
-              <Feather name="x" size={20} color={colors.foreground} />
+              <Feather name="x" size={20} color={panelKey === "jobs" ? "#f1f2f4" : colors.foreground} />
             </Pressable>
           </View>
         </View>

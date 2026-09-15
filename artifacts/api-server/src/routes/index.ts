@@ -32,7 +32,10 @@ import adminDemoProfilesRouter from "./admin-demo-profiles";
 import entitiesRouter from "./entities";
 import conciergeRouter from "./concierge";
 
+import taskListsRouter from "./task-lists";
+
 const router: IRouter = Router();
+router.use(taskListsRouter);
 
 router.use(healthRouter);
 router.use(financialDocumentsRouter);
