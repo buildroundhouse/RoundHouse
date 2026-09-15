@@ -1,19 +1,13 @@
 /**
- * FoundYourBusinessCard — empty-state card shown on the Profile tab
- * when the active avatar is a Trade Pro / Facilities account that
- * hasn't founded a business entity yet.
+ * FoundYourBusinessCard — Profile on-ramp for creating a real Business Entity.
  *
- * Rendered inline in the regular profile flow (option (c) chosen by
- * the founder) — no admin-only path. The same card appears for real
- * users and for demo avatars; the only difference is that anything
- * created from a demo avatar is auto-stamped `is_admin_demo = true`
- * by the server and surfaces a "DEMO" badge in every UI surface.
- *
- * If the avatar HAS founded one or more entities, the card hides itself
- * (this is purely an empty-state nudge — once a business exists, the
- * primary surface for managing it lives elsewhere).
+ * A user may create a Business Entity either as its Owner or as Temporary
+ * Admin. Temporary Admin is an authority state for an unclaimed business; it
+ * does not assert ownership. This on-ramp is available from the neutral Viewer
+ * fallback too, so an unaffiliated user is never trapped in a functionless
+ * Viewer state with no way to establish an Entity.
  */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Modal,
@@ -31,18 +25,27 @@ import { useColors } from "@/hooks/useColors";
 import { useProfile } from "@/lib/profile";
 import { DemoBadge } from "@/components/DemoBadge";
 
-const BUSINESS_AVATAR_KINDS = new Set(["trade_pro", "facilities"]);
+const BUSINESS_SETUP_KINDS = new Set([
+  "trade_pro",
+  "facilities",
+  "collab",
+  "trade_pro_collab",
+  "facilities_collab",
+]);
 
 type EntityRow = {
   id: number;
   kind: string;
-  displayName: string;
+  displayName?: string;
+  name?: string;
   isAdminDemo: boolean;
 };
 
 type ListEntitiesResponse = {
   entities: EntityRow[];
 };
+
+export type EntityCreationCapacity = "owner" | "temporary_admin";
 
 const ENTITIES_MINE_KEY = ["/api/entities/mine"] as const;
 
@@ -52,22 +55,21 @@ export function FoundYourBusinessCard() {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
 
-  const isBusinessAvatar = BUSINESS_AVATAR_KINDS.has(
+  const canStartBusiness = BUSINESS_SETUP_KINDS.has(
     activeOutwardAccount?.kind ?? "",
   );
 
   const { data, isLoading } = useQuery({
-    enabled: isBusinessAvatar,
+    enabled: canStartBusiness,
     queryKey: ENTITIES_MINE_KEY,
     queryFn: () => customFetch<ListEntitiesResponse>("/api/entities/mine"),
   });
 
-  // Hide entirely when this avatar isn't business-eligible OR already
-  // controls one or more entities. We never want to nag a user who
-  // already founded their business — this card is purely the on-ramp.
-  if (!isBusinessAvatar) return null;
+  const hasBusiness = (data?.entities ?? []).some((e) => e.kind === "business");
+
+  if (!canStartBusiness) return null;
   if (isLoading) return null;
-  if ((data?.entities ?? []).length > 0) return null;
+  if (hasBusiness) return null;
 
   return (
     <View
@@ -87,12 +89,9 @@ export function FoundYourBusinessCard() {
         </View>
       </View>
       <View style={styles.body}>
-        <Text style={[styles.title, { color: colors.foreground }]}>
-          Found your business
-        </Text>
+        <Text style={[styles.title, { color: colors.foreground }]}>Set up a Business</Text>
         <Text style={[styles.blurb, { color: colors.mutedForeground }]}>
-          Set up your business profile so you can be hired, manage clients,
-          and bring your team in. You can edit everything later.
+          Create the actual Business Entity as its Owner or Temporary Admin.
         </Text>
         <Pressable
           accessibilityRole="button"
@@ -102,7 +101,7 @@ export function FoundYourBusinessCard() {
             { backgroundColor: colors.primary, opacity: pressed ? 0.85 : 1 },
           ]}
         >
-          <Text style={styles.buttonText}>Get started</Text>
+          <Text style={styles.buttonText}>+ Add Business</Text>
         </Pressable>
       </View>
 
@@ -110,7 +109,7 @@ export function FoundYourBusinessCard() {
         visible={open}
         onClose={() => setOpen(false)}
         onCreated={() => {
-          queryClient.invalidateQueries({ queryKey: ENTITIES_MINE_KEY });
+          void queryClient.invalidateQueries({ queryKey: ENTITIES_MINE_KEY });
           setOpen(false);
         }}
       />
@@ -118,22 +117,32 @@ export function FoundYourBusinessCard() {
   );
 }
 
-function FoundYourBusinessModal({
+export function FoundYourBusinessModal({
   visible,
   onClose,
   onCreated,
+  initialName = "",
 }: {
   visible: boolean;
   onClose: () => void;
   onCreated: () => void;
+  initialName?: string;
 }) {
   const colors = useColors();
   const { activeOutwardAccount } = useProfile();
   const isDemo = !!activeOutwardAccount?.isDemo;
-  const [displayName, setDisplayName] = useState("");
+  const [capacity, setCapacity] = useState<EntityCreationCapacity>("owner");
+  const [displayName, setDisplayName] = useState(initialName);
   const [legalName, setLegalName] = useState("");
   const [tagline, setTagline] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!visible) return;
+    setDisplayName(initialName);
+    setCapacity("owner");
+    setError(null);
+  }, [visible, initialName]);
 
   const create = useMutation({
     mutationFn: async () => {
@@ -147,18 +156,18 @@ function FoundYourBusinessModal({
           displayName: trimmed,
           legalName: legalName.trim() || undefined,
           tagline: tagline.trim() || undefined,
+          creationCapacity: capacity,
         }),
       });
     },
     onError: (err: unknown) => {
-      const msg =
-        err instanceof Error ? err.message : "Could not create business";
-      setError(msg);
+      setError(err instanceof Error ? err.message : "Could not create business");
     },
     onSuccess: () => {
       setDisplayName("");
       setLegalName("");
       setTagline("");
+      setCapacity("owner");
       setError(null);
       onCreated();
     },
@@ -171,12 +180,7 @@ function FoundYourBusinessModal({
   };
 
   return (
-    <Modal
-      transparent
-      animationType="fade"
-      visible={visible}
-      onRequestClose={handleClose}
-    >
+    <Modal transparent animationType="fade" visible={visible} onRequestClose={handleClose}>
       <View style={styles.modalBackdrop}>
         <View
           style={[
@@ -185,9 +189,7 @@ function FoundYourBusinessModal({
           ]}
         >
           <View style={styles.modalHeader}>
-            <Text style={[styles.modalTitle, { color: colors.foreground }]}>
-              Found your business
-            </Text>
+            <Text style={[styles.modalTitle, { color: colors.foreground }]}>Set up Business</Text>
             {isDemo ? <DemoBadge size="md" /> : null}
             <Pressable
               hitSlop={10}
@@ -199,12 +201,27 @@ function FoundYourBusinessModal({
             </Pressable>
           </View>
 
-          <Text
-            style={[styles.modalBlurb, { color: colors.mutedForeground }]}
-          >
-            You'll be the founding owner. You can invite teammates from the
-            business profile after it's created.
+          <Text style={[styles.modalBlurb, { color: colors.mutedForeground }]}>
+            Create the real Business Entity and choose how you are establishing it.
           </Text>
+
+          <Text style={[styles.fieldLabel, { color: colors.mutedForeground }]}>SETUP AUTHORITY</Text>
+          <View style={styles.capacityRow}>
+            <CapacityButton
+              selected={capacity === "owner"}
+              title="Owner"
+              subtitle="I own this business"
+              onPress={() => setCapacity("owner")}
+              colors={colors}
+            />
+            <CapacityButton
+              selected={capacity === "temporary_admin"}
+              title="Temporary Admin"
+              subtitle="I’m setting it up for its owner"
+              onPress={() => setCapacity("temporary_admin")}
+              colors={colors}
+            />
+          </View>
 
           <Field
             label="Business name"
@@ -212,29 +229,31 @@ function FoundYourBusinessModal({
             colors={colors}
             value={displayName}
             onChangeText={setDisplayName}
-            placeholder="e.g. Acme Plumbing"
-            autoFocus
+            placeholder="e.g. DMT DESIGN BUILD"
+            autoFocus={!initialName}
           />
           <Field
             label="Legal name (optional)"
             colors={colors}
             value={legalName}
             onChangeText={setLegalName}
-            placeholder="e.g. Acme Plumbing LLC"
+            placeholder="e.g. DMT Design Build LLC"
           />
           <Field
             label="Tagline (optional)"
             colors={colors}
             value={tagline}
             onChangeText={setTagline}
-            placeholder="One line about your business"
+            placeholder="One line about the business"
           />
 
-          {error ? (
-            <Text style={[styles.error, { color: colors.destructive }]}>
-              {error}
+          {capacity === "temporary_admin" ? (
+            <Text style={[styles.capacityNote, { color: colors.mutedForeground }]}>
+              This Business will be treated as unclaimed until its legitimate Owner takes control.
             </Text>
           ) : null}
+
+          {error ? <Text style={[styles.error, { color: colors.destructive }]}>{error}</Text> : null}
 
           <View style={styles.modalActions}>
             <Pressable
@@ -249,11 +268,7 @@ function FoundYourBusinessModal({
                 },
               ]}
             >
-              <Text
-                style={[styles.secondaryBtnText, { color: colors.foreground }]}
-              >
-                Cancel
-              </Text>
+              <Text style={[styles.secondaryBtnText, { color: colors.foreground }]}>Cancel</Text>
             </Pressable>
             <Pressable
               accessibilityRole="button"
@@ -264,22 +279,51 @@ function FoundYourBusinessModal({
                 {
                   backgroundColor: colors.primary,
                   opacity:
-                    pressed || create.isPending || displayName.trim().length === 0
-                      ? 0.7
-                      : 1,
+                    pressed || create.isPending || displayName.trim().length === 0 ? 0.7 : 1,
                 },
               ]}
             >
               {create.isPending ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <Text style={styles.primaryBtnText}>Create</Text>
+                <Text style={styles.primaryBtnText}>Create Business</Text>
               )}
             </Pressable>
           </View>
         </View>
       </View>
     </Modal>
+  );
+}
+
+function CapacityButton({
+  selected,
+  title,
+  subtitle,
+  onPress,
+  colors,
+}: {
+  selected: boolean;
+  title: string;
+  subtitle: string;
+  onPress: () => void;
+  colors: ReturnType<typeof useColors>;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.capacityButton,
+        {
+          borderColor: selected ? colors.primary : colors.border,
+          backgroundColor: selected ? colors.scoreBackground : colors.card,
+          opacity: pressed ? 0.8 : 1,
+        },
+      ]}
+    >
+      <Text style={[styles.capacityTitle, { color: colors.foreground }]}>{title}</Text>
+      <Text style={[styles.capacitySubtitle, { color: colors.mutedForeground }]}>{subtitle}</Text>
+    </Pressable>
   );
 }
 
@@ -344,15 +388,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   body: { flex: 1, gap: 6 },
-  title: {
-    fontSize: 16,
-    fontFamily: "Inter_700Bold",
-  },
-  blurb: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    lineHeight: 18,
-  },
+  title: { fontSize: 16, fontFamily: "Inter_700Bold" },
+  blurb: { fontSize: 13, fontFamily: "Inter_400Regular", lineHeight: 18 },
   button: {
     alignSelf: "flex-start",
     marginTop: 8,
@@ -360,12 +397,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
   },
-  buttonText: {
-    color: "#fff",
-    fontSize: 13,
-    fontFamily: "Inter_600SemiBold",
-  },
-
+  buttonText: { color: "#fff", fontSize: 13, fontFamily: "Inter_600SemiBold" },
   modalBackdrop: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.45)",
@@ -375,35 +407,31 @@ const styles = StyleSheet.create({
   },
   modalCard: {
     width: "100%",
-    maxWidth: 460,
+    maxWidth: 500,
     borderRadius: 14,
     borderWidth: 1,
     padding: 18,
     gap: 12,
   },
-  modalHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
+  modalHeader: { flexDirection: "row", alignItems: "center", gap: 8 },
+  modalTitle: { fontSize: 18, fontFamily: "Inter_700Bold", flexShrink: 1 },
+  modalClose: { marginLeft: "auto" },
+  modalBlurb: { fontSize: 13, fontFamily: "Inter_400Regular", lineHeight: 18 },
+  capacityRow: { flexDirection: "row", gap: 8 },
+  capacityButton: {
+    flex: 1,
+    minHeight: 66,
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 9,
+    justifyContent: "center",
   },
-  modalTitle: {
-    fontSize: 18,
-    fontFamily: "Inter_700Bold",
-    flexShrink: 1,
-  },
-  modalClose: {
-    marginLeft: "auto",
-  },
-  modalBlurb: {
-    fontSize: 13,
-    fontFamily: "Inter_400Regular",
-    lineHeight: 18,
-  },
+  capacityTitle: { fontSize: 13, fontFamily: "Inter_700Bold" },
+  capacitySubtitle: { fontSize: 11, fontFamily: "Inter_400Regular", marginTop: 2, lineHeight: 15 },
+  capacityNote: { fontSize: 11, fontFamily: "Inter_400Regular", lineHeight: 16 },
   field: { gap: 4 },
-  fieldLabel: {
-    fontSize: 12,
-    fontFamily: "Inter_500Medium",
-  },
+  fieldLabel: { fontSize: 12, fontFamily: "Inter_500Medium" },
   input: {
     borderWidth: 1,
     borderRadius: 8,
@@ -412,10 +440,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "Inter_400Regular",
   },
-  error: {
-    fontSize: 12,
-    fontFamily: "Inter_500Medium",
-  },
+  error: { fontSize: 12, fontFamily: "Inter_500Medium" },
   modalActions: {
     flexDirection: "row",
     justifyContent: "flex-end",
@@ -428,20 +453,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
   },
-  secondaryBtnText: {
-    fontSize: 13,
-    fontFamily: "Inter_600SemiBold",
-  },
+  secondaryBtnText: { fontSize: 13, fontFamily: "Inter_600SemiBold" },
   primaryBtn: {
     paddingHorizontal: 18,
     paddingVertical: 9,
     borderRadius: 8,
-    minWidth: 90,
+    minWidth: 120,
     alignItems: "center",
   },
-  primaryBtnText: {
-    color: "#fff",
-    fontSize: 13,
-    fontFamily: "Inter_600SemiBold",
-  },
+  primaryBtnText: { color: "#fff", fontSize: 13, fontFamily: "Inter_600SemiBold" },
 });
