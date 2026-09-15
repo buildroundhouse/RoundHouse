@@ -143,9 +143,10 @@ export async function resolveActiveOutwardAccountId(
 
 async function ensureDefaultOutwardAccount(clerkId: string): Promise<number | null> {
   // The Collaborator / Friend baseline is the universal default skin.
-  // Every signed-in user always has one — auto-created here on demand
-  // so newly-created users (and any pre-#572 user without one) get
-  // self-healed on next request.
+  // Every identity-complete user has one — auto-created here on demand
+  // so completed users (and any pre-#572 user without one) get
+  // self-healed on next request. Users who are still in original intake
+  // deliberately have no baseline yet.
   return ensureCollabBaselineOutwardAccount(clerkId);
 }
 
@@ -168,10 +169,16 @@ export async function ensureCollabBaselineMode(
   clerkId: string,
 ): Promise<number | null> {
   const [user] = await db
-    .select({ clerkId: usersTable.clerkId })
+    .select({
+      clerkId: usersTable.clerkId,
+      identityCompletedAt: usersTable.identityCompletedAt,
+    })
     .from(usersTable)
     .where(eq(usersTable.clerkId, clerkId));
-  if (!user) return null;
+  // An incomplete identity is the durable signal that this account belongs
+  // in original intake. Do not manufacture a completed collab/viewer mode
+  // while the client is loading its parallel sign-in requests.
+  if (!user?.identityCompletedAt) return null;
 
   const [existing] = await db
     .select({ id: userModesTable.id })
@@ -242,11 +249,14 @@ export async function ensureCollabBaselineOutwardAccount(
     .select({
       name: usersTable.name,
       avatarUrl: usersTable.avatarUrl,
+      identityCompletedAt: usersTable.identityCompletedAt,
       activeOutwardAccountId: usersTable.activeOutwardAccountId,
     })
     .from(usersTable)
     .where(eq(usersTable.clerkId, clerkId));
-  if (!user) return null;
+  // Keep original intake account-less. Once identity intake is completed,
+  // the next normal request provisions the permanent personal baseline.
+  if (!user?.identityCompletedAt) return null;
 
   // Always ensure the matching mode first so we can stamp the OA's
   // sourceUserModeId at insert time (and self-heal it on the existing

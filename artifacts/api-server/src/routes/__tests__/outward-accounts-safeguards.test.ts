@@ -31,8 +31,13 @@ vi.mock("../../middlewares/requireAuth", () => ({
   },
 }));
 
-const { db, usersTable, outwardAccountsTable, userConnectionsTable } =
-  await import("@workspace/db");
+const {
+  db,
+  usersTable,
+  userModesTable,
+  outwardAccountsTable,
+  userConnectionsTable,
+} = await import("@workspace/db");
 const outwardAccountsRouter = (await import("../outward-accounts")).default;
 const usersRouter = (await import("../users")).default;
 const { withActiveOutwardAccount } = await import(
@@ -72,6 +77,7 @@ beforeAll(async () => {
       email: `${clerkId}@example.test`,
       name: `User ${idx}`,
       username: clerkId,
+      identityCompletedAt: new Date(),
     })),
   );
 });
@@ -97,6 +103,9 @@ afterAll(async () => {
     .delete(outwardAccountsTable)
     .where(inArray(outwardAccountsTable.ownerClerkId, allClerks));
   await db.delete(usersTable).where(inArray(usersTable.clerkId, allClerks));
+  await db
+    .delete(userModesTable)
+    .where(inArray(userModesTable.userClerkId, allClerks));
 });
 
 describe("per-kind creation caps (#562)", () => {
@@ -325,6 +334,7 @@ describe("collab baseline auto-provisioning (#572)", () => {
       email: `${baselineClerk}@example.test`,
       name: "Baseline User",
       username: baselineClerk,
+      identityCompletedAt: new Date(),
     });
     allClerks.push(baselineClerk);
   });
@@ -433,6 +443,7 @@ describe("collab baseline auto-provisioning (#572)", () => {
       email: `${raceClerk}@example.test`,
       name: "Race User",
       username: raceClerk,
+      identityCompletedAt: new Date(),
     });
     allClerks.push(raceClerk);
 
@@ -454,6 +465,42 @@ describe("collab baseline auto-provisioning (#572)", () => {
         ),
       );
     expect(collabRows.length).toBe(1);
+  });
+
+  it("does not manufacture viewer state while original intake is incomplete", async () => {
+    const intakeClerk = `${tag}-original-intake`;
+    await db.insert(usersTable).values({
+      clerkId: intakeClerk,
+      email: `${intakeClerk}@example.test`,
+      name: "Original Intake User",
+      username: intakeClerk,
+      identityCompletedAt: null,
+    });
+    allClerks.push(intakeClerk);
+
+    const [, modesResponse, outwardResponse] = await Promise.all([
+      request(app).get("/api/users/me").set("x-test-user", intakeClerk),
+      request(app).get("/api/users/me/modes").set("x-test-user", intakeClerk),
+      request(app).get("/api/outward-accounts").set("x-test-user", intakeClerk),
+    ]);
+
+    const [modes, accounts] = await Promise.all([
+      db
+        .select({ id: userModesTable.id })
+        .from(userModesTable)
+        .where(eq(userModesTable.userClerkId, intakeClerk)),
+      db
+        .select({ id: outwardAccountsTable.id })
+        .from(outwardAccountsTable)
+        .where(eq(outwardAccountsTable.ownerClerkId, intakeClerk)),
+    ]);
+
+    expect(modesResponse.status).toBe(200);
+    expect(modesResponse.body).toEqual({ modes: [], activeModeId: null });
+    expect(outwardResponse.status).toBe(200);
+    expect(outwardResponse.body).toEqual({ accounts: [], activeOutwardAccountId: null });
+    expect(modes).toHaveLength(0);
+    expect(accounts).toHaveLength(0);
   });
 });
 

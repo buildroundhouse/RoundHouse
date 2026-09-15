@@ -237,10 +237,10 @@ router.get("/users/me", requireAuth, async (req, res): Promise<void> => {
     [user] = await db.select(selfUserColumns).from(usersTable).where(eq(usersTable.clerkId, userId));
   }
 
-  // #572: every signed-in user must own a permanent
+  // #572: every identity-complete user must own a permanent
   // Collaborator / Friend outward account. Backfill it on /users/me
-  // (idempotent) so legacy users self-heal on next login and brand-new
-  // users get one before the client renders the switcher.
+  // (idempotent) so legacy users self-heal on next login. The helper
+  // intentionally does nothing during original identity intake.
   await ensureCollabBaselineOutwardAccount(userId);
 
   const intake = await loadActiveModeIntake(userId, user.lastActiveModeId ?? null);
@@ -1202,10 +1202,9 @@ router.put("/users/me/identity", requireAuth, async (req, res): Promise<void> =>
 
 router.get("/users/me/modes", requireAuth, async (req, res): Promise<void> => {
   const { userId } = req as AuthRequest;
-  // #572: every user must always have the permanent Collaborator /
-  // Friend mode. Backfill before reading so the client never observes
-  // an empty modes list (which would route the user back through the
-  // mode picker on every fresh device).
+  // #572: every identity-complete user must have the permanent
+  // Collaborator / Friend mode. The helper intentionally leaves an
+  // identity-incomplete account empty so it returns to original intake.
   await ensureCollabBaselineMode(userId);
   const modes = await db
     .select()
