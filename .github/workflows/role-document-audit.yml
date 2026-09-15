@@ -1,0 +1,65 @@
+name: Role document audit
+on:
+  push:
+    branches: [docs/sync-approved-roles-20260915]
+    paths:
+      - .github/workflows/role-document-audit.yml
+      - .role-audit/plan.py
+permissions:
+  contents: write
+jobs:
+  documentation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply reviewed documentation plan
+        run: |
+          if [ -f .role-audit/plan.py ]; then
+            python3 .role-audit/plan.py
+            git diff --check
+            git config user.name 'RoundHouse Documentation'
+            git config user.email 'buildroundhouse@users.noreply.github.com'
+            git add docs
+            if ! git diff --cached --quiet; then
+              git commit -m 'Synchronize approved roles across governing documentation'
+              git push origin HEAD:docs/sync-approved-roles-20260915
+            fi
+          fi
+      - name: Export documentation and reference audit
+        run: |
+          mkdir -p /tmp/roundhouse-role-audit
+          python3 - <<'PY'
+          import json, pathlib, re, subprocess, zipfile
+          root = pathlib.Path('.')
+          paths = subprocess.check_output(['git','ls-files'], text=True).splitlines()
+          refs = []
+          inventory = []
+          pattern = re.compile(r'Home Team Member|Trade Team Member|Commercial Management|Commercial Team Member|Unaffiliated|History Viewer Entity|Home Team Pro|roles?\b|paid.party', re.I)
+          with zipfile.ZipFile('/tmp/roundhouse-role-audit/docs.zip', 'w', zipfile.ZIP_DEFLATED) as z:
+            for name in paths:
+              p = root / name
+              inventory.append(name)
+              if name.startswith('docs/') and p.suffix == '.md':
+                z.write(p, name)
+              if name.startswith(('.agents/', '.role-audit/')) or p.suffix not in ('.md','.ts','.tsx','.js','.json','.yaml','.yml','.py') or p.stat().st_size > 1000000:
+                continue
+              try:
+                text = p.read_text()
+              except UnicodeError:
+                continue
+              for i, line in enumerate(text.splitlines(), 1):
+                if pattern.search(line):
+                  refs.append({'path':name, 'line':i, 'text':line})
+            z.writestr('role-references.json', json.dumps(refs, indent=2))
+            z.writestr('repository-paths.json', json.dumps(inventory, indent=2))
+            z.writestr('commit.txt', subprocess.check_output(['git','rev-parse','HEAD'], text=True))
+          print('Audited', len(paths), 'tracked paths;', len(refs), 'role-related lines.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: roundhouse-role-audit
+          path: /tmp/roundhouse-role-audit/docs.zip
+          retention-days: 1
