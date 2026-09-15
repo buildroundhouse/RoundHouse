@@ -22,14 +22,14 @@ The owner of the home and the primary authority over the Property.
 ### Home Team Member
 Someone the Homeowner allows to participate in managing or caring for the home. Authority depends on the permissions given to them.
 
-### Viewer
-A person given authorized visibility into a Residential Property or Commercial Facility without becoming a Team Member and without receiving contribution or management authority.
+### Property Viewer
+A person given authorized view-only access to a specific Property without becoming a Team Member and without receiving contribution or management authority.
 
-Viewer is the neutral view-only Role. A person may have a neutral Viewer-facing profile / Acting Identity, but that identity does not create a free-floating Roundhouse relationship. Viewer participation becomes active only when the person is added to a legitimate Residential Property or Commercial Facility.
+Property Viewer is the single Viewer Role for both Residential Properties and Commercial Facilities. There is no separate Home Viewer or Commercial Viewer Role.
 
-A Viewer invitation always names the Property / Facility and the scope the Viewer may see.
+A Property Viewer relationship always identifies the specific Property / Facility and the scope the Viewer may see. Property Viewer does not create a free-floating Roundhouse relationship and does not exist without a Property / Facility connection.
 
-A Home Team Member who is removed from the Home Team may remain as a Viewer where continued visibility is appropriate, but only through a deliberate current authorization. This is continued Entity access, which requires authorization. Separately, when the last approved Entity affiliation ends, a former participant of any role automatically defaults to Unaffiliated / Viewer, retaining personal history without former Entity access.
+A Home Team Member who is removed from the Home Team may remain as a Property Viewer where continued visibility is appropriate, but only through deliberate current authorization to that Property.
 
 ### Trade Professional
 A person providing professional trade or service work. Access to one Property or Job does not automatically provide access to another.
@@ -39,7 +39,9 @@ A person may create their own Trade Business and become a Trade Professional. Be
 ### Trade Team Member
 A person working as part of a Trade Business or team. Being a Trade Team Member does not automatically provide access to every client, Property, Job, invoice, or Business record.
 
-There is **no Trade Viewer role**. Public or otherwise authorized viewing of a Trade Business or Trade Professional does not require someone to become a participant in that Trade Entity. A former Trade participant retains their own legitimate historical work and portfolio through permanent Identity and historical attribution.
+There is **no Trade Viewer Role**. The only active Viewer Role is Property Viewer, which is tied to a specific Residential Property or Commercial Facility. Public or otherwise authorized viewing of a Trade Business or Trade Professional does not require someone to become a participant in that Business.
+
+A former Trade participant retains their own legitimate historical work through the permanent History Viewer Entity described below.
 
 ### Commercial Management
 A person responsible for managing a commercial Property or facility according to the authority they have been given.
@@ -50,17 +52,52 @@ Someone participating under Commercial Management. Access can be limited to part
 ### Supplier
 A person or Business providing materials, products, or recurring goods or services. Access is limited to the information and functions necessary for their participation.
 
-## 2. Active Roles and Historical Participation
+## 2. History Viewer Entity
 
-An active role represents a person's current participation. Current authority and permission are layered separately.
+History Viewer is a permanent Entity attached to a person's Roundhouse account after that person first connects to an actual Property or Business.
 
-Losing an active role does not erase the person's identity or the work they legitimately performed while holding that role.
+History Viewer is **not a Role inside another Property or Business**. It is its own permanent, limited Entity whose purpose is to house and display that person's legitimate historical participation across Properties, Businesses, Jobs, and Work.
 
-A person who no longer has current access may still see their own legitimate historical contributions through permanent Identity and historical attribution. Historical visibility does not reopen access to the Property, Business, Job, client information, or other records that belonged to the former active relationship.
+History Viewer remains available even while the person has active Property or Business relationships. If every active Property and Business relationship later ends, History Viewer remains attached to the account.
 
-A historical record can continue to identify the Role, Entity, Business relationship, and authority source through which the person originally participated.
+History Viewer presents a combined Timeline of the person's legitimate history while preserving the original source of every item, including the original Property, Business, Role, date, Work context, and attribution.
 
-## 3. Pro and Authority Designations
+History Viewer does not transfer ownership of historical records away from their original Property or Business and does not restore current access to a former Property or Business.
+
+### History Viewer capabilities
+
+History Viewer may:
+
+- display the complete combined Timeline of the person's legitimate historical participation;
+- display Work, photos, CAPTURE evidence, completed Jobs, milestones, accomplishments, ratings, and attribution the person is entitled to retain;
+- identify the original Property, Business, Job, Role, and date associated with each historical item;
+- allow the person to search for, connect to, claim where appropriate, or set up a Property or Business.
+
+History Viewer may not:
+
+- create Notes;
+- use CAPTURE;
+- create or manage Work;
+- create or manage appointments or Calendar activity;
+- manage people or participants;
+- create current activity inside a former Property or Business;
+- expose new activity, current finances, current team information, current private messages, or other records for which the former relationship no longer grants access.
+
+Historical access through History Viewer is read-only and limited to the person's legitimate historical participation.
+
+## 3. Active Roles and Historical Participation
+
+An active Role represents a person's current participation in a Property or Business. Current authority and permission are layered separately.
+
+A current Property or Business relationship is required for an active Role.
+
+Losing an active Role does not erase the person's Identity or the work they legitimately performed while holding that Role.
+
+When a current relationship ends, current workspace access ends according to its governing permissions, while the person's legitimate historical participation remains available through History Viewer.
+
+A historical record continues to identify the Role, Property or Business relationship, and authority source through which the person originally participated.
+
+## 4. Pro and Authority Designations
 
 **Pro is a membership designation, not a base Role.** A person's underlying Role, Pro status, and authority remain separate.
 
@@ -81,11 +118,11 @@ Examples include:
 
 A Home Pro may add a Home Team Member without making that person a Home Pro.
 
-A person whose Trade Pro status exists through a Trade Business loses that Business-derived Pro status when that participation ends unless another basis for active Trade Pro status exists. Legitimate historical Trade work remains attributed to them.
+A person whose Trade Pro status exists through a Trade Business loses that Business-derived Pro status when that participation ends unless another basis for active Trade Pro status exists. Legitimate historical Trade work remains attributed to them and remains available through History Viewer.
 
 Ownership does not automatically make someone the operating Lead or Manager. Lead and Manager authority do not transfer ownership.
 
-## 4. Manager Authority
+## 5. Manager Authority
 
 **Manager is an authority designation, not a base Role.** An Owner or authorized person may delegate management of a Property, Job, Business workflow, or specific participants without transferring ownership.
 
@@ -130,7 +167,7 @@ The Homeowner receives an informational Notification rather than another approva
 
 Removing or narrowing Manager authority stops future automatic approvals outside the remaining scope.
 
-## 5. Manage Team
+## 6. Manage Team
 
 Homeowners and authorized Trade Professionals may have **Manage Team → Add Worker / Add Participant** according to context.
 
@@ -142,7 +179,7 @@ Temporary Profiles can receive schedules, Daily Grinds, tasks, workflow, and wor
 
 A Temporary Profile describes activation state, not employment status or ownership.
 
-## 6. Property Participants & Approval
+## 7. Property Participants & Approval
 
 Working at a Property does not itself authorize someone to add or manage participants.
 
@@ -170,7 +207,7 @@ The Business should not create a participant and then force that same participan
 
 Existing legitimate participants and history remain when the Homeowner later claims control. Current permissions are reevaluated under claimed-Property governance without rewriting historical truth.
 
-## 7. Business → Outside Trade Professional / Subcontractor
+## 8. Business → Outside Trade Professional / Subcontractor
 
 A subcontractor or outside Trade Professional is first established through the **Business relationship** that is bringing them to the job.
 
@@ -184,7 +221,7 @@ The subcontractor should not have to independently locate the homeowner's Proper
 
 The Homeowner should not have to recreate the Business's staffing setup.
 
-## 8. Permission Source
+## 9. Permission Source
 
 Every current permission must have an identifiable source.
 
@@ -195,14 +232,14 @@ Examples include:
 - Business-derived assignment;
 - Commercial Management authorization;
 - direct independent Property relationship;
-- Viewer invitation;
+- Property Viewer invitation;
 - another explicit governing authorization.
 
 Roundhouse must be able to answer:
 
 **Who gave this person access, under what authority, through what relationship, and is that authority still valid?**
 
-## 9. Business-Derived Property Access
+## 10. Business-Derived Property Access
 
 A participant may receive Property access because they are working through a Trade Business.
 
@@ -214,9 +251,9 @@ The Homeowner does not have to manually remove the Business's former subcontract
 
 Business-derived removal does not erase legitimate Work, CAPTURE evidence, communications, Resolutions, Timeline history, or attribution.
 
-**Current access ends. Historical truth remains.**
+**Current access ends. Historical truth remains and is available through History Viewer where the person is entitled to see it.**
 
-## 10. Independent Property Relationships
+## 11. Independent Property Relationships
 
 A person can hold more than one legitimate source of authority or access over time.
 
@@ -231,17 +268,17 @@ Therefore:
 
 Roundhouse must revoke the correct permission source without accidentally destroying another independent authorization the person legitimately holds.
 
-## 11. Share & Activation
+## 12. Share & Activation
 
 Either a Homeowner or authorized Trade Professional may use **Share Roundhouse** to ask a Temporary participant or new person to activate their Roundhouse Identity.
 
 Share Roundhouse is part of the **Invitation Center**, not a separate relationship system.
 
-The invitation may carry the intended Entity, Role, Business relationship, and pending approval context so activation resumes the correct flow.
+The invitation may carry the intended Property or Business, Role, Business relationship, and pending approval context so activation resumes the correct flow.
 
 Where the participant is already associated with a legitimate Property or Business, activation connects the permanent Identity to that existing participation without losing Work or history.
 
-## 12. Claiming a Temporary Profile
+## 13. Claiming a Temporary Profile
 
 Creating or managing a Temporary Profile never gives someone ownership of that person's Identity.
 
@@ -249,11 +286,11 @@ A Share invitation can connect the intended person to their Temporary Profile.
 
 Without Share, claiming an existing Temporary Profile requires verified matching of appropriate identity information, including **Name + Phone + Email** where required by the governing verification policy.
 
-Once verified, the Temporary Profile connects to the person's permanent Roundhouse Identity without losing existing Role, Entity participation, assignments, Work, or history.
+Once verified, the Temporary Profile connects to the person's permanent Roundhouse Identity without losing existing Role, Property or Business participation, assignments, Work, or history.
 
 **Temporary Profile → Verified Identity → Same Person → Same History**
 
-## 13. Management Accountability
+## 14. Management Accountability
 
 Authorized management activity may include:
 
@@ -263,7 +300,7 @@ Roundhouse preserves these events so Owners can understand what actually occurre
 
 **Manager authority determines who can manage. Permission source explains why access exists. Timeline records what happened.**
 
-## 14. Property Creation
+## 15. Property Creation
 
 Creating a Property does not establish ownership of that Property.
 
@@ -273,7 +310,7 @@ A Trade Team Member arriving at a new Job may create the Property so work can be
 
 Creation, ownership, authority, and access remain separate.
 
-## 15. Permissions
+## 16. Permissions
 
 Permissions determine what someone can **see and do**.
 
@@ -281,17 +318,17 @@ Permissions may be broad or limited to specific Properties, Businesses, Jobs, cl
 
 Access to one does not automatically provide access to the others.
 
-## 16. Property Permissions
+## 17. Property Permissions
 
 The Homeowner or someone given sufficient Property authority determines what participants can access within the Property.
 
-A gardener may only need landscaping information. An electrician may only need electrical information. A designer might need access across several areas. A Viewer may receive only a deliberately chosen view-only subset.
+A gardener may only need landscaping information. An electrician may only need electrical information. A designer might need access across several areas. A Property Viewer may receive only a deliberately chosen view-only subset.
 
 Being allowed to work at a Property does not automatically mean being allowed to see everything associated with that Property or manage other participants.
 
 The Property permission record should preserve its source so derived permissions can end automatically when their governing relationship ends.
 
-## 17. Business Permissions
+## 18. Business Permissions
 
 A Business Owner or authorized Lead / Manager determines what people working through that Business can access.
 
@@ -301,13 +338,13 @@ Business membership does not automatically provide access to the entire Business
 
 Business authority to manage a participant does not automatically grant Property participant-approval authority. That authority must come from the Property Owner or another legitimate Property controller.
 
-## 18. Client Information
+## 19. Client Information
 
 Assignment to a Job does not automatically provide unrestricted access to the Business's client information.
 
 A worker can receive the information necessary to perform the Job—such as client name, Job location, scope of work, schedule, and necessary Property information—without automatically receiving private contact information or the Business's complete history with that client.
 
-## 19. Financial Permissions
+## 20. Financial Permissions
 
 Estimates, invoices, billing, payments, and financial reporting have their own permissions.
 
@@ -319,7 +356,7 @@ A Business Owner may give a bookkeeper or another authorized person broader fina
 
 Permission to perform work does not automatically provide permission to see the Business's finances.
 
-## 20. Layered Permissions
+## 21. Layered Permissions
 
 Permissions can exist at different levels and from different sources.
 
@@ -327,44 +364,24 @@ A Business can determine which of its people may participate in a Job. The Prope
 
 A person receives access appropriate to the particular interaction rather than automatically inheriting everything available to the Business, Property, or other participants.
 
-## 21. Temporary and Job-Specific Authority
+## 22. Temporary and Job-Specific Authority
 
 Authority and permissions can be temporary and scoped to a particular Job, Property, function, or participant.
 
 For example, a Trade Team Member could receive permission to prepare an invoice for the Job they are completing without receiving permanent billing authority for the Business.
 
-When that interaction ends, the temporary permission can end without changing the person's permanent identity or historical participation.
+When that interaction ends, the temporary permission can end without changing the person's permanent Identity or historical participation.
 
-## 22. Historical Access
+## 23. Historical Access
 
 Changing someone's current permissions, management authority, Business relationship, or active Role does not erase Roundhouse records that already exist.
 
 A person may lose access to a Property, Business, Job, client, management relationship, or financial function while the historical record of what occurred remains preserved.
 
-A former participant can see their own legitimate historical contributions without regaining former authority or access.
+The person's legitimate historical participation remains available through History Viewer without reopening current authority or access to the original Property or Business.
 
 Current access and historical record are separate.
 
 ## Governing Rule
 
-**Role identifies how someone is participating. Authority determines what they can control. Permissions determine what they can see and do. Viewer is the neutral view-only Role and only participates through a legitimate Residential Property or Commercial Facility. A Business may bring its own subcontractors forward, and a Property Manager with explicitly delegated participant-management authority may approve them on the Owner's behalf. Every permission retains its source: Business-derived access ends automatically when the governing Business relationship ends, while independently authorized access survives. Active roles and authority can end without erasing historical participation.**
-
-
-## Unaffiliated Viewer — September 14, 2026 governing update
-
-Follow the [Unaffiliated Viewer lifecycle](../UNAFFILIATED_VIEWER_LOGIC.md). This supersedes older
-wording that excludes automatic fallback after the last affiliation ends. A former
-Viewer, homeowner who sells the house, Trade Pro owner who sells the business,
-or teammate whose employment ends defaults to Viewer once no approved Entity
-affiliation remains. The same rule applies to all other former roles.
-
-Keep the same personal account and its own work history, including work performed
-through a former business. End former Entity access without deleting historical
-authorship or the Entity's original records. Independently authorized affiliations
-remain in effect; a sale that retains membership is not yet a departure.
-
-Command Center, Profile, and View Profile show **Unaffiliated** on the Entity/name
-line, with **Viewer** immediately underneath, replacing stale Entity names and
-former roles. This retained account is not a new-user onboarding choice. A later
-approved affiliation supplies its assigned role. See the governing lifecycle for
-acceptance checks and the implementation work still pending.
+**Role identifies how someone is currently participating. Authority determines what they can control. Permissions determine what they can see and do. Property Viewer is the single view-only Role for a specific Residential Property or Commercial Facility. History Viewer is a permanent limited Entity created after a person first connects to an actual Property or Business; it houses that person's legitimate combined historical Timeline and remains even if all active Property and Business relationships later end. History Viewer does not restore current access and cannot create Notes, CAPTURE, Work, appointments, or other operational activity. A Business may bring its own subcontractors forward, and a Property Manager with explicitly delegated participant-management authority may approve them on the Owner's behalf. Every permission retains its source: Business-derived access ends automatically when the governing Business relationship ends, while independently authorized access survives. Active Roles and authority can end without erasing historical participation.**
