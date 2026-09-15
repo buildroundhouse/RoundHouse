@@ -90,7 +90,7 @@ async function ensureDefaultAccountForUser(
   const kind = seedMode?.kind ?? pickDefaultKind(modes);
   const branding = brandingFromIntake(seedMode?.intakeData ?? null);
 
-  const insert: InsertOutwardAccount = {
+  const insert: typeof outwardAccountsTable.$inferInsert = {
     ownerClerkId: user.clerkId,
     kind,
     title: branding.title,

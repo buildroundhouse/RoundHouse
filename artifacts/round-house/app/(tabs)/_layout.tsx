@@ -173,8 +173,8 @@ export default function TabLayout() {
   if (status.kind === "loading") return <LoadingScreen />;
   if (status.kind === "error") return <SetupRetry onRetry={status.retry} />;
   if (status.kind === "needs-identity") return <Redirect href="/(onboarding)/identity" />;
-  if (status.kind === "needs-mode-picker") return <Redirect href="/(onboarding)/mode-picker" />;
-  if (status.kind === "needs-intake") return <Redirect href="/(onboarding)/intake" />;
+  if (status.kind === "needs-mode-picker") return <Redirect href="/(onboarding)/entry" />;
+  if (status.kind === "needs-intake") return <Redirect href="/(onboarding)/entry" />;
   if (status.kind === "admin-empty") return <Redirect href="/account/admin" />;
 
   return (

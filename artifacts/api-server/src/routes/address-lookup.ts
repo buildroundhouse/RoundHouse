@@ -33,8 +33,8 @@ router.post("/address-lookup", async (req, res) => {
           !matchedStreet || matchedStreet.split(/\s/)[0] !== street.split(/\s/)[0]) return [];
       return [{ street: matchedStreet, unit: "", city: parts.city, state: parts.state, zip: parts.zip,
         placeId: `census:${match.tigerLine?.tigerLineId ?? matchedStreet}:${match.tigerLine?.side ?? ""}`,
-        latitude: Number.isFinite(match.coordinates?.y) ? match.coordinates.y : null,
-        longitude: Number.isFinite(match.coordinates?.x) ? match.coordinates.x : null,
+        latitude: Number.isFinite(match.coordinates?.y) ? match.coordinates?.y : null,
+        longitude: Number.isFinite(match.coordinates?.x) ? match.coordinates?.x : null,
         status: "matched" }];
     });
     res.setHeader("Cache-Control", "no-store");

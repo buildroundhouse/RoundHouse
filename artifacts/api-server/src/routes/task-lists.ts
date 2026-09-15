@@ -20,7 +20,7 @@ router.get('/task-lists', async(req,res,next) => {
 });
 router.put('/task-lists/:id', async(req,res,next) => {
  try {
-  const a=req as AuthRequest; const parsed=document.safeParse(req.body?.document); const revision=req.body?.revision;
+  const a=req as unknown as AuthRequest; const parsed=document.safeParse(req.body?.document); const revision=req.body?.revision;
   if(!parsed.success || parsed.data.id!==req.params.id || !Number.isInteger(revision) || revision<0){res.status(400).json({error:'Invalid list'});return;}
   const d=parsed.data;
   if(!canActOnResolution(await resolutionAccess(a))){res.status(403).json({error:'Viewer access is read-only'});return;}

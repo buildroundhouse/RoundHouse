@@ -11,7 +11,7 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
 import { eq, inArray } from "drizzle-orm";
 
-const sendPushToUserMock = vi.fn(async () => {});
+const sendPushToUserMock = vi.fn(async (_userId: string, _payload: { title?: string; body?: string; data?: Record<string, unknown> }) => {});
 vi.mock("../../lib/push", () => ({
   sendPushToUser: sendPushToUserMock,
   sendPushToUsers: vi.fn(async () => {}),

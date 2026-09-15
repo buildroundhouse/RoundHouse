@@ -9,10 +9,13 @@ import {
 } from "@workspace/db";
 
 /**
- * Single source of truth for which `user_modes.kind` strings are valid
- * to create. Both the regular `POST /users/me/modes` route and the
- * admin demo-profile route validate against this list so the demo flow
- * can never accept a kind the production flow rejects (or vice versa).
+ * Valid mode-storage keys for NEW creation.
+ *
+ * `collab` is retained only as the historical storage key backing the neutral
+ * Viewer profile. The older `trade_pro_collab` and `facilities_collab` kinds
+ * remain readable on legacy accounts but may no longer be created. Work-capable
+ * people now use Trade Professional / Trade Team Member / Commercial roles;
+ * view-only people use Viewer through a Property or Facility invitation.
  */
 export const VALID_MODE_KINDS: UserModeKind[] = [
   "trade_pro",
@@ -21,18 +24,10 @@ export const VALID_MODE_KINDS: UserModeKind[] = [
   "trade_pro_teammate",
   "facilities_teammate",
   "home_teammate",
-  "trade_pro_collab",
-  "facilities_collab",
   "collab",
 ];
 
-/**
- * #614 — Teammate kinds are scoped strictly to their parent account
- * family. A `home_teammate` belongs to a Home, `trade_pro_teammate` to
- * a Trade Pro, `facilities_teammate` to a Facility. This map is what
- * {@link createUserMode} consults to enforce that. Collaborator and
- * the owner-facing kinds are absent (no parent requirement).
- */
+/** Teammate kinds require an existing parent operating context. */
 export const TEAMMATE_PARENT_KIND: Partial<
   Record<UserModeKind, UserModeKind>
 > = {
@@ -41,6 +36,7 @@ export const TEAMMATE_PARENT_KIND: Partial<
   facilities_teammate: "facilities",
 };
 
+/** Product-facing names. Historical neutral keys all render as Viewer. */
 export const PARENT_KIND_LABEL: Record<UserModeKind, string> = {
   home: "Home",
   trade_pro: "Trade Pro",
@@ -48,20 +44,15 @@ export const PARENT_KIND_LABEL: Record<UserModeKind, string> = {
   home_teammate: "Home Teammate",
   trade_pro_teammate: "Trade Teammate",
   facilities_teammate: "Facility Teammate",
-  trade_pro_collab: "Collaborator",
-  facilities_collab: "Collaborator",
-  collab: "Collaborator",
+  trade_pro_collab: "Viewer",
+  facilities_collab: "Viewer",
+  collab: "Viewer",
 };
 
 export interface CreateUserModeOptions {
   clerkId: string;
   kind: UserModeKind;
-  /**
-   * When true (default), updates `users.last_active_mode_id` to the
-   * resulting mode so the new mode is the user's active context. The
-   * regular onboarding flow always wants this; bulk seeding paths can
-   * pass false to leave the active pointer alone.
-   */
+  /** When true, adopt the resulting mode as the active context. */
   setActive?: boolean;
 }
 
@@ -70,28 +61,28 @@ export type CreateUserModeResult =
   | { ok: false; status: 400; error: string };
 
 /**
- * Create (or reuse) a `user_modes` row for the given user, applying the
- * same validation and intake-data seeding the production
- * `POST /users/me/modes` route enforces:
- *   - `kind` must be in {@link VALID_MODE_KINDS}.
- *   - Teammate kinds require an existing parent kind on the same user
- *     (see {@link TEAMMATE_PARENT_KIND}).
- *   - Single-profile kinds (collab) reuse the existing row if any.
- *   - Multi-profile kinds always insert a fresh row, seeded with the
- *     user's name + avatar (and `ownerName` for trade_pro).
+ * Create or reuse a mode-storage row.
  *
- * Routes that need to short-circuit demo or admin flows through the
- * same path call this helper so the production and demo behaviors stay
- * in lockstep — fixing a validation gap or seed-shape change in one
- * place is automatically picked up by the other.
+ * The neutral Viewer baseline is represented by the historical `collab` key
+ * until the underlying data migration is complete. It has no independent
+ * Entity permission: private Viewer access still requires a Residential
+ * Property or Commercial Facility membership/invitation.
  */
 export async function createUserMode(
   opts: CreateUserModeOptions,
 ): Promise<CreateUserModeResult> {
   const { clerkId, kind, setActive = true } = opts;
   if (!VALID_MODE_KINDS.includes(kind)) {
-    return { ok: false, status: 400, error: "Invalid mode kind" };
+    return {
+      ok: false,
+      status: 400,
+      error:
+        kind === "trade_pro_collab" || kind === "facilities_collab"
+          ? "That legacy profile type is no longer available. Use Viewer for view-only Property/Facility access or a Trade/Commercial Role for operational participation."
+          : "Invalid mode kind",
+    };
   }
+
   const requiredParent = TEAMMATE_PARENT_KIND[kind];
   if (requiredParent) {
     const existingParent = await db
@@ -112,6 +103,7 @@ export async function createUserMode(
       };
     }
   }
+
   if (SINGLE_PROFILE_KINDS.includes(kind)) {
     const [existing] = await db
       .select()
@@ -132,23 +124,28 @@ export async function createUserMode(
       return { ok: true, mode: existing, reusedExisting: true };
     }
   }
+
   const [me] = await db
     .select({ name: usersTable.name, avatarUrl: usersTable.avatarUrl })
     .from(usersTable)
     .where(eq(usersTable.clerkId, clerkId));
+
   const seed: Record<string, unknown> = {};
   if (me?.name) seed.displayName = me.name;
   if (me?.avatarUrl) seed.avatarUrl = me.avatarUrl;
   if (kind === "trade_pro" && me?.name) seed.ownerName = me.name;
+
   const [created] = await db
     .insert(userModesTable)
     .values({ userClerkId: clerkId, kind, intakeData: seed })
     .returning();
+
   if (setActive) {
     await db
       .update(usersTable)
       .set({ lastActiveModeId: created.id })
       .where(eq(usersTable.clerkId, clerkId));
   }
+
   return { ok: true, mode: created, reusedExisting: false };
 }

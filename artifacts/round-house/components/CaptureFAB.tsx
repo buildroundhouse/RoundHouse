@@ -3,6 +3,7 @@ import { getTaskCaptureTarget, type CaptureTarget } from "@/lib/taskLists";
 import { useProfile } from "@/lib/profile";
 import { isViewerKind } from "@/lib/personal-profile";
 import React, { useEffect, useState } from "react";
+import { router } from "expo-router";
 import {
   ActivityIndicator,
   Alert,
@@ -306,9 +307,9 @@ export function CaptureFAB({ hideTrigger = false }: { hideTrigger?: boolean } = 
           setSubmitting(false);
           return;
         }
-        const created = await createProperty.mutateAsync({ data: { name } });
-        pid = created.id;
-        await queryClient.invalidateQueries({ queryKey: ["/api/properties"] });
+        close();
+        router.push("/(onboarding)/entry");
+        return;
       }
 
       let photoUrl: string | undefined;

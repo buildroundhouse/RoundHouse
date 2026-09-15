@@ -147,7 +147,7 @@ export default function AdminLobbyScreen() {
                   {
                     borderColor: room.accent,
                     transform: [{ translateY: pressed ? 2 : 0 }],
-                    shadowColor: room.glow ?? room.accent,
+                    shadowColor: room.glow,
                   },
                 ]}
               >
@@ -165,7 +165,7 @@ export default function AdminLobbyScreen() {
                           s.doorBulb,
                           {
                             backgroundColor: room.accent,
-                            shadowColor: room.glow ?? room.accent,
+                            shadowColor: room.glow,
                           },
                         ]}
                       />

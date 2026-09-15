@@ -49,10 +49,12 @@ describe("actual profile onboarding gate", () => {
   it("offers retry when verification fails", () => {
     state.failed = true; expect(status().kind).toBe("error"); expect(status().retry).toBeTypeOf("function");
   });
-  it.each(["home", "facilities", "trade_pro"])("resumes unfinished %s intake", (kind) => {
+  it.each(["home", "facilities", "trade_pro"])("requires an approved relationship for %s", (kind) => {
     state.modes = [{ id: 1, kind, intakeCompletedAt: null }];
     expect(status()).toEqual({ kind: "needs-intake", mode: state.modes[0] });
     state.modes[0].intakeCompletedAt = "saved";
+    expect(status().kind).toBe("needs-mode-picker");
+    state.memberships = [{ myMembership: { status: "approved" } }];
     expect(status().kind).toBe("ready");
   });
   it("still requires a new person's identity", () => {

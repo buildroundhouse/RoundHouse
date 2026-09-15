@@ -23,6 +23,7 @@ export type EntityMemberRole =
   | "manager"
   | "employee"
   | "worker"
+  | "viewer"
   | "collaborator";
 
 export type EntityMemberStatus =
@@ -34,6 +35,31 @@ export type EntityMemberStatus =
 
 export type EntityMemberDirection = "invite" | "request";
 
+export type RoundhouseBaseRole =
+  | "homeowner"
+  | "home_team_member"
+  | "viewer"
+  | "trade_professional"
+  | "trade_team_member"
+  | "commercial_management"
+  | "commercial_team_member"
+  | "supplier";
+
+export type EntityRelationshipKind =
+  | "internal_team"
+  | "outside_trade"
+  | "supplier"
+  | "viewer";
+
+export type EntityPermissionSource =
+  | "owner_direct"
+  | "manager_delegated"
+  | "business_derived"
+  | "commercial_management"
+  | "viewer_invite"
+  | "independent_property"
+  | "legacy";
+
 export type EntityMemberPermissions = {
   seeContacts?: boolean;
   seeBilling?: boolean;
@@ -44,6 +70,13 @@ export type EntityMemberPermissions = {
   temporaryAdmin?: boolean;
   unclaimed?: boolean;
   manageParticipants?: boolean;
+  baseRole?: RoundhouseBaseRole | null;
+  relationshipKind?: EntityRelationshipKind | null;
+  permissionSource?: EntityPermissionSource | null;
+  sourceBusinessEntityId?: number | null;
+  sourceBusinessMemberId?: number | null;
+  approvedUnderManagerMemberId?: number | null;
+  scope?: Record<string, boolean | string | number | null> | null;
   /**
    * Per-property classification (worker / outside_service_provider /
    * collaborator) carried on property memberships. Lets the

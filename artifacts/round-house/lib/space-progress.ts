@@ -1,6 +1,6 @@
-/** Legacy personal/viewer profiles do not establish participation in a space. */
+/** Every completed working context must be backed by an approved Entity membership. */
 export function needsEntityMembership(kind?: string): boolean {
-  return !!kind && (kind === "collab" || kind.endsWith("_collab") || kind.endsWith("_teammate"));
+  return !!kind;
 }
 
 export type IntakeEntity = {

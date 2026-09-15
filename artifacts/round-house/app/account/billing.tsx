@@ -10,7 +10,7 @@ import {
 import { confirm } from "@/lib/confirm";
 import * as WebBrowser from "expo-web-browser";
 import { Feather } from "@expo/vector-icons";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useColors } from "@/hooks/useColors";
 import {
   useGetMyBilling,
@@ -55,7 +55,8 @@ function formatPeriodEnd(iso: string | null | undefined) {
 
 export default function BillingScreen() {
   const colors = useColors();
-  const params = useLocalSearchParams<{ accountId?: string }>();
+  const params = useLocalSearchParams<{ accountId?: string; returnToIntake?: string }>();
+  const router = useRouter();
   const highlightId = params.accountId ? Number(params.accountId) : null;
   const { data, isLoading, refetch } = useGetMyBilling();
   const enableMut = useEnableOutwardAccountBilling();
@@ -146,6 +147,7 @@ export default function BillingScreen() {
       contentContainerStyle={{ padding: 16, gap: 18, paddingBottom: 48 }}
     >
       <Text style={[styles.h1, { color: colors.foreground }]}>Billing</Text>
+      {params.returnToIntake === "1" ? <Pressable accessibilityRole="button" onPress={() => router.replace("/(onboarding)/entry")} style={{ paddingVertical: 14 }}><Text style={{ color: colors.primary }}>RETURN TO INTAKE</Text></Pressable> : null}
       <Text style={[styles.help, { color: colors.mutedForeground }]}>
         Each outward account is free. Paid capabilities — creating property
         records and expanding member participation — are billed per account
