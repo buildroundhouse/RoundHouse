@@ -29,6 +29,7 @@ import companyNoticesRouter from "./companyNotices";
 import gameRoomRouter from "./game-room";
 import presetChipsRouter from "./preset-chips";
 import adminDemoProfilesRouter from "./admin-demo-profiles";
+import entitySetupRouter from "./entity-setup";
 import entitiesRouter from "./entities";
 import conciergeRouter from "./concierge";
 
@@ -67,6 +68,7 @@ router.use(companyNoticesRouter);
 router.use(gameRoomRouter);
 router.use(presetChipsRouter);
 router.use(adminDemoProfilesRouter);
+router.use(entitySetupRouter);
 router.use(entitiesRouter);
 router.use(conciergeRouter);
 
