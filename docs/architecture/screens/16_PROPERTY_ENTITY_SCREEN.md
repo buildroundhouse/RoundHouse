@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The Property Entity is the permanent digital place for one Property and also a legitimate workplace for authorized Homeowners, Home Team Members, Viewers, Trade Professionals, Trade Team Members, Commercial participants, and other explicitly authorized people.
+The Property Entity is the permanent digital place for one Residential or Commercial Property. People participate through their authorized Property, Trade, or Supplier relationship and the exact sub-role titles in Roles & Authority.
 
 It is not another personal Command Center.
 
@@ -12,6 +12,8 @@ It is not another personal Command Center.
 The Property Entity preserves useful positional familiarity from the Command Center while remaining visually distinct enough that the person always understands they are inside a Property.
 
 Participation and invitation behavior is governed by **`33_INVITATIONS.md`** and **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**.
+
+Role titles, paid eligibility, and action scope follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. A subscription satisfies the paid-party requirement but grants no additional ownership or access by itself.
 
 ---
 
@@ -74,7 +76,7 @@ Typical permission sources include:
 - direct Owner authorization;
 - delegated Property Manager authorization;
 - Business-derived assignment;
-- Commercial Management authorization;
+- authorized Facility management;
 - Viewer invitation;
 - independent direct Property relationship.
 
@@ -82,20 +84,14 @@ The permission source is not merely audit metadata. It determines whether access
 
 ## Viewer
 
-**Viewer is the neutral view-only Role.**
+A Property Viewer has an authorized connection to this specific Property. The Residential title is **Home (Viewer)**.
 
-A neutral Viewer profile does not create a relationship by itself. The person must be invited or otherwise legitimately authorized to this specific Residential Property or Commercial Facility.
+The Viewer sees the shared information, may message within the authorized Property context, and can use Share RoundHouse and search/connect/setup paths. Shared interaction requires a paid subscription on the participant or Property-controlling side.
 
-Viewer receives only the explicitly granted view scope and does not gain:
+Notes, CAPTURE, Work, appointment booking, financial actions, and participant management require an operating role authorized for that action. Starting setup of another Property or Business establishes the person's relationship in that destination; it does not expand the current Property Viewer scope.
 
-- CAPTURE contribution authority;
-- Work assignment authority;
-- participant-management authority;
-- estimate / invoice authority;
-- edit authority;
-- broader access to unrelated Properties or Businesses.
+History Viewer accesses the person's separate private History under **`../../HISTORY_ENTITY_LOGIC.md`**.
 
-There is no Trade Viewer Role.
 
 ---
 
@@ -316,8 +312,8 @@ The goal is familiar operation with unmistakable Property context.
 # 12. Governing Rules
 
 1. The Property Entity is both a permanent record and a legitimate place where authorized people work or view according to Role.
-2. Viewer is the neutral view-only Role and only becomes meaningful through a specific Residential Property or Commercial Facility authorization.
-3. There is no free-floating social Property relationship and no Trade Viewer Role.
+2. Property Viewer access is authorized for the named Property, including only shared visibility and permitted messaging.
+3. Shared interaction requires appropriate authorization and at least one paid party.
 4. Every active Property permission retains a source.
 5. A Trade Business brings its own subcontractor / outside Trade Professional forward rather than making the participant independently negotiate Property access.
 6. Claimed Property participant additions require Owner approval unless delegated Manager authority explicitly grants participant-management authority.

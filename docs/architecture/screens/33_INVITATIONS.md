@@ -16,6 +16,8 @@ The invitation system must always preserve the distinction between:
 - **Authority** — who is allowed to approve or manage that participation;
 - **Permission source** — why the person currently has access.
 
+Titles and authority follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Shared interaction requires at least one paid party: the participating person or the person who owns or controls the Property or Business. Subscription eligibility, participant consent, and authorization are checked separately. An invitation remains pending until the required conditions are satisfied; a new account enters the Command Center only after its first completed relationship.
+
 ---
 
 # 1. Invitation Center
@@ -90,19 +92,13 @@ Share should remain personal rather than spammy.
 
 # 4. Viewer
 
-**Viewer is the neutral view-only Role.**
+A Viewer invitation names the Residential Property or Commercial Facility, the information shared, and the permitted messaging scope. The Residential display title is **Home (Viewer)**.
 
-There is no separate social or free-floating neutral relationship.
+The Viewer may be paid or unpaid. The Viewer or the person owning or controlling the Property must have a paid subscription for this shared relationship. Consent and authorization are required in addition to subscription eligibility.
 
-A Viewer may have a neutral Viewer-facing profile / Acting Identity, but Viewer participation only becomes meaningful after that person is added to a legitimate **Residential Property or Commercial Facility**.
+**History Viewer** is the role inside the person's private History. That History is available only to its associated person after their first completed Property or Business connection. Share RoundHouse from History invites someone to the platform or a legitimate Property/Business connection, not into the sender's private History.
 
-Viewer does not create a person-to-person connection.
-
-Viewer does not receive contribution, Work, Team, or management authority merely by being a Viewer.
-
-A Viewer invitation therefore always names the Property or Facility the person is being invited to view and the scope of information they may see.
-
-There is no Trade Viewer Role.
+Both Viewer contexts provide Share RoundHouse and search/connect/setup paths. New Property or Business operations use the relationship established in that destination. Free accounts may create one Property and one Business. Ownership transfer starts when the legitimate claimant finds the record and requests transfer from its current controller.
 
 ---
 
@@ -118,32 +114,19 @@ Examples:
 
 ### Property / Facility
 
-The inviter may be establishing an appropriate relationship such as:
-
-- Home Team Member;
-- Viewer;
-- Trade Professional / Business participation;
-- Commercial Team Member;
-- Supplier where appropriate.
+The invitation identifies the Property, the person's intended Property sub-role, and authorized scope. Residential choices use **Home Pro (Manager)**, **Home Pro (Teammate)**, **Home (Viewer)**, or another applicable approved Home title. An invited Trade or Supplier participant retains the appropriate Business role and receives separately authorized Property access.
 
 ### Business
 
-The inviter may be establishing an appropriate Business relationship such as:
+The invitation uses an approved Trade or Supplier sub-role, with employment or subcontracting recorded as the working relationship. Owner, Manager, Lead, and combined positions use the exact parentheses and en dash defined in Roles & Authority.
 
-- Trade Team Member;
-- authorized Manager / Lead authority on top of the person's base Role;
-- Subcontractor / Outside Trade Professional relationship;
-- Supplier relationship.
+The exact choices depend on the inviter's authority, the intended relationship, and subscription eligibility.
 
-The exact choices depend on the inviter's authority and the Entity involved.
+RoundHouse shows a plain-language confirmation before sending, for example:
 
-Roundhouse should show a plain-language confirmation before sending, for example:
+**Invite Carlos Hernandez to DMT DESIGN BUILD as Trade Professional for subcontracted work?**
 
-**Add Carlos Hernandez to JD Design Studios as an Outside Trade Professional?**
-
-or
-
-**Invite Maria Lopez to Spring Lake Residence as a Viewer?**
+**Invite Maria Lopez to Spring Lake Residence as Home (Viewer)?**
 
 ---
 
@@ -245,7 +228,7 @@ Useful permission-source categories include:
 - Property Owner direct authorization;
 - delegated Property Manager authorization;
 - Business-derived assignment;
-- Commercial Management authorization;
+- authorized Facility management;
 - direct independent Property relationship;
 - Viewer invitation;
 - other explicit governing authorization.
@@ -299,7 +282,7 @@ There is no silent person-to-Entity membership unless the person has already acc
 Examples:
 
 - Joining a Business requires the invited person's acceptance.
-- Becoming a Home Team Member requires the invited person's acceptance.
+- Becoming a Home Pro (Teammate) requires the invited person's acceptance.
 - Becoming a Viewer requires the invited person's acceptance.
 - A subcontractor who already joined a Business may receive Business-derived Property access when the Property Owner or delegated Manager approves the placement.
 
@@ -375,7 +358,7 @@ The canonical participation record should preserve at minimum:
 
 - Entity ID;
 - Person ID;
-- Acting Identity / base Role;
+- Acting Identity / current Role;
 - status;
 - direction: invite or request;
 - inviter / requester;
@@ -404,29 +387,14 @@ Ending the JD relationship removes the first source without destroying the secon
 
 ---
 
-# 18. Vocabulary
+# 18. Role Titles and Invitation Language
 
-Use:
+Role categories and sub-role titles come from **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Invitations preserve the exact displayed title, the authority requested, and its source.
 
-- **Invite**
-- **Add / Invite**
-- **Request Access**
-- **Viewer**
-- **Home Team Member**
-- **Trade Professional**
-- **Trade Team Member**
-- **Outside Trade Professional / Subcontractor**
-- **Commercial Management**
-- **Commercial Team Member**
-- **Supplier**
-- **Manager authority**
-- **Business-derived access**
-- **Independent Property access**
-
-Do not create a generic social relationship role.
+Use **Invite**, **Add / Invite**, and **Request Access** for the action. **Subcontractor** and other working descriptions accompany the role where useful. **Business-derived access** and **Independent Property access** identify permission sources.
 
 ---
 
 ## Governing Rule
 
-**Invitations create legitimate participation through Entities. Profile exposes one Invitation Center before Find, and every Share Roundhouse doorway enters that same system. A Business brings its own subcontractors forward instead of sending them to negotiate access separately. Claimed Properties require Owner approval unless delegated Manager authority explicitly allows the Business to approve participants on the Owner's behalf; Unclaimed Properties allow the legitimate managing Business to establish necessary operational access. Business-derived Property permissions automatically end when their governing Business relationship ends, while history remains and independently authorized relationships survive. Viewer is the neutral view-only Role and must always be attached to a legitimate Residential Property or Commercial Facility.**
+**Invitations create legitimate participation through Entities. Profile exposes one Invitation Center before Find, and every Share Roundhouse doorway enters that same system. A Business brings its own subcontractors forward instead of sending them to negotiate access separately. Claimed Properties require Owner approval unless delegated Manager authority explicitly allows the Business to approve participants on the Owner's behalf; Unclaimed Properties allow the legitimate managing Business to establish necessary operational access. Business-derived Property permissions automatically end when their governing Business relationship ends, while history remains and independently authorized relationships survive. Property Viewer invitations establish scoped access to the named Property. History stays private to its associated person. Shared interaction requires at least one paid party and appropriate authorization.**

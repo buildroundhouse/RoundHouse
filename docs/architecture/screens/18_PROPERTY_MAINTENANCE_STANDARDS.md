@@ -17,6 +17,8 @@ They are related but not interchangeable.
 
 Maintenance does not replace Work, CAPTURE, Calendar, Resolution, or Vault. It coordinates with them.
 
+Role titles, authority, and subscription eligibility follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Each action remains limited to the current authorized scope; historical records keep their original attribution.
+
 ---
 
 ## 1. Maintenance Working Sheet
@@ -96,7 +98,7 @@ A recurring maintenance rule remains the durable template. When an occurrence be
 
 ## Assignment
 
-A maintenance routine may be assigned to an authorized Home Team Member, Trade Professional, Trade Team Member, or other legitimate participant according to Property permissions.
+A maintenance routine may be assigned to an authorized Home Pro (Teammate), Trade participant, or other legitimate participant according to Property permissions.
 
 Assignment identifies expected responsibility. It does not grant broader Property access than the person's Entity permissions allow.
 
@@ -338,7 +340,7 @@ Maintenance is Property-scoped and permission-aware.
 
 A Homeowner / authorized Property authority may create and manage routines and Standards.
 
-Home Team Members, Trade Professionals, and Trade Team Members may see, fulfill, document, or manage particular Maintenance items according to their Role and permissions.
+Home Pro (Teammate) participants, Trade Professionals, and Trade participants may see, fulfill, document, or manage particular Maintenance items according to their Role and permissions.
 
 A person does not gain access to unrelated Property information merely because they are assigned one maintenance item.
 

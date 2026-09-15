@@ -14,6 +14,8 @@ It assembles current information from the Property's existing Specs, Assets, Doc
 
 **Vault contains the truth. Handoff assembles the truth for the person who needs to get oriented.**
 
+Role titles, authority, and subscription eligibility follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Each action remains limited to the current authorized scope; historical records keep their original attribution.
+
 ---
 
 # 1. Exact Location
@@ -233,7 +235,7 @@ Examples:
 - Homeowner / Property authority where appropriate;
 - Business manager;
 - assigned Trade Professional;
-- relevant Trade Team Member;
+- relevant Trade participant;
 - approved outside trade partner;
 - other Property contact necessary to the current role.
 
@@ -253,7 +255,7 @@ A Homeowner may see broad Property context.
 
 A Trade Professional may see information materially relevant to the authorized scope of work.
 
-A Trade Team Member may see the Work, Assets, Specs, Documents, and contacts required for their assignment without gaining unrelated Property access.
+A Trade participant may see the Work, Assets, Specs, Documents, and contacts required for their assignment without gaining unrelated Property access.
 
 A Viewer receives only viewable information already permitted by that relationship.
 

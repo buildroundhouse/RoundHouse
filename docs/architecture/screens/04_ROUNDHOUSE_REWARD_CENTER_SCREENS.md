@@ -16,6 +16,8 @@ Examples of immediate feedback may include `+25`, a rolling point total, and a s
 
 The Reward Center should visually communicate what those points and statuses may unlock in the future without requiring those future rewards to function during MVP.
 
+Role titles and access follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. **Home (Viewer)**, other authorized Property viewing, and **History Viewer** do not earn points, badges, or status progression. Historical achievements may remain visible in History. Pro subscription status is separate from earned reward Status. Admin reward eligibility follows the reward policy rather than being inferred from administrative control.
+
 ---
 
 # Shared Screen Architecture
@@ -119,9 +121,9 @@ The MVP should **show the possibility without implementing the full redemption o
 
 ---
 
-# Screen 1 — Trade Professional Owner / Manager Reward Center
+# Screen 1 — Trade Owner and Manager Reward Center
 
-This is the full Trade version.
+This version serves **Trade Pro (Owner)**, **Trade Pro (Manager)**, **Trade Pro (Owner – Lead)**, and **Trade Pro (Manager – Lead)** within their authorized reward-management scope.
 
 ## Top
 
@@ -145,7 +147,7 @@ These are visual future capabilities for MVP unless specifically activated later
 
 ## Team Rewards
 
-Owner/Manager may see a **Team Rewards** card showing that they will eventually be able to view rewards and recognition associated with their Trade Team Members.
+Owner/Manager may see a **Team Rewards** card showing that they will eventually be able to view rewards and recognition associated with their Trade participants.
 
 For MVP, this can be largely visual and marked **Coming Soon**. It should not require building a live team reward tally or management dashboard.
 
@@ -155,7 +157,7 @@ This must be a separate, clearly named destination/card:
 
 ### In-House Rewards Creation Center
 
-**Create incentives and rewards for your team. You or your organization are responsible for providing and fulfilling any rewards you create for Trade Team Members.**
+**Create incentives and rewards for your team. You or your organization are responsible for providing and fulfilling any rewards you create for Trade participants.**
 
 The card is visible during MVP but does not need to open.
 
@@ -163,9 +165,9 @@ Roundhouse provides the future system for creating/tracking these incentives. Th
 
 ---
 
-# Screen 2 — Homeowner Owner / Manager Reward Center
+# Screen 2 — Home Owner and Manager Reward Center
 
-This is the full Home version and follows nearly the same layout and behavior as the Trade Owner/Manager screen.
+This version serves **Home Pro (Owner)** and **Home Pro (Manager)**. The standard **Homeowner** retains the eligible individual reward experience without team-organization or reward-management controls.
 
 ## Top
 
@@ -192,7 +194,7 @@ These demonstrate what Points may eventually unlock without requiring redemption
 
 ## Home Team Rewards
 
-Owner/Manager may see a **Team Rewards** card indicating that they will eventually be able to see rewards and recognition for Home Team Members.
+Owner/Manager may see a **Team Rewards** card indicating that they will eventually be able to see rewards and recognition for Home Pro (Teammate) participants.
 
 For MVP, this may be visual and **Coming Soon**.
 
@@ -200,17 +202,17 @@ For MVP, this may be visual and **Coming Soon**.
 
 ### In-House Rewards Creation Center
 
-**Create incentives and rewards for your team. You are responsible for providing and fulfilling any rewards you create for Home Team Members.**
+**Create incentives and rewards for your team. You are responsible for providing and fulfilling any rewards you create for Home Pro (Teammate) participants.**
 
 This is visible but does not need to open during MVP.
 
 ---
 
-# Screen 3 — Trade Team Member Reward Center
+# Screen 3 — Trade Participant Reward Center
 
-This is a scaled-back individual version.
+This is the individual reward view for **Trade Professional** and **Trade Pro (Lead)**. Lead responsibility alone does not grant the Owner/Manager reward controls.
 
-A Trade Team Member sees only their own reward experience. They do not see other team members' reward information and do not receive reward-creation or team-management controls.
+A Trade participant sees only their own reward experience. They do not see other team members' reward information and do not receive reward-creation or team-management controls.
 
 ## Top
 
@@ -227,7 +229,7 @@ Then:
 
 ## Rewards — Coming Soon
 
-The Trade Team Member may see future rewards offered by Roundhouse and a clearly separated company-funded area such as:
+The Trade participant may see future rewards offered by Roundhouse and a clearly separated company-funded area such as:
 
 ### Rewards Offered by DMT DESIGN BUILD
 
@@ -237,11 +239,11 @@ The Team Member can see these rewards but cannot create, administer, or inspect 
 
 ---
 
-# Screen 4 — Home Team Member Reward Center
+# Screen 4 — Home Pro (Teammate) Reward Center
 
-This is the Home equivalent of the Trade Team Member screen.
+This is the Home equivalent of the Trade participant screen.
 
-The Home Team Member sees only their own Points, Status, progress, Badges, activity, and available/future rewards.
+The Home Pro (Teammate) sees only their own Points, Status, progress, Badges, activity, and available/future rewards.
 
 ## Top
 
@@ -258,7 +260,7 @@ Then:
 
 ## Rewards — Coming Soon
 
-The Home Team Member may see:
+The Home Pro (Teammate) may see:
 
 - Future rewards offered by Roundhouse
 - Future rewards supplied by the Homeowner/Property authority
@@ -267,13 +269,13 @@ The second area should be clearly labeled to identify its source, for example:
 
 ### Rewards Offered by [Home / Property / Homeowner]
 
-The Home Team Member cannot create rewards and cannot see another team member's personal reward information.
+The Home Pro (Teammate) cannot create rewards and cannot see another team member's personal reward information.
 
 ---
 
 # Key Differences Between the Four Screens
 
-| Capability | Trade Owner / Manager | Homeowner Owner / Manager | Trade Team Member | Home Team Member |
+| Capability | Trade Owner/Manager positions | Home Pro (Owner) / Home Pro (Manager) | Trade Professional / Trade Pro (Lead) | Home Pro (Teammate) |
 | --- | --- | --- | --- | --- |
 | Own Points + Status | Yes | Yes | Yes | Yes |
 | Progress to Next Status | Yes | Yes | Yes | Yes |

@@ -6,6 +6,8 @@ This document defines how one Roundhouse **Work Record** can appear as a compact
 
 It also records the governing portability rule for users or Entities that leave Roundhouse.
 
+Role titles, authority, and subscription eligibility follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Each action remains limited to the current authorized scope; historical records keep their original attribution.
+
 ---
 
 # 1. One Record, Multiple Views

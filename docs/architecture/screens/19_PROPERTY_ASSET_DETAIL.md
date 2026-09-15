@@ -23,6 +23,8 @@ Examples include:
 - security equipment
 - other serviceable Property assets
 
+Role titles, authority, and subscription eligibility follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Each action remains limited to the current authorized scope; historical records keep their original attribution.
+
 ---
 
 ## 1. Asset Identity Header
@@ -307,7 +309,7 @@ The Estimate / Invoice system remains the governing financial record.
 
 Asset visibility follows Property permissions.
 
-Authorized Trade Professionals and Trade Team Members may need broad enough Asset visibility to safely and effectively perform work, including model, location, service history, manuals, relevant Standards, and prior conditions.
+Authorized Trade participants may need broad enough Asset visibility to safely and effectively perform work, including model, location, service history, manuals, relevant Standards, and prior conditions.
 
 Private internal Business notes do not automatically become Property-visible merely because they relate to the Asset.
 

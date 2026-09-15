@@ -12,9 +12,11 @@ People answers:
 
 People always respects current Roundhouse context, Role, authority, permissions, and the source of access.
 
-**Viewer** is the neutral view-only Role. Viewer only appears through a legitimate Residential Property or Commercial Facility relationship.
+**Home (Viewer)** identifies a limited connection to a Residential Property. Facility viewing follows the governing Property authorization. **History Viewer** accesses only the person's private History and does not create a shared People relationship.
 
 Invitation and access setup belongs in **`33_INVITATIONS.md`**, not in People.
+
+Current titles and permissions follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. People rows show the exact approved sub-role title. Messaging and shared organization require the relevant permission and at least one paid party: the participant or the person who owns or controls the Property or Business.
 
 ---
 
@@ -47,7 +49,7 @@ Rows may show:
 
 - Profile photo
 - Person name
-- base Role or relevant relationship
+- current Role or relevant relationship
 - Business name where applicable
 - Home / Property / Facility name where applicable
 - Property address where useful and permitted
@@ -95,10 +97,10 @@ From the Homeowner's normal Command Center, People is divided into two primary b
 
 This block contains:
 
-- **Home Team Members**
-- **Viewers**
+- **Home Pro (Teammate) participants**
+- **Home (Viewer)**
 
-Viewer is view-only and is always associated with a specific Residential Property or Commercial Facility authorization. A neutral Viewer profile by itself does not create a People relationship.
+Property Viewers appear through authorization to the named Residential Property or Commercial Facility. They see the shared information and may use permitted Property messaging. At least one party to that relationship must have a paid subscription.
 
 For a Homeowner with multiple Properties, each person shows the Home / Property that connects the relationship.
 
@@ -132,7 +134,7 @@ Opening People from a Property Entity shows only people legitimately associated 
 
 The structure remains:
 
-1. **Home Team** — Home Team Members + Viewers
+1. **Home Team** — Home Pro (Teammate) participants + Viewers
 2. **Trade Professionals** — Trade Professionals with current authorized Property participation
 
 A person's row may, when useful, indicate how the current Property relationship was established:
@@ -183,7 +185,7 @@ The Trade Professional should be able to identify:
 - address where permitted
 - people at that Entity the Trade Professional is authorized to communicate with
 
-A Trade Professional does not automatically gain visibility into every Home Team Member or Viewer simply because the Business works at the Property.
+A Trade Professional does not automatically gain visibility into every Home Pro (Teammate) or Viewer simply because the Business works at the Property.
 
 ---
 
@@ -271,8 +273,8 @@ Likewise:
 - phone and email appear only when permitted;
 - View Entity and View Property actions require legitimate access;
 - Message retains Entity context;
-- Viewer remains view-only;
-- a neutral Viewer profile alone does not create a relationship;
+- Property Viewers receive only shared visibility and permitted messaging;
+- private History does not expose a shared People directory;
 - Business-derived access disappears from active People when its governing Business source ends unless another current authorization remains.
 
 People is a **relationship-aware directory**, not an authority bypass.
@@ -284,11 +286,11 @@ People is a **relationship-aware directory**, not an authority bypass.
 1. **People is the second bottom Command Center control from the left, immediately after Resolution.**
 2. People is a relationship directory, not a social network, public search system, or invitation inbox.
 3. Pending invitations remain in the Invitation Center until legitimate participation becomes active.
-4. Viewer is the neutral view-only Role and must be attached to a legitimate Residential Property or Commercial Facility.
-5. There is no Trade Viewer Role.
+4. Property Viewer relationships identify the specific Property and authorized scope.
+5. History Viewer is private to the associated person; Business roster participation uses Trade or Supplier roles.
 6. Search filters only relationships already visible to the current person.
 7. Homeowner People contains **Home Team** and **Trade Professionals**.
-8. Home Team contains Home Team Members and Property / Facility Viewers.
+8. Home Team contains Home Pro (Teammate) participants and Property / Facility Viewers.
 9. Trade Business grouping reveals only the people legitimately associated with the Homeowner / Property.
 10. Business People and Business Team remain distinct.
 11. Business-derived Property participation retains its source and ends when that governing Business relationship ends unless an independent authorization exists.

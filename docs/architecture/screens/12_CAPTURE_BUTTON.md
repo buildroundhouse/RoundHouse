@@ -11,6 +11,8 @@ It creates the factual Timeline of a workday: arrival, planned work, estimates, 
 
 CAPTURE works independently. Concierge may assist, but it is not required.
 
+CAPTURE requires an operating role authorized to document in the selected Property or Business, following **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. A Property Viewer and History Viewer may see permitted existing evidence but do not initiate CAPTURE. Historical attribution retains the Role and authority held when the evidence was created.
+
 ---
 
 ## Daily Log

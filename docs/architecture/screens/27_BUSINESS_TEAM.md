@@ -16,6 +16,8 @@ Team is the Business operating roster. It is intentionally distinct from the bro
 
 Invitation behavior is governed by **`33_INVITATIONS.md`**.
 
+Current roles and authority follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Each roster row and invitation shows the exact approved Trade or Supplier title, including parentheses and the en dash for combined positions. Adding or organizing participants requires authorized Owner, Manager, or Admin scope and at least one paid party; a free participant can join a paid Business within the scope granted.
+
 ---
 
 # 1. Position Inside the Business Entity
@@ -52,7 +54,7 @@ It should communicate **crew / roster / working together**, not management statu
 Examples:
 
 - Owners / Managers;
-- Trade Team Members;
+- Trade participants;
 - accepted Subcontractors / Outside Trade Professionals.
 
 ## People
@@ -71,7 +73,7 @@ A person can appear in People without being part of Team.
 
 Team should never become a duplicate full Business contact directory.
 
-**Viewer is not a Business Team category.** Viewer is the neutral view-only Role used when someone is deliberately added to a Residential Property or Commercial Facility.
+Business Team rows use the approved Trade or Supplier sub-role. Property viewing and the person's private History have their own Viewer context rather than Business roster authority.
 
 ---
 
@@ -95,13 +97,13 @@ The screen should feel like a clean roster, not an HR administration dashboard.
 
 The roster is organized into three clear groups:
 
-1. **Owners / Managers**
-2. **Trade Team Members**
+1. **Owners / Managers / Admins**
+2. **Business Participants**
 3. **Subcontractors / Outside Trade Professionals**
 
 This distinction is intentional.
 
-**Trade Team Members belong to the Business. Subcontractors work with the Business.**
+**Internal participants work within the Business. Subcontractors work with the Business.** These relationship descriptions do not replace the person's approved role title.
 
 A subcontractor remains a Trade Professional in their own right. Their outside-Business relationship does not turn them into an internal employee merely because the Business uses them on a job.
 
@@ -179,17 +181,11 @@ Authorized people use **+ Add / Invite** to establish a real Business relationsh
 
 The flow must first establish **how the person is participating**, rather than treating everyone as the same kind of Business member.
 
-Typical choices include:
+Choose the intended sub-role from the approved Trade or Supplier catalogue and record any subcontracting relationship separately.
 
-- Trade Team Member;
-- Subcontractor / Outside Trade Professional;
-- Supplier or other supported Business relationship where applicable.
+The invitation preserves the exact title, granted authority, and scope. A plain-language confirmation reads, for example:
 
-Owner, Lead, and Manager are authority designations layered separately from the person's base Role.
-
-Before sending, Roundhouse should show a plain-language confirmation such as:
-
-**Invite Carlos Hernandez to JD Design Studios as an Outside Trade Professional?**
+**Invite Carlos Hernandez to DMT DESIGN BUILD as Trade Professional for subcontracted work?**
 
 The invitation appears in the global Invitation Center as well as the Business's Pending area.
 
@@ -308,7 +304,7 @@ Pending invitations must not look like active Team members before they accept.
 
 Team preserves the Roundhouse distinction between **Role** and **authority**.
 
-A person's base Role describes how they participate. Authority describes what they are allowed to control.
+A person's current Role describes how they participate. Authority describes what they are allowed to control.
 
 Examples of authority include Owner, Lead, Manager, and limited operational authority.
 
@@ -350,7 +346,7 @@ Business scheduling and dispatch remain governed by Calendar.
 Team is permission-aware.
 
 - Owners / authorized Managers may manage broader Business roster information according to authority;
-- Trade Team Members see only roster information legitimately available to them;
+- Trade participants see only roster information legitimately available to them;
 - Outside Trade Professionals see only the Business and Property information necessary for their authorized work;
 - Business membership alone does not grant unrelated Property access;
 - Business authority alone does not grant the right to approve Property participants unless the Property Owner delegated that authority.

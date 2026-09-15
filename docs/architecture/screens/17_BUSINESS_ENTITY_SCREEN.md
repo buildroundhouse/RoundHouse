@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The Business Entity is the permanent digital place for one Business and a legitimate workplace for authorized Owners, Managers, Trade Professionals, Trade Team Members, and accepted outside Trade Professionals / subcontractors.
+The Business Entity is the permanent digital place for one Trade or Supplier Business. Its participants use the exact approved Trade or Supplier sub-role titles and act within their authorized scope.
 
 It is not another personal Command Center.
 
@@ -12,6 +12,8 @@ It is not another personal Command Center.
 The Business Entity preserves useful positional familiarity from the Command Center while remaining visually distinct enough that the person always understands they are inside the Business.
 
 Invitation and participant behavior is governed by **`33_INVITATIONS.md`**, **`27_BUSINESS_TEAM.md`**, and **`28_BUSINESS_PROPERTIES.md`**.
+
+Role titles and authority follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Shared coordination requires both the relevant permission and at least one paid party. Business access does not by itself grant access to a client Property or another person's private History.
 
 ---
 
@@ -84,7 +86,7 @@ with **Cancelled** as a terminal exception.
 
 Business Work makes Property context, assignee, due date, and current state prominent.
 
-Authorized Owners / Managers can assign or reassign work to appropriate Trade Team Members and accepted outside Trade Professionals according to Business and Property permissions.
+Authorized Owners / Managers can assign or reassign work to appropriate Trade participants and accepted outside Trade Professionals according to Business and Property permissions.
 
 Assigning a person to Work at a Property does **not** silently grant unrestricted Property access. Property participation must resolve through the governing Property authorization path.
 
@@ -102,27 +104,20 @@ Team answers:
 
 Primary groups:
 
-1. **Owners / Managers**
-2. **Trade Team Members**
+1. **Owners / Managers / Admins**
+2. **Business Participants**
 3. **Subcontractors / Outside Trade Professionals**
 
-**Trade Team Members belong to the Business. Subcontractors work with the Business.**
-
-Viewer is **not** a Business Team category. Viewer is the neutral view-only Role used when a person is deliberately authorized to a Residential Property or Commercial Facility.
+These are roster groupings. Each person displays the exact approved Trade or Supplier title. Employment and subcontracting describe the working relationship separately from that title.
 
 ### Add / Invite
 
-Authorized people use **+ Add / Invite** to establish a Business relationship.
+An authorized Owner, Manager, or Admin uses **+ Add / Invite** to choose the intended Trade or Supplier sub-role and review the Business relationship and permission scope.
 
-The Business must determine how the person participates before sending the invitation, such as:
+Shared organization requires at least one paid party and authorization to manage participants. A Viewer entering setup establishes an appropriate relationship in the destination Business before using its operating tools.
 
-- Trade Team Member;
-- Subcontractor / Outside Trade Professional;
-- Supplier or another supported Business relationship.
+Pending invitations remain separate from active participants and are also visible in the Invitation Center.
 
-Owner, Lead, and Manager are authority designations layered separately from base Role.
-
-Pending invitations remain separate from active Team members and are also visible in the global Invitation Center.
 
 ### Business → Subcontractor Flow
 
@@ -288,7 +283,7 @@ The goal is familiar operation with unmistakable Business context.
 
 1. The Business Entity is both a permanent Business record and a legitimate collective workplace.
 2. Business Work is collective workload; Daily Grind remains personal.
-3. Team distinguishes internal Trade Team Members from subcontractors / Outside Trade Professionals.
+3. Team distinguishes internal Trade participants from subcontractors / Outside Trade Professionals.
 4. Viewer is not a Business Team category and is never a substitute for an outside Trade Professional.
 5. Business invitations and Profile invitations use one governing Invitation Center / participation system.
 6. A subcontractor is first established through the Business relationship, then brought forward to a Property.
@@ -309,21 +304,10 @@ The goal is familiar operation with unmistakable Business context.
 **The Command Center tells me what I am doing. The Business Entity tells me what the Business is doing, who is operating through it, where it is authorized to work, and why each participant has access.**
 
 
-## Unaffiliated Viewer — September 14, 2026 governing update
+## History and Changes in Participation
 
-Follow the [Unaffiliated Viewer lifecycle](../../UNAFFILIATED_VIEWER_LOGIC.md). This supersedes older
-wording that excludes automatic fallback after the last affiliation ends. A former
-Viewer, homeowner who sells the house, Trade Pro owner who sells the business,
-or teammate whose employment ends defaults to Viewer once no approved Entity
-affiliation remains. The same rule applies to all other former roles.
+Changing a Business role or ending its relationship preserves the person's contributions and original Role, authority, date, and source context.
 
-Keep the same personal account and its own work history, including work performed
-through a former business. End former Entity access without deleting historical
-authorship or the Entity's original records. Independently authorized affiliations
-remain in effect; a sale that retains membership is not yet a departure.
+After the first completed Property or Business connection, the person's private History remains available alongside current relationships and after the last such relationship ends. **History** is the Entity name; **History Viewer** is the role used to access it. See **`../../HISTORY_ENTITY_LOGIC.md`**.
 
-Command Center, Profile, and View Profile show **Unaffiliated** on the Entity/name
-line, with **Viewer** immediately underneath, replacing stale Entity names and
-former roles. This retained account is not a new-user onboarding choice. A later
-approved affiliation supplies its assigned role. See the governing lifecycle for
-acceptance checks and the implementation work still pending.
+New accounts complete their first legitimate Property or Business connection before entering the Command Center.

@@ -12,6 +12,8 @@ The core workflow is:
 
 The page opens from the fourth bottom Command Center button and includes a **back arrow in the upper-left** to return to the Command Center.
 
+Role titles and action authority follow **`../ROUNDHOUSE_ROLES_AND_PERMISSIONS.md`**. Financial permissions are scoped separately from ordinary work access. Shared estimating, invoicing, and payment coordination require at least one paid party and the appropriate authorization. Viewer access does not grant financial creation or management authority.
+
 ---
 
 ## Main Page
