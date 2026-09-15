@@ -22,10 +22,10 @@ export default function Index() {
     return <Redirect href="/(onboarding)/identity" />;
   }
   if (status.kind === "needs-mode-picker") {
-    return <Redirect href="/(onboarding)/mode-picker" />;
+    return <Redirect href="/(onboarding)/entry" />;
   }
   if (status.kind === "needs-intake") {
-    return <Redirect href="/(onboarding)/intake" />;
+    return <Redirect href="/(onboarding)/entry" />;
   }
   if (status.kind === "admin-empty") {
     return <Redirect href="/account/admin" />;

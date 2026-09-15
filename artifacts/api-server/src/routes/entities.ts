@@ -30,6 +30,7 @@ import { resolveActiveOutwardAccountId } from "../lib/outwardAccounts";
 import { isAdminDemoClerkId } from "../lib/adminDemo";
 import { autoCastMembership, canControlEntity } from "../lib/autoCast";
 import { canParticipateInEntity, getApprovedMembership } from "../lib/entityAccess";
+import { finalizeApprovedIntakeMembership } from "./approved-intake";
 import { insertNotifications } from "../lib/insertNotifications";
 import { sendPushToUser } from "../lib/push";
 
@@ -247,7 +248,7 @@ router.get("/entities/:id", requireAuth, async (req, res): Promise<void> => {
     .select()
     .from(entitiesTable)
     .where(eq(entitiesTable.id, id));
-  if (!entity) {
+  if (!entity || entity.archivedAt || (entity.kind === "history" && entity.createdByUserClerkId !== (req as AuthRequest).userId)) {
     res.status(404).json({ error: "Entity not found" });
     return;
   }
@@ -380,6 +381,10 @@ router.post(
       .where(eq(entitiesTable.id, id));
     if (!entity || entity.archivedAt) {
       res.status(404).json({ error: "Entity not found" });
+      return;
+    }
+    if (entity.kind === "history") {
+      res.status(403).json({ error: "History belongs only to its associated person and cannot accept participants." });
       return;
     }
 
@@ -611,11 +616,19 @@ router.post(
 
     const now = new Date();
     const newStatus = action === "accept" ? "approved" : "declined";
-    const [updated] = await db
-      .update(entityMembersTable)
-      .set({ status: newStatus, decidedAt: now })
-      .where(eq(entityMembersTable.id, memberId))
-      .returning();
+    let updated: typeof entityMembersTable.$inferSelect;
+    try { updated = await db.transaction(async (tx) => {
+      const [membership] = await tx.update(entityMembersTable)
+        .set({ status: newStatus, decidedAt: now })
+        .where(and(eq(entityMembersTable.id, memberId), eq(entityMembersTable.status, row.status)))
+        .returning();
+      if (!membership) throw Object.assign(new Error("Membership has already been decided."), { status: 409 });
+      if (action === "accept") await finalizeApprovedIntakeMembership(memberId, tx);
+      return membership;
+    }); } catch (error) {
+      res.status(Number((error as { status?: number })?.status) || 500).json({ error: error instanceof Error ? error.message : "Could not authorize this relationship." });
+      return;
+    }
 
     // Close-the-loop side effects on accept (mirrors the invite-creation
     // notify pattern above so the inviter learns the invite landed and the
@@ -721,6 +734,10 @@ router.delete(
     if (!Number.isFinite(entityId) || !Number.isFinite(memberId)) {
       res.status(400).json({ error: "Invalid id" });
       return;
+    }
+    const [destination] = await db.select({ kind: entitiesTable.kind }).from(entitiesTable).where(eq(entitiesTable.id, entityId)).limit(1);
+    if (destination?.kind === "history") {
+      res.status(403).json({ error: "Private History stays associated with its person." }); return;
     }
     const [row] = await db
       .select()

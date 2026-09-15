@@ -17,6 +17,7 @@ import assetsRouter from "./assets";
 import discoveryRouter from "./discovery";
 import invitesRouter from "./invites";
 import appInvitesRouter from "./app-invites";
+import invitationCenterRouter from "./invitation-center";
 import rewardsRouter from "./rewards";
 import outwardAccountsRouter from "./outward-accounts";
 import billingRouter from "./billing";
@@ -30,12 +31,17 @@ import gameRoomRouter from "./game-room";
 import presetChipsRouter from "./preset-chips";
 import adminDemoProfilesRouter from "./admin-demo-profiles";
 import entitySetupRouter from "./entity-setup";
+import approvedIntakeRouter from "./approved-intake";
 import entitiesRouter from "./entities";
 import conciergeRouter from "./concierge";
 
 import taskListsRouter from "./task-lists";
+import { requireAuth } from "../middlewares/requireAuth";
 
 const router: IRouter = Router();
+router.post(["/properties", "/entities", "/entity-setup/business", "/outward-accounts"], requireAuth, (_req, res) => {
+  res.status(409).json({ code: "approved_intake_required", error: "Use Add Property or Business to review and ACTIVATE the new record.", intakePath: "/(onboarding)/entry" });
+});
 router.use(taskListsRouter);
 
 router.use(healthRouter);
@@ -56,6 +62,7 @@ router.use(assetsRouter);
 router.use(discoveryRouter);
 router.use(invitesRouter);
 router.use(appInvitesRouter);
+router.use(invitationCenterRouter);
 router.use(rewardsRouter);
 router.use(outwardAccountsRouter);
 router.use(billingRouter);
@@ -69,6 +76,7 @@ router.use(gameRoomRouter);
 router.use(presetChipsRouter);
 router.use(adminDemoProfilesRouter);
 router.use(entitySetupRouter);
+router.use(approvedIntakeRouter);
 router.use(entitiesRouter);
 router.use(conciergeRouter);
 

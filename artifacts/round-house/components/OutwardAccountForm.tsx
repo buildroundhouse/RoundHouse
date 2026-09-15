@@ -17,7 +17,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useColors } from "@/hooks/useColors";
 import { resolveStorageUrl, uploadAsset } from "@/lib/uploads";
 import { ServicesPickerModal } from "@/components/ServicesPickerModal";
-import type { ServiceEntry } from "@workspace/api-client-react";
+import type { ServiceEntry, UserModeKind } from "@workspace/api-client-react";
 export type OutwardAccountKind = "trade_pro" | "home" | "facilities";
 
 // Continuity rule: a person's AVATAR and FIRST NAME are shared across every
@@ -27,7 +27,7 @@ export type OutwardAccountKind = "trade_pro" | "home" | "facilities";
 // and bio. This keeps a consistent face on every interaction so contacts
 // always recognize who they're talking to, regardless of which skin is active.
 export type OutwardAccountFormValues = {
-  kind: OutwardAccountKind;
+  kind: UserModeKind;
   title: string;
   displayName: string;
   bannerUrl: string | null;

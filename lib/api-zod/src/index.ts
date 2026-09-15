@@ -3,4 +3,5 @@
 // many names collide; re-exporting both creates module ambiguity.
 export * from "./generated/api";
 export * from "./userModeOrder";
+export * from "./approvedIntake";
 export * from "./task-lists";

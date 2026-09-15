@@ -17,6 +17,7 @@ vi.mock("@expo/vector-icons", () => ({ Feather: () => null }));
 vi.mock("expo-image-picker", () => ({}));
 vi.mock("@/hooks/useColors", () => ({ useColors: () => ({ foreground: "#111", background: "#fff", mutedForeground: "#666", border: "#ddd", primary: "#126" }) }));
 vi.mock("@/lib/confirm", () => ({ confirm: vi.fn() }));
+vi.mock("@/lib/auth", () => ({ useAuth: () => ({ signOut: vi.fn() }) }));
 vi.mock("@/components/ProfileNavigation", () => import("../components/ProfileNavigation"));
 vi.mock("@/components/ProfilePreview", () => import("../components/ProfilePreview"));
 vi.mock("@/lib/ownerNameDisplay", () => import("./ownerNameDisplay"));
@@ -91,6 +92,11 @@ describe("profile navigation and preview across avatars", () => {
   it("does not treat an unapproved or descriptive Manager title as authority", () => {
     const result = profileContext("home_teammate", { roleTitle: "Manager", entityId: 12 }, [{ id: 12, displayName: "Oak House", kind: "property", myMembership: { role: "manager", status: "invited" } }]);
     expect(result.role).toBe("Home Team Member"); expect(result.memberships).toEqual([]);
+  });
+  it("preserves the exact activated title without reinterpreting it from a legacy kind", () => {
+    const result = profileContext("trade_pro", { roleTitle: "Supplier Pro (Owner – Lead)", approvedIntake: { path: "supplier" }, entityId: 12 }, [{ id: 12, displayName: "Supply Business", kind: "business", myMembership: { role: "owner", status: "approved" } }]);
+    expect(result.role).toBe("Supplier Pro (Owner – Lead)");
+    expect(result.entity?.id).toBe(12);
   });
   it("does not promote a Viewer because of a legacy authority value", () => {
     const result = profileContext("collab", {}, [{ id: 12, displayName: "Oak House", kind: "property", myMembership: { role: "manager", status: "approved" } }]);

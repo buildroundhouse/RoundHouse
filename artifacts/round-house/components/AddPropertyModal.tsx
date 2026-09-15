@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useRouter } from "expo-router";
 import {
   Alert,
   Image,
@@ -53,6 +54,10 @@ const TYPE_ICONS: Record<PropertyType, FeatherIconName> = {
 };
 
 export function AddPropertyModal({ visible, onClose, onSubmit }: Props) {
+  const router = useRouter();
+  React.useEffect(() => {
+    if (visible) { onClose(); router.push("/(onboarding)/entry"); }
+  }, [visible]);
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const [name, setName] = useState("");

@@ -1293,6 +1293,13 @@ router.put("/users/me/modes/:modeId", requireAuth, async (req, res): Promise<voi
   // forcing the user to refill the entire intake. Field-format normalization
   // (e.g. ZIP) still runs.
   const isFirstCompletion = existing.intakeCompletedAt == null;
+  if (isFirstCompletion) {
+    res.status(409).json({
+      error: "Complete and ACTIVATE the approved Property, Trade, or Supplier intake.",
+      code: "approved_intake_required",
+    });
+    return;
+  }
   const validationError = isFirstCompletion
     ? validateIntakeData(existing.kind, intakeData)
     : existing.kind === "trade_pro" && typeof intakeData.primaryZip === "string" && intakeData.primaryZip.trim() !== ""

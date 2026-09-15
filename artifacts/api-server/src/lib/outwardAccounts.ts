@@ -5,6 +5,8 @@ import { applyOutwardAccountKindDefaults } from "./ownerNameDisplay";
 import {
   db,
   outwardAccountsTable,
+  entitiesTable,
+  entityMembersTable,
   outwardAccountPurgeRunsTable,
   usersTable,
   userModesTable,
@@ -13,6 +15,21 @@ import {
   type OutwardAccountPurgeRunSource,
   type UserModeKind,
 } from "@workspace/db";
+
+async function hasEstablishedConnection(clerkId: string): Promise<boolean> {
+  const [membership] = await db
+    .select({ id: entityMembersTable.id })
+    .from(entityMembersTable)
+    .innerJoin(entitiesTable, eq(entitiesTable.id, entityMembersTable.entityId))
+    .where(and(
+      eq(entityMembersTable.userClerkId, clerkId),
+      eq(entityMembersTable.status, "approved"),
+      isNull(entityMembersTable.archivedAt),
+      isNull(entitiesTable.archivedAt),
+    ))
+    .limit(1);
+  return !!membership;
+}
 
 /**
  * How long after a soft-delete a user can still recover an outward
@@ -179,6 +196,9 @@ export async function ensureCollabBaselineMode(
   // in original intake. Do not manufacture a completed collab/viewer mode
   // while the client is loading its parallel sign-in requests.
   if (!user?.identityCompletedAt) return null;
+  // A personal History context is created only after the first legitimate
+  // Property or Business connection. Identity completion alone is not access.
+  if (!(await hasEstablishedConnection(clerkId))) return null;
 
   const [existing] = await db
     .select({ id: userModesTable.id })
@@ -257,6 +277,7 @@ export async function ensureCollabBaselineOutwardAccount(
   // Keep original intake account-less. Once identity intake is completed,
   // the next normal request provisions the permanent personal baseline.
   if (!user?.identityCompletedAt) return null;
+  if (!(await hasEstablishedConnection(clerkId))) return null;
 
   // Always ensure the matching mode first so we can stamp the OA's
   // sourceUserModeId at insert time (and self-heal it on the existing

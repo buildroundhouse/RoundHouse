@@ -6,6 +6,7 @@
  * Roundhouse account a real operating context.
  */
 import React, { useEffect, useState } from "react";
+import { useRouter } from "expo-router";
 import {
   ActivityIndicator,
   Modal,
@@ -207,6 +208,10 @@ export function FoundYourBusinessModal({
   onCreated: () => void;
   initialName?: string;
 }) {
+  const router = useRouter();
+  useEffect(() => {
+    if (visible) { onClose(); router.push("/(onboarding)/entry"); }
+  }, [visible]);
   const colors = useColors();
   const { activeOutwardAccount } = useProfile();
   const isDemo = !!activeOutwardAccount?.isDemo;

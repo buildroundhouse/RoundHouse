@@ -51,3 +51,6 @@ Thumbs.db
 .local/
 # Vercel generated build output and local project link
 .vercel/
+
+# Local Replit workspace configuration may contain credentials
+.replit

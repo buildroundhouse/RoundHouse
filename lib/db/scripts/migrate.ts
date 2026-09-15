@@ -49,6 +49,10 @@ type Step = { name: string; sql: string };
 export const SCHEMA_STEPS: Step[] = [
   ...FINANCIAL_DOCUMENT_STEPS,
   ...CALENDAR_STEPS,
+  {
+    name: "entity_business_details.address",
+    sql: `ALTER TABLE entity_business_details ADD COLUMN IF NOT EXISTS address text;`,
+  },
   // --- users -------------------------------------------------------------
   {
     name: "users.active_outward_account_id",

@@ -526,14 +526,14 @@ export default function AccountIndexScreen() {
       ) : null}
 
       <Pressable
-        onPress={() => router.push("/account/create" as never)}
+        onPress={() => router.push("/(onboarding)/entry" as never)}
         style={({ pressed }) => [
           styles.cta,
           { backgroundColor: colors.primary, opacity: pressed ? 0.85 : 1 },
         ]}
       >
         <Feather name="plus" size={16} color="#fff" />
-        <Text style={styles.ctaText}>New outward account</Text>
+        <Text style={styles.ctaText}>Add Property or Business</Text>
       </Pressable>
 
       {archivedAccounts.length > 0 ? (

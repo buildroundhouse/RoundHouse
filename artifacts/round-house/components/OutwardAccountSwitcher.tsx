@@ -424,7 +424,8 @@ export function OutwardAccountSwitcher({
                       ]}
                     >
                       {archivedAccounts.map((entry, idx) => {
-                        const a = entry.account;
+                        const a = entry;
+                        const restorable = !!a.archivedAt && Date.now() - new Date(a.archivedAt).getTime() <= 30 * 24 * 60 * 60 * 1000;
                         const title = accountTitle(a);
                         const subtitle = accountSubtitle(a, title);
                         return (
@@ -461,7 +462,7 @@ export function OutwardAccountSwitcher({
                                 >
                                   {title}
                                 </Text>
-                                {subtitle || !entry.restorable ? (
+                                {subtitle || !restorable ? (
                                   <Text
                                     style={[
                                       styles.rowSubtitle,
@@ -470,7 +471,7 @@ export function OutwardAccountSwitcher({
                                     numberOfLines={1}
                                   >
                                     {subtitle ?? ""}
-                                    {!entry.restorable
+                                    {!restorable
                                       ? subtitle
                                         ? " · past restore window"
                                         : "Past restore window"
@@ -479,7 +480,7 @@ export function OutwardAccountSwitcher({
                                 ) : null}
                               </View>
                             </View>
-                            {entry.restorable ? (
+                            {restorable ? (
                               <Pressable
                                 onPress={() => performRestore(a)}
                                 disabled={busyId === a.id}

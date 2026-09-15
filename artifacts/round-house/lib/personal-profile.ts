@@ -1,3 +1,5 @@
+import { validApprovedTitle, type ApprovedIntakePath } from "@workspace/api-zod";
+
 export const PERSONAL_FIELDS = [
   { key: "bio", label: "About / Bio", multiline: true },
   { key: "email", label: "Contact email" },
@@ -52,21 +54,26 @@ export type ProfileEntity = {
 
 /** Titles are descriptive; only approved Entity membership establishes authority. */
 export function profileContext(kind: string | undefined, md: Record<string, unknown>, entities: ProfileEntity[]) {
-  const memberships = entities.filter(e => e.myMembership?.status === "approved" && (!isViewerKind(kind) || e.kind === "property" || e.kind === "facility"));
+  const history = kind === "collab" && md.roleTitle === "History Viewer";
+  const propertyKinds = ["property", "facility", "residential_property", "commercial_property"];
+  const memberships = entities.filter(e => e.myMembership?.status === "approved" && (history ? e.kind === "history" : !isViewerKind(kind) || propertyKinds.includes(e.kind)));
   const requestedId = Number(md.entityId);
   // Primary identity differs by role: a trade avatar represents a Business,
   // even when that avatar also works at several client Properties.
   const viewer = isViewerKind(kind);
-  const primary = memberships.filter(e => viewer ? e.kind !== "business"
+  const primary = memberships.filter(e => history ? e.kind === "history" : viewer ? e.kind !== "business"
     : kind?.startsWith("trade_pro") || kind === "supplier" ? e.kind === "business"
-    : kind?.startsWith("facilities") ? e.kind === "facility" : e.kind === "property");
+    : kind?.startsWith("facilities") ? ["facility", "commercial_property"].includes(e.kind) : ["property", "residential_property"].includes(e.kind));
   const entity = primary.find(e => e.id === requestedId) ?? (primary.length === 1 ? primary[0] : null);
   const baseRole = PROFILE_ROLE_LABELS[kind ?? "collab"] ?? "Viewer";
   const authority = entity?.myMembership?.role;
   const authorityLabel = ({ owner: "Owner", admin: "Admin", manager: "Manager" } as Record<string, string>)[authority ?? ""];
-  const role = baseRole === "Viewer" ? "Viewer"
+  const intakePath = (md.approvedIntake as { path?: ApprovedIntakePath } | undefined)?.path;
+  const approvedRole = md.roleTitle === "History Viewer" && kind === "collab" ? "History Viewer"
+    : intakePath && ["property", "trade", "supplier"].includes(intakePath) && typeof md.roleTitle === "string" && validApprovedTitle(intakePath, md.roleTitle) ? md.roleTitle : null;
+  const role = approvedRole ?? (baseRole === "Viewer" ? "Viewer"
     : kind === "home" && authority === "manager" ? "Home Manager"
-    : authorityLabel && !(kind === "home" && authority === "owner") ? `${baseRole} (${authorityLabel})` : baseRole;
+    : authorityLabel && !(kind === "home" && authority === "owner") ? `${baseRole} (${authorityLabel})` : baseRole);
   const savedName = typeof md.placeName === "string" ? md.placeName : typeof md.companyName === "string" ? md.companyName : "";
   const entityName = entity?.displayName ?? (primary.length > 1 ? primary.map(e => e.displayName).join(" · ") : savedName || "No Entity participation yet");
   return { role, entity, entityName, memberships };

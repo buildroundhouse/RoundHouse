@@ -1,5 +1,8 @@
 import { type Response } from "express";
 import type { AuthRequest } from "../middlewares/requireAuth";
+import { and, eq, isNull, ne, sql } from "drizzle-orm";
+import { db, entitiesTable, entityMembersTable, outwardAccountsTable } from "@workspace/db";
+import { personHasPaidAccess } from "./paidAccess";
 
 /**
  * The closed set of paid capabilities (#309). Today these all map to the
@@ -29,13 +32,24 @@ export type PaidCapability = (typeof PAID_CAPABILITIES)[number];
  * else — the lapse webhook is what keeps that column honest.
  */
 export async function isCapabilityAvailable(
-  _outwardAccountId: number | null,
+  outwardAccountId: number | null,
   _capability: PaidCapability,
+  entityId?: number,
 ): Promise<boolean> {
-  // Paywall disabled: every account has full capabilities. The
-  // outward_accounts.capability_state column is left in place so the
-  // billing UI and webhooks keep working, but no feature is gated on it.
-  return true;
+  if (outwardAccountId == null) return false;
+  const [account] = await db.select({ owner: outwardAccountsTable.ownerClerkId }).from(outwardAccountsTable)
+    .where(and(eq(outwardAccountsTable.id, outwardAccountId), isNull(outwardAccountsTable.archivedAt))).limit(1);
+  if (!account) return false;
+  const contexts = await db.select({ controller: entitiesTable.controllerUserClerkId }).from(entityMembersTable)
+    .innerJoin(entitiesTable, eq(entitiesTable.id, entityMembersTable.entityId))
+    .where(and(eq(entityMembersTable.userOutwardAccountId, outwardAccountId), eq(entityMembersTable.userClerkId, account.owner),
+      eq(entityMembersTable.status, "approved"), isNull(entityMembersTable.archivedAt), isNull(entitiesTable.archivedAt), ne(entitiesTable.kind, "history"),
+      entityId === undefined ? undefined : eq(entitiesTable.id, entityId)));
+  if (!contexts.length) return false;
+  if (await personHasPaidAccess(account.owner)) return true;
+  // Without a destination parameter, do not borrow a paid controller from an
+  // unrelated membership to enable actions in a free destination.
+  return (await Promise.all(contexts.map((context) => personHasPaidAccess(context.controller)))).every(Boolean);
 }
 
 export interface CapabilityRequiredPayload {
@@ -66,12 +80,18 @@ export async function requirePaidCapability(
   capability: PaidCapability,
 ): Promise<boolean> {
   const outwardAccountId = req.activeOutwardAccountId ?? null;
-  const ok = await isCapabilityAvailable(outwardAccountId, capability);
+  let entityId = Number(req.params.entityId ?? req.body?.entityId) || undefined;
+  const propertyId = Number(req.params.propertyId ?? req.body?.propertyId ?? (req.path.startsWith("/properties/") ? req.params.id : undefined));
+  if (propertyId) {
+    const linked = await db.execute<{ entity_id: number }>(sql`SELECT entity_id FROM property_entity_links WHERE property_id=${propertyId} LIMIT 1`);
+    entityId = linked.rows[0]?.entity_id ?? -1;
+  }
+  const ok = await isCapabilityAvailable(outwardAccountId, capability, entityId);
   if (ok) return true;
   const payload: CapabilityRequiredPayload = {
     error:
-      "This capability requires expanded capabilities on this account. " +
-      "Open billing on your private account to enable it for this skin.",
+      "This action requires paid access for you or the person controlling this Property or Business. " +
+      "Your role and authorized scope still apply.",
     capability,
     outwardAccountId,
     deepLink: outwardAccountId

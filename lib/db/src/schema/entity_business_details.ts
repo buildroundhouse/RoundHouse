@@ -39,6 +39,8 @@ export const entityBusinessDetailsTable = pgTable("entity_business_details", {
    * legal name.
    */
   companyName: text("company_name"),
+  /** Identifying location used with the name during search and deduplication. */
+  address: text("address"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

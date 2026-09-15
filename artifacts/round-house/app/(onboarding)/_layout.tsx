@@ -41,6 +41,12 @@ export default function OnboardingLayout() {
   if (setupScreen === "identity" && hasSavedIdentity(profile)) {
     return <Redirect href={afterIdentityRoute(activeMode)} />;
   }
+  if (setupScreen !== "identity" && !hasSavedIdentity(profile)) {
+    return <Redirect href="/(onboarding)/identity" />;
+  }
+  if (["intake", "entry-entity", "entry-business", "entry-property-type", "entry-business-type", "entry-role", "entry-access"].includes(setupScreen ?? "")) {
+    return <Redirect href="/(onboarding)/entry" />;
+  }
   if (status.kind === "ready" && !onSetupScreen) {
     return <Redirect href="/(tabs)" />;
   }

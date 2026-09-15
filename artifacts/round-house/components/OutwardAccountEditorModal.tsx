@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useRouter } from "expo-router";
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
@@ -37,6 +38,7 @@ export function OutwardAccountEditorModal({
   onSaved,
 }: Props) {
   const colors = useColors();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const { refetchOutwardAccounts, refetchProfile, outwardAccounts } =
     useProfile();
@@ -75,27 +77,8 @@ export function OutwardAccountEditorModal({
 
   const onSubmit = async (values: OutwardAccountFormValues) => {
     if (mode.kind === "create") {
-      const created = await createMutation.mutateAsync({
-        data: {
-          kind: values.kind,
-          title: values.title,
-          displayName: values.displayName,
-          bannerUrl: values.bannerUrl,
-          companyName: values.companyName.trim()
-            ? values.companyName.trim()
-            : null,
-          bio: values.bio.trim() ? values.bio.trim() : null,
-          lastInitialOnly: values.lastInitialOnly,
-          makeActive: activate,
-        },
-      });
-      await Promise.all([refetchOutwardAccounts(), refetchProfile()]);
-      if (activate) {
-        // Re-scope every other read in the app to the new persona.
-        await queryClient.invalidateQueries();
-      }
-      onSaved?.(created);
       onClose();
+      router.push("/(onboarding)/entry");
     } else {
       const updated = await updateMutation.mutateAsync({
         id: mode.account.id,

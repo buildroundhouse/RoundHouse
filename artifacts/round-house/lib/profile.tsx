@@ -63,6 +63,19 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       headers: { "x-active-outward-account-id": String(accountId) },
     }),
   });
+  const historyMode = modesQuery.data?.modes.find((mode) =>
+    mode.kind === "collab" && (mode.intakeData as Record<string, unknown> | undefined)?.roleTitle === "History Viewer",
+  );
+  const historyAccount = outwardQuery.data?.accounts.find((account) => account.sourceUserModeId === historyMode?.id);
+  const historyFallbackRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!verifyMembership || !accountId || membershipQuery.isPending || membershipQuery.isError || hasApprovedEntity(membershipQuery.data?.entities)) return;
+    if (!historyMode || !historyAccount || selectedMode?.id === historyMode.id || historyFallbackRef.current === historyMode.id) return;
+    historyFallbackRef.current = historyMode.id;
+    void customFetch("/api/users/me/active-mode", {
+      method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ modeId: historyMode.id }),
+    }).then(() => Promise.all([modesQuery.refetch(), outwardQuery.refetch()])).finally(() => { historyFallbackRef.current = null; });
+  }, [verifyMembership, accountId, membershipQuery.isPending, membershipQuery.isError, membershipQuery.data, historyMode?.id, historyAccount?.id, selectedMode?.id]);
 
   const value = useMemo<ProfileContextValue>(() => {
     const profile = (meQuery.data ?? null) as UserProfile | null;
@@ -106,15 +119,21 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       status = { kind: "needs-mode-picker" };
     } else if (!activeMode) {
       status = { kind: "needs-mode-picker" };
+    } else if (!activeMode.intakeCompletedAt) {
+      // Draft intake is resumable before membership exists. It cannot become
+      // ready until ACTIVATE creates or receives an approved membership.
+      status = { kind: "needs-intake", mode: activeMode };
     } else if (verifyMembership && (outwardQuery.isError || membershipQuery.isError)) {
       status = { kind: "error", retry: () => { void outwardQuery.refetch(); if (accountId) void membershipQuery.refetch(); } };
     } else if (verifyMembership && (outwardQuery.isPending || (!!accountId && membershipQuery.isPending))) {
       status = { kind: "loading" };
+    } else if (verifyMembership && !hasApprovedEntity(membershipQuery.data?.entities) && historyMode && historyAccount) {
+      // A returning person whose final working relationship ended retains
+      // their private History, without reopening the former working record.
+      status = { kind: "loading" };
     } else if (verifyMembership && (!accountId || !hasApprovedEntity(membershipQuery.data?.entities))) {
       // A legacy auto-completed personal baseline is not space intake.
       status = { kind: "needs-mode-picker" };
-    } else if (!activeMode.intakeCompletedAt) {
-      status = { kind: "needs-intake", mode: activeMode };
     } else {
       status = { kind: "ready", mode: activeMode };
     }
@@ -152,6 +171,8 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     membershipQuery.data,
     membershipQuery.isPending,
     membershipQuery.isError,
+    historyMode,
+    historyAccount,
     verifyMembership,
     accountId,
     isLoaded,
@@ -168,7 +189,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   const lastPingedRef = useRef<string | null>(null);
   useEffect(() => {
     const profile = value.profile;
-    if (!profile?.clerkId) return;
+    if (!profile?.clerkId || value.status.kind !== "ready" || value.activeOutwardAccount?.title === "History Viewer") return;
     const now = new Date();
     const localDate =
       now.getFullYear() +
@@ -183,7 +204,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       method: "POST",
       body: JSON.stringify({ localDate, localHour: now.getHours() }),
     }).catch(() => { /* non-fatal */ });
-  }, [value.profile]);
+  }, [value.profile, value.status.kind, value.activeOutwardAccount?.title]);
 
   return <ProfileContext.Provider value={value}>{children}</ProfileContext.Provider>;
 }

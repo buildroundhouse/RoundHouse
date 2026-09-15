@@ -27,7 +27,8 @@ import { z } from "zod/v4";
 export type EntityKind =
   | "business"
   | "residential_property"
-  | "commercial_property";
+  | "commercial_property"
+  | "history";
 
 export const entitiesTable = pgTable(
   "entities",

@@ -19,7 +19,7 @@ describe("saved identity checkpoint", () => {
   });
   it("resumes the unfinished space instead of reopening identity", () => {
     state.mode = { id: 42, kind: "home", intakeCompletedAt: null };
-    expect(OnboardingLayout().props.href).toEqual({ pathname: "/(onboarding)/intake", params: { modeId: "42", kind: "home" } });
+    expect(OnboardingLayout().props.href).toEqual({ pathname: "/(onboarding)/entry" });
   });
   it("uses entity selection when only the legacy baseline exists", () => {
     state.mode = { id: 1, kind: "collab", intakeCompletedAt: "2026-09-14" };
@@ -27,7 +27,7 @@ describe("saved identity checkpoint", () => {
   });
   it("does not reset completed identity while moving between space screens", () => {
     state.segment = "entry-role";
-    expect(OnboardingLayout().props.href).toBeUndefined();
+    expect(OnboardingLayout().props.href).toBe("/(onboarding)/entry");
   });
   it("still requires first-time users to save identity", () => {
     state.profile.identityCompletedAt = null;

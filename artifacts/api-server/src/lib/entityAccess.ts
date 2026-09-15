@@ -9,8 +9,12 @@
  * `sharedEntityIds` returns the entity ids both viewers participate
  * in. Used wherever we need the "do these two interact?" check.
  */
-import { and, eq, inArray, isNull } from "drizzle-orm";
-import { db, entityMembersTable, outwardAccountsTable } from "@workspace/db";
+import { and, eq, inArray, isNull, ne, or } from "drizzle-orm";
+import { db, entitiesTable, entityMembersTable, outwardAccountsTable } from "@workspace/db";
+
+function availableTo(userClerkId: string) {
+  return and(isNull(entitiesTable.archivedAt), or(ne(entitiesTable.kind, "history"), eq(entitiesTable.createdByUserClerkId, userClerkId)));
+}
 
 /** True iff the user is an approved member of the entity. */
 export async function canParticipateInEntity(
@@ -20,12 +24,14 @@ export async function canParticipateInEntity(
   const [row] = await db
     .select({ id: entityMembersTable.id })
     .from(entityMembersTable)
+    .innerJoin(entitiesTable, eq(entitiesTable.id, entityMembersTable.entityId))
     .where(
       and(
         eq(entityMembersTable.entityId, entityId),
         eq(entityMembersTable.userClerkId, userClerkId),
         eq(entityMembersTable.status, "approved"),
         isNull(entityMembersTable.archivedAt),
+        availableTo(userClerkId),
       ),
     )
     .limit(1);
@@ -38,18 +44,20 @@ export async function getApprovedMembership(
   entityId: number,
 ) {
   const [row] = await db
-    .select()
+    .select({ membership: entityMembersTable })
     .from(entityMembersTable)
+    .innerJoin(entitiesTable, eq(entitiesTable.id, entityMembersTable.entityId))
     .where(
       and(
         eq(entityMembersTable.entityId, entityId),
         eq(entityMembersTable.userClerkId, userClerkId),
         eq(entityMembersTable.status, "approved"),
         isNull(entityMembersTable.archivedAt),
+        availableTo(userClerkId),
       ),
     )
     .limit(1);
-  return row ?? null;
+  return row?.membership ?? null;
 }
 
 /** Entity ids the given user participates in (status='approved'). */
@@ -59,11 +67,13 @@ export async function approvedEntityIdsFor(
   const rows = await db
     .select({ entityId: entityMembersTable.entityId })
     .from(entityMembersTable)
+    .innerJoin(entitiesTable, eq(entitiesTable.id, entityMembersTable.entityId))
     .where(
       and(
         eq(entityMembersTable.userClerkId, userClerkId),
         eq(entityMembersTable.status, "approved"),
         isNull(entityMembersTable.archivedAt),
+        availableTo(userClerkId),
       ),
     );
   return [...new Set(rows.map((r) => r.entityId))];

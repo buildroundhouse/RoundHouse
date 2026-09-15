@@ -105,7 +105,7 @@ beforeAll(async () => {
       role: "employee",
       isAdmin: false,
       permissions: {},
-      status: "invited",
+      status: "pending",
     },
   ]);
 });
@@ -168,7 +168,7 @@ describe("company notice push fan-out (#474)", () => {
     // Remove every seat so the owner is the lone teammate.
     await db
       .update(teamSeatsTable)
-      .set({ removedAt: new Date(), status: "removed" })
+      .set({ removedAt: new Date() })
       .where(eq(teamSeatsTable.companyOutwardAccountId, companyId));
 
     const res = await request(app)
